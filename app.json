@@ -1,6 +1,6 @@
 {
   "expo": {
-    "scheme": "acme",
+    "scheme": "littleapemovies",
     "userInterfaceStyle": "automatic",
     "orientation": "default",
     "web": {
@@ -8,14 +8,28 @@
       "bundler": "metro"
     },
     "plugins": [
+      ["expo-build-properties", {
+        "ios": { "newArchEnabled" : true}
+      }],
       [
         "expo-router",
-        {
+               {
           "origin": "https://n"
         }
-      ]
+      ],
+      "expo-font",
+      "expo-secure-store"
     ],
     "name": "little-ape-movies",
-    "slug": "little-ape-movies"
+    "slug": "little-ape-movies",
+    "experiments": {
+      "typedRoutes": true
+    },
+    "android": {
+      "package": "com.markmccoid.littleapemovies"
+    },
+    "ios": {
+      "bundleIdentifier": "com.markmccoid.littleapemovies"
+    }
   }
 }

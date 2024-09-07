@@ -1,0 +1,23 @@
+import React, { createContext } from "react";
+import { View, useColorScheme } from "react-native";
+// import { useColorScheme } from "nativewind";
+import { themes } from "../../utils/color-theme";
+
+interface ThemeProviderProps {
+  children: React.ReactNode;
+}
+export const ThemeContext = createContext<{
+  theme: "light" | "dark";
+}>({
+  theme: "light",
+});
+export const ThemeProvider = ({ children }: ThemeProviderProps) => {
+  const colorScheme = useColorScheme() || "light";
+  return (
+    <ThemeContext.Provider value={{ theme: colorScheme }}>
+      <View style={themes[colorScheme]} className="flex-1">
+        {children}
+      </View>
+    </ThemeContext.Provider>
+  );
+};
