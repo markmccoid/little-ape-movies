@@ -1,8 +1,6 @@
-import { View, Text } from "react-native";
 import React from "react";
 import { Stack } from "expo-router";
-import useMovieStore from "@/store/movieStore";
-import { getCurrentUser } from "@/store/localStorage-users";
+import { getCurrentUser } from "@/store/dataAccess/localStorage-users";
 
 const AuthLayout = () => {
   React.useEffect(() => {

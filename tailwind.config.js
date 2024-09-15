@@ -24,11 +24,20 @@ module.exports = {
         accent: {
           DEFAULT: "var(--color-accent)",
         },
-        text: "var(--color-text)",
-        card: "var(--color-card)",
+        text: {
+          DEFAULT: "var(--color-text)",
+          inverted: "var(--color-text-inverted)",
+        },
+
+        card: {
+          DEFAULT: "var(--color-card)",
+          inverted: "var(--color-card-inverted)",
+        },
+
         border: "var(--color-border)",
         button: "var(--color-button)",
         buttontext: "var(--color-button-text)",
+        selected: "var(--color-selected)",
         overlay: "var(--color-overlay)",
       },
     },

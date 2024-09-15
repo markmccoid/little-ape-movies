@@ -1,15 +1,17 @@
 import { View, Text } from "react-native";
 import React from "react";
 import { Stack } from "expo-router";
-import { useTheme } from "@react-navigation/native";
+
+import { useCustomTheme } from "@/utils/colorThemes";
 const SignInLayout = () => {
-  const { colors } = useTheme();
+  const { colors } = useCustomTheme();
   return (
     <Stack
       screenOptions={{
         headerStyle: {
-          backgroundColor: colors.primary,
+          backgroundColor: colors.secondary,
         },
+        headerShadowVisible: false,
         headerTintColor: colors.text,
       }}
     >

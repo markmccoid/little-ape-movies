@@ -17,6 +17,20 @@ type Props = {
   color?: string;
   style?: ViewStyle;
 };
+
+//~~ ------------------
+//~~ MOVIE ICONS
+//~~ ------------------
+export const MovieIcon = ({ size = 25, color, style }: Props) => {
+  return <MaterialIcons name="movie" size={size} color={color} style={style} />;
+};
+export const AddCircleIcon = ({ size = 25, color, style }: Props) => {
+  return <Ionicons name="add-circle-outline" size={size} color={color} style={style} />;
+};
+export const RemoveCircleIcon = ({ size = 25, color, style }: Props) => {
+  return <Ionicons name="remove-circle-outline" size={size} color={color} style={style} />;
+};
+
 export const ImageIcon = ({ size = 25, color, style }: Props) => {
   return <Entypo name="image" size={size} color={color} style={style} />;
 };
@@ -218,88 +232,88 @@ export const EditIcon = ({ size = 25, color, style }: Props) => {
 //-- -----------------------------------
 //-- DROPBOX Icons
 //-- -----------------------------------
-export const DropboxIcon = ({ size = 25, color, style }: Props) => {
-  return <FontAwesome name="dropbox" color={color} size={size} style={style} />;
-};
-export const GoogleDriveIcon = ({ size = 25, color, style }: Props) => {
-  return <Entypo name="google-drive" color={color} size={size} style={style} />;
-};
+// export const DropboxIcon = ({ size = 25, color, style }: Props) => {
+//   return <FontAwesome name="dropbox" color={color} size={size} style={style} />;
+// };
+// export const GoogleDriveIcon = ({ size = 25, color, style }: Props) => {
+//   return <Entypo name="google-drive" color={color} size={size} style={style} />;
+// };
 
-export const FolderClosedIcon = ({ size = 25, color, style }: Props) => {
-  return <AntDesign name="folder1" size={size} color={color} style={style} />;
-};
-export const FolderOpenIcon = ({ size = 25, color, style }: Props) => {
-  return <AntDesign name="folderopen" size={size} color={color} style={style} />;
-};
-export const FileAudioIcon = ({ size = 25, color, style }: Props) => {
-  return <FontAwesome5 name="file-audio" size={size} color={color} style={style} />;
-};
-export const FileMovieIcon = ({ size = 25, color, style }: Props) => {
-  return <FontAwesome5 name="file-video" size={size} color={color} style={style} />;
-};
+// export const FolderClosedIcon = ({ size = 25, color, style }: Props) => {
+//   return <AntDesign name="folder1" size={size} color={color} style={style} />;
+// };
+// export const FolderOpenIcon = ({ size = 25, color, style }: Props) => {
+//   return <AntDesign name="folderopen" size={size} color={color} style={style} />;
+// };
+// export const FileAudioIcon = ({ size = 25, color, style }: Props) => {
+//   return <FontAwesome5 name="file-audio" size={size} color={color} style={style} />;
+// };
+// export const FileMovieIcon = ({ size = 25, color, style }: Props) => {
+//   return <FontAwesome5 name="file-video" size={size} color={color} style={style} />;
+// };
 
-export const FileGeneralIcon = ({ size = 25, color, style }: Props) => {
-  return <FontAwesome name="file" size={size} color={color} style={style} />;
-};
+// export const FileGeneralIcon = ({ size = 25, color, style }: Props) => {
+//   return <FontAwesome name="file" size={size} color={color} style={style} />;
+// };
 
-export const CancelIcon = ({ size = 25, color, style }: Props) => {
-  return <MaterialIcons name="cancel" size={size} color={color} style={style} />;
-};
+// export const CancelIcon = ({ size = 25, color, style }: Props) => {
+//   return <MaterialIcons name="cancel" size={size} color={color} style={style} />;
+// };
 
-export const CloudDownloadIcon = ({ size = 25, color, style }: Props) => {
-  return <AntDesign name="clouddownload" size={size} color={color} style={style} />;
-};
+// export const CloudDownloadIcon = ({ size = 25, color, style }: Props) => {
+//   return <AntDesign name="clouddownload" size={size} color={color} style={style} />;
+// };
 
-export const StarFilledIcon = ({ size = 25, color, style }: Props) => {
-  return <FontAwesome name="star" size={size} color={color} style={style} />;
-};
+// export const StarFilledIcon = ({ size = 25, color, style }: Props) => {
+//   return <FontAwesome name="star" size={size} color={color} style={style} />;
+// };
 
-export const StarUnFilledIcon = ({ size = 25, color, style }: Props) => {
-  return <FontAwesome name="star-o" size={size} color={color} style={style} />;
-};
-export const InfoCircleIcon = ({ size = 25, color, style }: Props) => {
-  return <Entypo name="info-with-circle" size={size} color={color} style={style} />;
-};
-export const InfoIcon = ({ size = 25, color, style }: Props) => {
-  return <FontAwesome name="info" size={size} color={color} style={style} />;
-};
+// export const StarUnFilledIcon = ({ size = 25, color, style }: Props) => {
+//   return <FontAwesome name="star-o" size={size} color={color} style={style} />;
+// };
+// export const InfoCircleIcon = ({ size = 25, color, style }: Props) => {
+//   return <Entypo name="info-with-circle" size={size} color={color} style={style} />;
+// };
+// export const InfoIcon = ({ size = 25, color, style }: Props) => {
+//   return <FontAwesome name="info" size={size} color={color} style={style} />;
+// };
 
-export const PowerIcon = ({ size = 25, color, style }: Props) => {
-  return <MaterialCommunityIcons name="power" size={size} color={color} style={style} />;
-};
+// export const PowerIcon = ({ size = 25, color, style }: Props) => {
+//   return <MaterialCommunityIcons name="power" size={size} color={color} style={style} />;
+// };
 
-export const SpeedIcon = ({ size = 25, color, style }: Props) => {
-  return <MaterialIcons name="speed" size={size} color={color} style={style} />;
-};
+// export const SpeedIcon = ({ size = 25, color, style }: Props) => {
+//   return <MaterialIcons name="speed" size={size} color={color} style={style} />;
+// };
 
-export const TimerSandIcon = ({ size = 25, color, style }: Props) => {
-  return <MaterialCommunityIcons name="timer-sand" size={size} color={color} style={style} />;
-};
+// export const TimerSandIcon = ({ size = 25, color, style }: Props) => {
+//   return <MaterialCommunityIcons name="timer-sand" size={size} color={color} style={style} />;
+// };
 
-// Bottom Menu
-export const ListIcon = ({ size = 25, color, style }: Props) => {
-  return <Ionicons name="list-outline" size={size} color={color} style={style} />;
-};
+// // Bottom Menu
+// export const ListIcon = ({ size = 25, color, style }: Props) => {
+//   return <Ionicons name="list-outline" size={size} color={color} style={style} />;
+// };
 
-// Audiobookshelf (abs) icons
+// // Audiobookshelf (abs) icons
 
-export const KeyboardCloseIcon = ({ size = 25, color, style }: Props) => {
-  return <MaterialCommunityIcons name="keyboard-close" size={size} color={color} style={style} />;
-};
-export const NarratedByIcon = ({ size = 25, color, style }: Props) => {
-  return <MaterialCommunityIcons name="account-voice" size={size} color={color} style={style} />;
-};
+// export const KeyboardCloseIcon = ({ size = 25, color, style }: Props) => {
+//   return <MaterialCommunityIcons name="keyboard-close" size={size} color={color} style={style} />;
+// };
+// export const NarratedByIcon = ({ size = 25, color, style }: Props) => {
+//   return <MaterialCommunityIcons name="account-voice" size={size} color={color} style={style} />;
+// };
 
-export const PublishedDateIcon = ({ size = 25, color, style }: Props) => {
-  return (
-    <MaterialCommunityIcons name="calendar-month-outline" size={size} color={color} style={style} />
-  );
-};
+// export const PublishedDateIcon = ({ size = 25, color, style }: Props) => {
+//   return (
+//     <MaterialCommunityIcons name="calendar-month-outline" size={size} color={color} style={style} />
+//   );
+// };
 
-export const SeriesIcon = ({ size = 25, color, style }: Props) => {
-  return <Ionicons name="library-outline" size={size} color={color} style={style} />;
-};
+// export const SeriesIcon = ({ size = 25, color, style }: Props) => {
+//   return <Ionicons name="library-outline" size={size} color={color} style={style} />;
+// };
 
-export const DurationIcon = ({ size = 25, color, style }: Props) => {
-  return <Ionicons name="timer-outline" size={size} color={color} style={style} />;
-};
+// export const DurationIcon = ({ size = 25, color, style }: Props) => {
+//   return <Ionicons name="timer-outline" size={size} color={color} style={style} />;
+// };

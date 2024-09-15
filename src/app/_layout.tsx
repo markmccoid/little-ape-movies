@@ -13,13 +13,14 @@ import * as SplashScreen from "expo-splash-screen";
 import { useColorScheme } from "react-native";
 import { ThemeProvider } from "@react-navigation/native";
 import { CustomLightTheme, CustomDarkTheme } from "../utils/colorThemes";
-import { AuthProvider, useAuth } from "@/store/AuthProvider";
+import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { initTMDB } from "@markmccoid/tmdb_api";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60 * 10000,
+      staleTime: 5 * 10000,
     },
   },
 });
@@ -48,6 +49,9 @@ const InitialLayout = () => {
   //~~ --------------------------
   useEffect(() => {
     const mainInit = async () => {
+      const tmdbKey = process.env.EXPO_PUBLIC_TMDB_API_KEY;
+      if (!tmdbKey) throw new Error("TMDB API Key not defined");
+      await initTMDB(tmdbKey);
       setInitialized(true);
     };
     mainInit();
@@ -61,13 +65,13 @@ const InitialLayout = () => {
   //~~ NOTE: useSegments cannot be used if useRootNavigationState() is being used. Causes infinite loop.
   //~~ ---------------------------------------------
   useEffect(() => {
-    console.log("SEG", segments);
+    // console.log("SEG", segments);
     // Flag telling us if route is going to auth, a protected route
     const inAuthGroup = segments[0] === "(auth)";
     // checking to see if the +not-found route is active.  Note that this is a "special"
     // expo router rouate which is why I'm not checking the segment[0] for +not-found
     const routeNotFound =
-      rootNavigationState.routes[rootNavigationState.index || 0].name === "+not-found" &&
+      rootNavigationState?.routes[rootNavigationState.index || 0].name === "+not-found" &&
       segments.length > 0;
     // If we are NOT logged in (userId NOT present) AND we are trying to go to an auth group, redirect to Sign in page
     if (!user && inAuthGroup) {
@@ -88,11 +92,6 @@ const InitialLayout = () => {
       SplashScreen.hideAsync();
     }
   }, [initialized, loaded]);
-
-  // Not sure if this is needed since it really is same as below.
-  // if (!loaded || !initalized) {
-  //   return <Slot />;
-  // }
 
   return (
     <View style={{ flex: 1 }}>

@@ -1,7 +1,7 @@
 import { View, Text, Pressable, useColorScheme } from "react-native";
 import React from "react";
 import { Link } from "expo-router";
-import { useAuth } from "@/store/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 
 const Settings = () => {
   const { currentUser: user, onLogout } = useAuth();

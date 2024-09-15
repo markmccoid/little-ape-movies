@@ -19,8 +19,10 @@ import { useTheme } from "@react-navigation/native";
 // import Colors from '@/constants/Colors';
 // import { defaultStyles } from '@/constants/Styles';
 import { LinearGradient } from "expo-linear-gradient";
-import { useAuth } from "@/store/AuthProvider";
-import { addNewUser, removeItem } from "@/store/localStorage-users";
+import { useAuth } from "@/providers/AuthProvider";
+import { addNewUser, removeItem } from "@/store/dataAccess/localStorage-users";
+import { useCustomTheme } from "@/utils/colorThemes";
+import { DeleteIcon } from "../common/Icons";
 
 const handleNewUserPrompt = (registerUser: (user: string) => void) => {
   Alert.prompt(
@@ -49,7 +51,7 @@ const handleNewUserPrompt = (registerUser: (user: string) => void) => {
 };
 
 const SignIn = () => {
-  const { colors } = useTheme();
+  const { colors } = useCustomTheme();
   const [loading, setLoading] = useState(false);
   const { initialized, currentUser, onLogin, allUsers, onRegister, onRemoveUser } = useAuth();
 
@@ -80,9 +82,9 @@ const SignIn = () => {
     );
   }
   return (
-    <View className="flex-1 px-10 pt-10 bg-secondary">
+    <View className="flex-1 px-10 pt-10 bg-primary">
       <LinearGradient
-        colors={[colors.primary, colors.secondary]}
+        colors={[colors.secondary, colors.primary]}
         style={{
           position: "absolute",
           left: 0,
@@ -104,21 +106,26 @@ const SignIn = () => {
         className="rounded-[100] border"
         source={require("../../../assets/images/little-ape-movie-image.jpg")}
       />
-      <ScrollView className="max-h-[100] border mb-[20]" contentContainerStyle={{ flexGrow: 1 }}>
+      <ScrollView
+        className="max-h-[100] border mb-[20] bg-card rounded-lg"
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
         {allUsers &&
           allUsers?.length > 0 &&
           allUsers.map((user) => {
             return (
-              <View key={user}>
+              <View key={user} className="bg-card">
                 <View className="flex-row justify-between items-center" key={user}>
                   <TouchableOpacity
                     className="flex-1 px-3 py-2 mr-2"
                     onPress={() => handleLogin(user)}
                   >
-                    <Text className="">{user}</Text>
+                    <Text className="text-text">{user}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => onRemoveUser(user)}>
-                    <Text>X</Text>
+                    <View className="border-l bg-card-inverted p-2">
+                      <DeleteIcon size={15} color={colors.textInverted} />
+                    </View>
                   </TouchableOpacity>
                 </View>
                 <View className="border-b" />

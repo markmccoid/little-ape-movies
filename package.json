@@ -11,6 +11,7 @@
   "dependencies": {
     "@expo-google-fonts/lato": "^0.2.3",
     "@expo/vector-icons": "^14.0.2",
+    "@markmccoid/tmdb_api": "^0.2.11",
     "@react-native-async-storage/async-storage": "^2.0.0",
     "@react-native-community/netinfo": "^11.3.2",
     "@react-navigation/drawer": "^6.7.2",
@@ -27,6 +28,9 @@
     "expo-secure-store": "~13.0.2",
     "expo-splash-screen": "~0.27.4",
     "expo-status-bar": "~1.12.1",
+    "immer": "^10.1.1",
+    "lodash": "^4.17.21",
+    "moti": "^0.29.0",
     "nativewind": "^4.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -36,7 +40,7 @@
     "react-native-mmkv": "^3.0.1",
     "react-native-reanimated": "3.10.0",
     "react-native-safe-area-context": "4.10.1",
-    "react-native-screens": "3.31.1",
+    "react-native-screens": "^3.34.0",
     "react-native-vector-icons": "^10.1.0",
     "react-native-web": "~0.19.10",
     "tailwindcss": "^3.4.0",
@@ -44,6 +48,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@types/lodash": "^4.17.7",
     "@types/react": "~18.2.45",
     "typescript": "~5.3.3"
   },

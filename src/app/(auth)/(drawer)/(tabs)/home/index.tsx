@@ -1,15 +1,15 @@
 import { View, Text, Pressable, useColorScheme, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Link, Stack } from "expo-router";
-import { FilterIcon } from "@/components/common/icons";
+import { FilterIcon } from "@/components/common/Icons";
 import { useTheme } from "@react-navigation/native";
 import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle";
 import MovieContainer from "@/components/movies/movieContainer";
 import { ScrollView } from "react-native-gesture-handler";
 
 import { updateTagFilter } from "@/store/dataHooks";
-import useMovieStore from "@/store/movieStore";
-import { getCurrentUser } from "@/store/localStorage-users";
+import useMovieStore from "@/store/store.movie";
+import { getCurrentUser } from "@/store/dataAccess/localStorage-users";
 
 const Page = () => {
   const { colors } = useTheme();
@@ -17,8 +17,10 @@ const Page = () => {
   // const movies = useMovieData();
   const [state, setState] = useState(false);
   const movies = useMovieStore((state) => state.movies);
-  const addMovie = useMovieStore((state) => state.addMovie);
+
+  const addMovie = useMovieStore((state) => state.actions.addMovie);
   const currUser = getCurrentUser();
+
   return (
     <View className="bg-background flex-1">
       <Stack.Screen

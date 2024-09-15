@@ -7,11 +7,14 @@
   --color-secondary: #b9d0f9;
   --color-accent: #0844a6;
   --color-background: #ebebf0;
-  --color-card: #3a5e96
+  --color-card: #fbfbfe;
+  --color-card-inverted: #010104;
   --color-text: #040316;
-  --color-border: #262323;
+  --color-text-inverted: #eae9fc;
+  --color-border: #09080c;
   --color-button: #9fb6db;
   --color-button-text: #040316;  
+  --color-selected: #90ee90;
   --color-overlay: rgba(0, 0, 0, .05);
 }
 
@@ -22,10 +25,13 @@
     --color-accent: #5996f7;
     --color-background: #0f0f14;
     --color-card: #010104;
+    --color-card-inverted: #fbfbfe;
     --color-text: #eae9fc;
-    --color-border: #cccccc;
+    --color-text-inverted: #040316;
+    --color-border: #eae9fc;
     --color-button: #9fb6db;
     --color-button-text: #040316;
+    --color-selected: #2f6b2f;
     --color-overlay: rgba(0, 0, 0, .05);
   }
 }

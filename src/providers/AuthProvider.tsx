@@ -7,9 +7,9 @@ import {
   signOut,
   removeUser,
   getCurrentUser,
-} from "./localStorage-users";
-import { deleteUserStorage, initCurrentUserStorage } from "./storageAdapter";
-import useMovieStore from "./movieStore";
+} from "@/store/dataAccess/localStorage-users";
+import { deleteUserStorage, initCurrentUserStorage } from "@/store/dataAccess/storageAdapter";
+import useMovieStore from "@/store/store.movie";
 
 type AuthProps = {
   currentUser: string | undefined;

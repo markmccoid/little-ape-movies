@@ -5,7 +5,7 @@ import { DrawerToggleButton } from "@react-navigation/drawer";
 
 const Page1Layout = () => {
   return (
-    <Stack screenOptions={{}}>
+    <Stack>
       <Stack.Screen name="index" />
       <Stack.Screen name="[movieId]" />
       <Stack.Screen name="subpage2" />

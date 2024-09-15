@@ -1,5 +1,4 @@
 import { MMKV } from "react-native-mmkv";
-const sample = require("../../assets/moviesamples.json");
 
 type Movies = {
   id: string;
@@ -23,20 +22,20 @@ type AuthedStorage = {
 };
 let storage: MMKV | undefined;
 //~~ Initialize the storage --------------------------------------
-export const initCurrentUserStorage = (currentUser: string) => {
-  // If the user is undefined return a null storage object (We really don't need to return anything.)
-  if (!currentUser) {
-    storage = undefined;
-    return storage;
-  }
-  storage = new MMKV({
-    id: `${currentUser}.storage`,
-  });
+// export const initCurrentUserStorage = (currentUser: string) => {
+//   // If the user is undefined return a null storage object (We really don't need to return anything.)
+//   if (!currentUser) {
+//     storage = undefined;
+//     return storage;
+//   }
+//   storage = new MMKV({
+//     id: `${currentUser}.storage`,
+//   });
 
-  // setAuthedItem("movies", JSON.stringify(sample));
-  setAuthedItem("test", "testString");
-  return storage;
-};
+//   // setAuthedItem("movies", JSON.stringify(sample));
+//   setAuthedItem("test", "testString");
+//   return storage;
+// };
 
 export const getAuthedStorage = () => storage;
 //~~ SET ----------------------------------------------------------------

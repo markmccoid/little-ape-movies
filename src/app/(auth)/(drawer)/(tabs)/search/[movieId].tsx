@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React, { useEffect } from "react";
 import { Link, Stack, useGlobalSearchParams, useNavigation } from "expo-router";
-import MovieDetails from "@/components/movieDetails/MovieDetails";
+import MovieDetails from "@/components/movies/MovieDetails";
 
 const MovieDetailSearch = () => {
   const { movieId } = useGlobalSearchParams<{ movieId: string }>();
@@ -11,7 +11,7 @@ const MovieDetailSearch = () => {
     navigation.setOptions({ title: `Movie - ${movieId}` });
   }, []);
 
-  return <MovieDetails movieId={movieId} newMovie={newMovie} />;
+  return <MovieDetails movieId={movieId} />;
 };
 
 export default MovieDetailSearch;
