@@ -43,7 +43,7 @@ const MovieImage = ({
   return (
     <View>
       <Image
-        className="border rounded-lg rounded-b-none"
+        className="border-hairline border-border rounded-lg rounded-b-none"
         source={{ uri: posterURL }}
         style={{ width: imageWidth, height: imageHeight, resizeMode, ...imageStyle }}
       />

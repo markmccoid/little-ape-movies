@@ -10,6 +10,7 @@ import {
 } from "@/store/dataAccess/localStorage-users";
 import { deleteUserStorage, initCurrentUserStorage } from "@/store/dataAccess/storageAdapter";
 import useMovieStore from "@/store/store.movie";
+import { eventBus } from "@/store/eventBus";
 
 type AuthProps = {
   currentUser: string | undefined;
@@ -42,11 +43,14 @@ export const AuthProvider = ({ children }: any) => {
 
   useEffect(() => {
     const currUser = getCurrentUser();
+    eventBus.publish("CLEAR_SEARCH_STORES");
     // This sets storageAdapter for Zustand Persist Middleware
     initCurrentUserStorage(currUser);
 
     // Clear store if NO user and then rehydrate
-    if (!currUser) useMovieStore.getState().clearStore();
+    if (!currUser) {
+      useMovieStore.getState().actions.clearStore();
+    }
     useMovieStore.persist.rehydrate();
 
     setCurrentUser(currUser);
@@ -56,11 +60,14 @@ export const AuthProvider = ({ children }: any) => {
 
   //~ LOGIN -------------------------------------------
   const handleLogin = (user: string) => {
+    eventBus.publish("CLEAR_SEARCH_STORES");
     // Stores the selected user in MMKV currentUser Storage
     signIn(user);
     // Inits the Authed storage MMKV with currenUser name
     initCurrentUserStorage(user);
-    if (!user) useMovieStore.getState().clearStore();
+    if (!user) {
+      useMovieStore.getState().actions.clearStore();
+    }
     useMovieStore.persist.rehydrate();
     // Current user exposed in the Auth Context
     setCurrentUser(user);

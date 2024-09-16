@@ -5,7 +5,7 @@
  *
  */
 type Listener = (...args: any[]) => void;
-type Events = "TAG_SEARCH_RESULTS";
+type Events = "TAG_SEARCH_RESULTS" | "CLEAR_SEARCH_STORES";
 class EventBus {
   private listeners: { [event: string]: Listener[] } = {};
 

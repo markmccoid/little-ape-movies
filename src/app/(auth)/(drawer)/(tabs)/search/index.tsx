@@ -34,8 +34,8 @@ const SearchPage = () => {
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: true,
-      // title: "Search",
-      // headerLeft: () => <NestedStackDrawerToggle />,
+      title: "Search",
+      headerLeft: () => <NestedStackDrawerToggle />,
       headerSearchBarOptions: {
         autoCapitalize: "none",
         placeholder: "Search Title",

@@ -40,9 +40,7 @@ export const useSearchResults = () => {
 
   useEffect(() => {
     // Cancel previous query if a new searchVal is provided.
-    console.log("Canceling query", prevSearchVal.current, searchVal);
     if (prevSearchVal?.current && prevSearchVal.current !== searchVal) {
-      console.log("REAL CANC");
       queryClient.cancelQueries({ queryKey: ["moviesearch", prevSearchVal] });
     }
     prevSearchVal.current = searchVal;

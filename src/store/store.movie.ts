@@ -19,16 +19,18 @@ export interface MovieStore {
     addMovie: (movie: movieSearchByTitle_Results) => void;
     updateMovie: (id: number, updatedMovie: Partial<movieSearchByTitle_Results>) => void;
     removeMovie: (id: number) => void;
-    getMovieById: (id: number) => movieSearchByTitle_Results[];
+    getMovieById: (id: number) => movieSearchByTitle_Results | undefined;
     clearStore: () => void;
   };
 }
 console.log("Movie Store Loaded");
-
+const movieInitialState = {
+  movies: [],
+};
 const useMovieStore = create<MovieStore>()(
   persist(
     (set, get) => ({
-      movies: [],
+      ...movieInitialState,
       actions: {
         addMovie: (movie) => {
           if (
@@ -60,7 +62,7 @@ const useMovieStore = create<MovieStore>()(
       storage: createJSONStorage(() => StorageAdapter),
       partialize: (state) => ({ movies: state.movies }),
       onRehydrateStorage: (state) => {
-        console.log("Rehydrating", state);
+        console.log("Rehydrating", state.movies.length);
       },
     }
   )
@@ -69,4 +71,5 @@ const useMovieStore = create<MovieStore>()(
 const doesMovieExist = (allMovies: number[], movieToCheck: number) => {
   return allMovies.includes(movieToCheck);
 };
+
 export default useMovieStore;

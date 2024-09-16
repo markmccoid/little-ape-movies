@@ -23,7 +23,7 @@ const SearchContainer = () => {
   };
 
   return (
-    <View className="flex-1 mt-2">
+    <View className="flex-1 mt-2" style={{ marginTop: 2 }}>
       <FlatList
         data={movies}
         renderItem={renderItem}

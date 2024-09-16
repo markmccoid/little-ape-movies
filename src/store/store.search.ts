@@ -24,6 +24,13 @@ type SearchStore = {
     setTotalPages: (totalPages: number) => void;
   };
 };
+const searchInitialState = {
+  results: [],
+  searchVal: undefined,
+  currentPage: 1,
+  lastProcessedPage: 0,
+  totalPages: 1,
+};
 export const useSearchStore = create<SearchStore>((set, get) => ({
   results: [],
   searchVal: undefined,
@@ -69,4 +76,9 @@ eventBus.subscribe("TAG_SEARCH_RESULTS", () => {
   useSearchStore.setState((state) => ({
     results: tagSavedMovies(state.results, savedMovies),
   }));
+});
+
+eventBus.subscribe("CLEAR_SEARCH_STORES", () => {
+  console.log("Clearing search state");
+  useSearchStore.setState({ ...searchInitialState });
 });
