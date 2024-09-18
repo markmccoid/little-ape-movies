@@ -9,7 +9,7 @@ import {
   getCurrentUser,
 } from "@/store/dataAccess/localStorage-users";
 import { deleteUserStorage, initCurrentUserStorage } from "@/store/dataAccess/storageAdapter";
-import useMovieStore from "@/store/store.movie";
+import useMovieStore from "@/store/store.shows";
 import { eventBus } from "@/store/eventBus";
 
 type AuthProps = {

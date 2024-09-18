@@ -1,7 +1,7 @@
 import { View, Text, Image, Dimensions } from "react-native";
 import React from "react";
 import { FontAwesome } from "@expo/vector-icons";
-import useMovieStore from "@/store/store.movie";
+import useMovieStore from "@/store/store.shows";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { MovieSearchResults } from "@/store/store.search";
 import MovieImage from "../common/MovieImage";
@@ -32,9 +32,9 @@ const SearchResult = ({ movie }: Props) => {
 
   const handleAddRemoveMovie = () => {
     if (movie.existsInSaved) {
-      actions.removeMovie(movie.id);
+      actions.removeShow(movie.id);
     } else {
-      actions.addMovie(movie);
+      actions.addShow(movie);
     }
   };
   return (

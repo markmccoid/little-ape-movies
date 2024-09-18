@@ -4,11 +4,10 @@ import { Link, Stack } from "expo-router";
 import { FilterIcon } from "@/components/common/Icons";
 import { useTheme } from "@react-navigation/native";
 import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle";
-import MovieContainer from "@/components/movies/movieContainer";
+import MoviesContainer from "@/components/movies/MoviesContainer";
 import { ScrollView } from "react-native-gesture-handler";
 
-import { updateTagFilter } from "@/store/dataHooks";
-import useMovieStore from "@/store/store.movie";
+import useMovieStore from "@/store/store.shows";
 import { getCurrentUser } from "@/store/dataAccess/localStorage-users";
 
 const Page = () => {
@@ -16,9 +15,9 @@ const Page = () => {
   // const [movies, setMovies] = useState([]);
   // const movies = useMovieData();
   const [state, setState] = useState(false);
-  const movies = useMovieStore((state) => state.movies);
+  const movies = useMovieStore((state) => state.shows);
 
-  const addMovie = useMovieStore((state) => state.actions.addMovie);
+  const addMovie = useMovieStore((state) => state.actions.addShow);
   const currUser = getCurrentUser();
 
   return (
@@ -112,12 +111,7 @@ const Page = () => {
       <TouchableOpacity onPress={() => addMovie({ id: "2", title: "Lady in the Water" })}>
         <Text className="text-text">ADD MOVIE 2</Text>
       </TouchableOpacity>
-      <ScrollView>
-        {movies &&
-          movies.map((el, index) => {
-            return <MovieContainer key={index} movie={el} />;
-          })}
-      </ScrollView>
+      <MoviesContainer />
     </View>
   );
 };

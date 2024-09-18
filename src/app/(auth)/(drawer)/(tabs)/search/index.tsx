@@ -16,7 +16,7 @@ import axios from "axios";
 import { ScrollView } from "react-native-gesture-handler";
 import { movieSearchByTitle } from "@markmccoid/tmdb_api";
 import { useSearchStore } from "@/store/store.search";
-import { useSearchResults } from "@/store/query.search";
+import { usePageSearch } from "@/store/query.search";
 import SearchContainer from "@/components/search/SearchContainer";
 
 const SearchPage = () => {

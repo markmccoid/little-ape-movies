@@ -24,6 +24,9 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+SplashScreen.preventAutoHideAsync();
+
 const InitialLayout = () => {
   // true after initialize function done
   const [initialized, setInitialized] = useState(false);

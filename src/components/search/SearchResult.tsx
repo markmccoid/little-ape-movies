@@ -2,7 +2,7 @@ import { View, Text, Dimensions, StyleSheet, TouchableOpacity } from "react-nati
 import React, { useState } from "react";
 import MovieImage from "../common/MovieImage";
 import { MovieSearchResults } from "@/store/store.search";
-import { MovieStore } from "@/store/store.movie";
+import { MovieStore } from "@/store/store.shows";
 import { AddCircleIcon, AddIcon, CheckCircleIcon } from "../common/Icons";
 import { useCustomTheme } from "@/utils/colorThemes";
 import { Link } from "expo-router";
@@ -21,13 +21,14 @@ const imageHeight = imageWidth * 1.5;
 //~~  SearchResult Component
 type Props = {
   movie: MovieSearchResults;
-  onAddMovie: MovieStore["actions"]["addMovie"];
-  onRemoveMovie: MovieStore["actions"]["removeMovie"];
+  onAddMovie: MovieStore["actions"]["addShow"];
+  onRemoveMovie: MovieStore["actions"]["removeShow"];
 };
 const SearchResult = ({ movie, onAddMovie, onRemoveMovie }: Props) => {
   const { colors } = useCustomTheme();
   // const [color, setColor] = useState({ from: "green", to: colors.primary });
   const handleAddRemoveMovie = () => {
+    console.log("movie add/remove", movie.existsInSaved, movie.id);
     if (movie.existsInSaved) {
       // setColor({ from: "green", to: colors.primary });
       onRemoveMovie(movie.id);

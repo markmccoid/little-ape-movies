@@ -1,23 +1,24 @@
 import { View, Text, Image, TouchableOpacity, FlatList } from "react-native";
 import React from "react";
-import { useSearchResults } from "@/store/query.search";
+import { usePageSearch, useSearchResults } from "@/store/query.search";
 import { MovieSearchResults, useSearchStore } from "@/store/store.search";
 import SearchResult from "./SearchResult";
 import MovieImage from "../common/MovieImage";
-import useMovieStore from "@/store/store.movie";
+import useMovieStore from "@/store/store.shows";
 
 const SearchContainer = () => {
-  const { isLoading } = useSearchResults();
-  const movies = useSearchStore((state) => state.results);
-  const { setNextPage } = useSearchStore((state) => state.actions);
+  // const { isLoading } = useSearchResults();
+  const { movies, isLoading, fetchNextPage } = usePageSearch();
+  // const movies = useSearchStore((state) => state.results);
+  // const { setNextPage } = useSearchStore((state) => state.actions);
   const movieActions = useMovieStore((state) => state.actions);
-
+  console.log("MOVIES", movies.length);
   const renderItem = ({ item }: { item: MovieSearchResults }) => {
     return (
       <SearchResult
         movie={item}
-        onAddMovie={movieActions.addMovie}
-        onRemoveMovie={movieActions.removeMovie}
+        onAddMovie={movieActions.addShow}
+        onRemoveMovie={movieActions.removeShow}
       />
     );
   };
@@ -33,7 +34,8 @@ const SearchContainer = () => {
           paddingHorizontal: 15,
         }}
         columnWrapperStyle={{ justifyContent: "space-between" }}
-        onEndReached={setNextPage}
+        onEndReached={fetchNextPage}
+        // onEndReached={setNextPage}
         onEndReachedThreshold={0.5}
         keyboardDismissMode="on-drag" // Dismiss keyboard when scrolling starts
         keyboardShouldPersistTaps="handled" // Prevent keyboard from persisting when tapping on items

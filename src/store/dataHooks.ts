@@ -1,10 +1,10 @@
-import useMovieStore from "./store.movie";
+import useMovieStore from "./store.shows";
 import { movieGetDetails } from "@markmccoid/tmdb_api";
 import { useQuery } from "@tanstack/react-query";
 import { add } from "lodash";
 
 export const useMovieData = (movieId: number) => {
-  const getMovieById = useMovieStore((state) => state.actions.getMovieById); // Replace with your actual selector
+  const getMovieById = useMovieStore((state) => state.actions.getShowById); // Replace with your actual selector
   const storedMovie = getMovieById(movieId);
 
   const fetchAdditionalMovieData = async (id: number) => {

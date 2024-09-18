@@ -1,9 +1,82 @@
 import { movieSearchByTitle, movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { useSearchStore } from "@/store/store.search";
-import useMovieStore from "./store.movie";
+import { MovieSearchResults, useSearchStore } from "@/store/store.search";
+import React from "react";
+import { tagSavedMovies } from "./store.utils";
+import useMovieStore from "./store.shows";
+import { eventBus } from "./eventBus";
 
+export const usePageSearch = () => {
+  const queryClient = useQueryClient();
+  const searchVal = useSearchStore((state) => state.searchVal);
+  const [movies, setMovies] = useState<MovieSearchResults[]>([]);
+  const moviesRef = useRef(movies);
+  // const prevSearchVal = useRef<string | undefined>(undefined);
+  // const currentPage = useSearchStore((state) => state.currentPage);
+  // const lastProcessedPage = useSearchStore((state) => state.lastProcessedPage);
+  // const totalPages = useSearchStore((state) => state.totalPages);
+  const actions = useSearchStore((state) => state.actions);
+
+  //~~ USEQUERY Movie Search Value Hook
+  const { data, isLoading, fetchNextPage } = useInfiniteQuery({
+    queryKey: ["moviesearch", searchVal],
+    queryFn: async ({ pageParam }) => {
+      if (!searchVal) return undefined;
+      return movieSearchByTitle(searchVal, pageParam);
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
+      console.log("LAST", lastPageParam, lastPage?.data.page);
+      if (!lastPage || lastPage?.data.totalPages === lastPage?.data.page) {
+        return undefined;
+      }
+      return lastPageParam + 1;
+    },
+    getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) => {
+      if (!firstPage || firstPageParam <= 1) {
+        return undefined;
+      }
+      return firstPageParam - 1;
+    },
+    // enabled: !!searchVal && !!(totalPages >= currentPage) && !!(lastProcessedPage < currentPage),
+  });
+
+  //!! Pub/Sub tagging of data
+  useEffect(() => {
+    const handleExternalEvent = () => {
+      const taggedMovies = tagSavedMovies(moviesRef.current, useMovieStore.getState().shows);
+      setMovies(taggedMovies);
+    };
+    // Subscribe to the Tag result event
+    const unsubFunc = eventBus.subscribe("TAG_SEARCH_RESULTS", handleExternalEvent);
+    return unsubFunc;
+  }, []);
+
+  //~~ Whenever we get new data we get the results and combine to a single array
+  //~~ The infiniteQuery returns the data in separate pages keys on the data object.
+  //~~ We have to run the .filter() to get rid of undefined values.
+  useEffect(() => {
+    const moviesHold =
+      (data?.pages
+        .flatMap((page) => page?.data.results)
+        .filter((el) => el) as MovieSearchResults[]) || [];
+    // Tag with existsInSaved key
+    const taggedMovies = tagSavedMovies(moviesHold, useMovieStore.getState().shows);
+    setMovies(taggedMovies);
+    // Need to store a ref so it can be used in the eventBus callback
+    moviesRef.current = taggedMovies;
+  }, [data]);
+  // Flatten Data
+  // const moviesHold: MovieSearchResults[] = React.useMemo(() => {
+  //   if (!data) return [];
+  //   return data.pages
+  //     .flatMap((page) => page?.data.results)
+  //     .filter((el) => el) as MovieSearchResults[];
+  // }, [data]);
+
+  return { movies, isLoading, fetchNextPage };
+};
 /**
  *
  * My thought is to have a hook that accepts a title(searchValue) and nextPage bool -> default "false"
@@ -51,6 +124,7 @@ export const useSearchResults = () => {
     if (isLoading) return;
     const newResults = data?.data?.results ?? [];
     const totalPages = data?.data?.totalPages ?? 0;
+
     actions.setTotalPages(totalPages);
 
     if (currentPage === 1) {

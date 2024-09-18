@@ -75,11 +75,7 @@ const SignIn = () => {
   // Also if there IS a user and we are initialize (but haven't moved to auth route)
   // still don't show the login screen.  This keeps the login screen from flashing.
   if (!initialized || (currentUser && initialized)) {
-    return (
-      <View>
-        <Text className="font-extrabold text-4xl">LOADING</Text>
-      </View>
-    );
+    return null; // <View>{/* <Text className="font-extrabold text-4xl"></Text> */}</View>;
   }
   return (
     <View className="flex-1 px-10 pt-10 bg-primary">

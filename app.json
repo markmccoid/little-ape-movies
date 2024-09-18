@@ -7,6 +7,12 @@
       "output": "static",
       "bundler": "metro"
     },
+    "icon": "./assets/images/appicon.png",
+    "splash": {
+      "image": "./assets/images/StartupScreen.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "plugins": [
       ["expo-build-properties", {
         "ios": { "newArchEnabled" : true}

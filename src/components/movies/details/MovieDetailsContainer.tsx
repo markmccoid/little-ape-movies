@@ -1,12 +1,13 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { Link, useNavigation } from "expo-router";
-import MovieImage from "../common/MovieImage";
+import MovieImage from "@/components/common/MovieImage";
 import { useMovieData } from "@/store/dataHooks";
-import useMovieStore from "@/store/store.movie";
+import useMovieStore from "@/store/store.shows";
 
-const MovieDetails = ({ movieId }: { movieId: number }) => {
+const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const navigation = useNavigation();
+
   const { data: movie, isLoading } = useMovieData(movieId);
   if (isLoading)
     return (
@@ -26,4 +27,4 @@ const MovieDetails = ({ movieId }: { movieId: number }) => {
   );
 };
 
-export default MovieDetails;
+export default MovieDetailsContainer;

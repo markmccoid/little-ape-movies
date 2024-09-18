@@ -1,6 +1,6 @@
 import { movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
 import { create } from "zustand";
-import useMovieStore from "./store.movie";
+import useMovieStore from "./store.shows";
 import { eventBus } from "./eventBus";
 import { tagSavedMovies } from "./store.utils";
 
@@ -72,7 +72,7 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
 //~~  - A movie is removed from saved
 //~~ =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 eventBus.subscribe("TAG_SEARCH_RESULTS", () => {
-  const savedMovies = useMovieStore.getState().movies;
+  const savedMovies = useMovieStore.getState().shows;
   useSearchStore.setState((state) => ({
     results: tagSavedMovies(state.results, savedMovies),
   }));

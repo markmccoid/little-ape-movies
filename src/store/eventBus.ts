@@ -14,6 +14,12 @@ class EventBus {
       this.listeners[event] = [];
     }
     this.listeners[event].push(callback);
+    // Return an unsubscribe function
+    return () => {
+      // console.log("UNSUB", this.listeners[event].length);
+      this.listeners[event] = this.listeners[event].filter((cb) => cb !== callback);
+      // console.log("AFTERUNSUB", this.listeners[event].length);
+    };
   }
 
   publish(event: Events, ...args: any[]) {

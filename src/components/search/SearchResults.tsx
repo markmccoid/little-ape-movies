@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Image, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { AddCircleIcon } from "../common/Icons";
 import MovieImage from "../common/MovieImage";
-import useMovieStore from "@/store/store.movie";
+import useMovieStore from "@/store/store.shows";
 import { MovieSearchResults } from "@/store/store.search";
 import { MotiView } from "moti";
 import { useCustomTheme } from "@/utils/colorThemes";
@@ -43,10 +43,10 @@ const ImageWithOverlay = ({ movie }: Props) => {
   const handleAddRemoveMovie = () => {
     if (movie.existsInSaved) {
       setColor({ from: "green", to: colors.primary });
-      actions.removeMovie(movie.id);
+      actions.removeShow(movie.id);
     } else {
       setColor({ from: colors.primary, to: "green" });
-      actions.addMovie(movie);
+      actions.addShow(movie);
     }
   };
   return (

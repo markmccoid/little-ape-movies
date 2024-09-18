@@ -1,6 +1,11 @@
 import React from "react";
 import { View, Text, StyleSheet, SafeAreaView } from "react-native";
-import { DrawerContentScrollView, DrawerItem, DrawerItemList } from "@react-navigation/drawer";
+import {
+  DrawerContentComponentProps,
+  DrawerContentScrollView,
+  DrawerItem,
+  DrawerItemList,
+} from "@react-navigation/drawer";
 import { useAuth } from "@/providers/AuthProvider";
 import { SymbolView } from "expo-symbols";
 import { Link, useNavigation, usePathname, useRouter } from "expo-router";
@@ -9,7 +14,7 @@ import { useCustomTheme } from "@/utils/colorThemes";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { FilterIcon } from "../common/Icons";
 
-function CustomDrawerContent(props) {
+function CustomDrawerContent(props: DrawerContentComponentProps) {
   const { currentUser, onLogout } = useAuth();
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
@@ -19,7 +24,7 @@ function CustomDrawerContent(props) {
     <View className="flex-1 bg-secondary">
       {/* HEADER */}
       <View
-        className="p-[20] flex-row items-center gap-3 border-b border-border"
+        className="p-[20] flex-row items-center gap-4 border-b border-border"
         style={{ marginTop: insets.top }}
       >
         <SymbolView name="person.fill" type="palette" colors={[colors.primary, colors.primary]} />
@@ -27,11 +32,12 @@ function CustomDrawerContent(props) {
       </View>
       {/* HOME and SETTINGS Links */}
       <View className="bg-card">
-        <Link href="/home" className="m-2 ">
+        <Link href="/home" className="mt-2 mx-2">
           <View
-            className={`p-[10] bg-card flex-row items-center gap-3 w-full rounded-lg ${
+            className={`px-[10] py-[5] bg-card flex-row items-center gap-3 rounded-lg w-full ${
               pathname === "/home" && "bg-secondary"
             }`}
+            style={{ margin: 10 }}
           >
             <SymbolView
               name="house"
@@ -43,9 +49,12 @@ function CustomDrawerContent(props) {
             <Text className="text-lg text-text">Home</Text>
           </View>
         </Link>
-        <Link href="/settings" className="m-2 ">
+        {/* Divider Line */}
+        <View className="w-full border-b-hairline" />
+
+        <Link href="/settings" className="m-2  mx-2">
           <View
-            className={`p-[10] bg-card flex-row items-center gap-3 w-full rounded-lg ${
+            className={`px-[10] py-[5] bg-card flex-row items-center gap-3 w-full rounded-lg ${
               pathname === "/settings" && "bg-secondary"
             }`}
           >
@@ -73,10 +82,10 @@ function CustomDrawerContent(props) {
       </DrawerContentScrollView>
       <View style={{ height: insets.bottom + 50 }}>
         <TouchableOpacity onPress={onLogout}>
-          <View className="h-[50] p-3 flex-row gap-3 items-center">
+          <View className="h-[50] px-[20] py-[10] flex-row gap-4 items-center">
             <SymbolView
               name="rectangle.portrait.and.arrow.right.fill"
-              size={24}
+              size={28}
               weight="bold"
               type="palette"
               colors={[colors.text, colors.text]}

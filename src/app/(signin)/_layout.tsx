@@ -16,10 +16,6 @@ const SignInLayout = () => {
       }}
     >
       <Stack.Screen name="index" options={{ title: "Little Ape Movies" }} />
-      <Stack.Screen
-        name="register"
-        options={{ title: "Little Ape Movies Register", headerBackTitle: "Login" }}
-      />
     </Stack>
   );
 };
