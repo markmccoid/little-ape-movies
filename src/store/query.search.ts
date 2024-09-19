@@ -1,4 +1,8 @@
-import { movieSearchByTitle, movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
+import {
+  movieSearchByTitle,
+  movieSearchByTitle_Results,
+  searchForPersonId,
+} from "@markmccoid/tmdb_api";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { MovieSearchResults, useSearchStore } from "@/store/store.search";
@@ -10,6 +14,7 @@ import { eventBus } from "./eventBus";
 export const usePageSearch = () => {
   const queryClient = useQueryClient();
   const searchVal = useSearchStore((state) => state.searchVal);
+  const searchType = useSearchStore((state) => state.searchType);
   const [movies, setMovies] = useState<MovieSearchResults[]>([]);
   const moviesRef = useRef(movies);
   // const prevSearchVal = useRef<string | undefined>(undefined);
@@ -18,7 +23,7 @@ export const usePageSearch = () => {
   // const totalPages = useSearchStore((state) => state.totalPages);
   const actions = useSearchStore((state) => state.actions);
 
-  //~~ USEQUERY Movie Search Value Hook
+  //~~ USEINFINITEQUERY TITLE Movie Search Value Hook
   const { data, isLoading, fetchNextPage } = useInfiniteQuery({
     queryKey: ["moviesearch", searchVal],
     queryFn: async ({ pageParam }) => {
@@ -27,7 +32,6 @@ export const usePageSearch = () => {
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-      console.log("LAST", lastPageParam, lastPage?.data.page);
       if (!lastPage || lastPage?.data.totalPages === lastPage?.data.page) {
         return undefined;
       }
@@ -39,6 +43,36 @@ export const usePageSearch = () => {
       }
       return firstPageParam - 1;
     },
+    enabled: searchType === "title",
+    // enabled: !!searchVal && !!(totalPages >= currentPage) && !!(lastProcessedPage < currentPage),
+  });
+
+  //~~ USEINFINITEQUERY Person Movie Search Value Hook
+  const {
+    data: personData,
+    isLoading: personLoading,
+    fetchNextPage: personFetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["personSearch", searchVal],
+    queryFn: async ({ pageParam }) => {
+      console.log("searchval person", searchVal);
+      if (!searchVal) return undefined;
+      return searchForPersonId(searchVal, pageParam);
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
+      if (!lastPage || lastPage?.data.totalPages === lastPage?.data.page) {
+        return undefined;
+      }
+      return lastPageParam + 1;
+    },
+    getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) => {
+      if (!firstPage || firstPageParam <= 1) {
+        return undefined;
+      }
+      return firstPageParam - 1;
+    },
+    enabled: searchType === "person",
     // enabled: !!searchVal && !!(totalPages >= currentPage) && !!(lastProcessedPage < currentPage),
   });
 
@@ -57,16 +91,26 @@ export const usePageSearch = () => {
   //~~ The infiniteQuery returns the data in separate pages keys on the data object.
   //~~ We have to run the .filter() to get rid of undefined values.
   useEffect(() => {
-    const moviesHold =
-      (data?.pages
-        .flatMap((page) => page?.data.results)
-        .filter((el) => el) as MovieSearchResults[]) || [];
-    // Tag with existsInSaved key
-    const taggedMovies = tagSavedMovies(moviesHold, useMovieStore.getState().shows);
-    setMovies(taggedMovies);
-    // Need to store a ref so it can be used in the eventBus callback
-    moviesRef.current = taggedMovies;
-  }, [data]);
+    if (searchType === "title") {
+      const moviesHold =
+        (data?.pages
+          .flatMap((page) => page?.data.results)
+          .filter((el) => el) as MovieSearchResults[]) || [];
+      // Tag with existsInSaved key
+      const taggedMovies = tagSavedMovies(moviesHold, useMovieStore.getState().shows);
+      setMovies(taggedMovies);
+      // Need to store a ref so it can be used in the eventBus callback
+      moviesRef.current = taggedMovies;
+    } else if (searchType === "person") {
+      const moviesHold =
+        (personData?.pages
+          .flatMap((page) => page?.data.results)
+          .filter((el) => el) as MovieSearchResults[]) || [];
+      // Tag with existsInSaved key
+      // const taggedMovies = tagSavedMovies(moviesHold, useMovieStore.getState().shows);
+      setMovies(moviesHold);
+    }
+  }, [data, personData]);
   // Flatten Data
   // const moviesHold: MovieSearchResults[] = React.useMemo(() => {
   //   if (!data) return [];

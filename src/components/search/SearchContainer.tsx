@@ -9,7 +9,7 @@ import useMovieStore from "@/store/store.shows";
 const SearchContainer = () => {
   // const { isLoading } = useSearchResults();
   const { movies, isLoading, fetchNextPage } = usePageSearch();
-  // const movies = useSearchStore((state) => state.results);
+  const searchType = useSearchStore((state) => state.searchType);
   // const { setNextPage } = useSearchStore((state) => state.actions);
   const movieActions = useMovieStore((state) => state.actions);
   console.log("MOVIES", movies.length);
@@ -23,6 +23,10 @@ const SearchContainer = () => {
     );
   };
 
+  if (searchType === "person") {
+    console.log("PERSON", movies);
+    return null;
+  }
   return (
     <View className="flex-1 mt-2" style={{ marginTop: 2 }}>
       <FlatList

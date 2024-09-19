@@ -7,57 +7,31 @@ import { tagSavedMovies } from "./store.utils";
 export type MovieSearchResults = movieSearchByTitle_Results & {
   existsInSaved: boolean;
 };
-
+type SearchType = "title" | "person";
 type SearchStore = {
-  results: MovieSearchResults[];
   searchVal: string | undefined;
-  currentPage: number;
-  lastProcessedPage: number;
-  totalPages: number;
+  searchType: SearchType;
   actions: {
     setSearch: (searchVal: string | undefined) => void;
-    setResults: (results: MovieSearchResults[], concatResults?: boolean) => void;
-
-    setCurrentPage: (currentPage: number) => void;
-    setLastProcessedPage: (lastProcessedPage: number) => void;
-    setNextPage: () => void;
-    setTotalPages: (totalPages: number) => void;
+    setSearchType: (searchType: SearchType) => void;
   };
 };
 const searchInitialState = {
-  results: [],
   searchVal: undefined,
-  currentPage: 1,
-  lastProcessedPage: 0,
-  totalPages: 1,
+  searchType: "title",
 };
 export const useSearchStore = create<SearchStore>((set, get) => ({
-  results: [],
   searchVal: undefined,
-  currentPage: 1,
-  lastProcessedPage: 0,
-  totalPages: 1,
-  // This is always the initial state of the search so we must reset our values back to defaults
+  searchType: "title",
+
   actions: {
     setSearch: (searchVal) =>
       set({
-        // results: [],
         searchVal,
-        currentPage: 1,
-        lastProcessedPage: 0,
-        totalPages: 1,
       }),
-    // setSearch: ({ searchVal, currentPage }) => set({ searchVal, currentPage }),
-    setResults: (results, concatResults = false) => {
-      const newResults = concatResults ? [...get().results, ...results] : results;
-      set({ results: newResults });
-      eventBus.publish("TAG_SEARCH_RESULTS");
+    setSearchType: (searchType) => {
+      set({ searchType });
     },
-
-    setCurrentPage: (currentPage) => set({ currentPage }),
-    setLastProcessedPage: (lastProcessedPage) => set({ lastProcessedPage }),
-    setNextPage: () => set({ currentPage: get().currentPage + 1 }),
-    setTotalPages: (totalPages) => set({ totalPages }),
   },
 }));
 

@@ -20,7 +20,8 @@ import { usePageSearch } from "@/store/query.search";
 import SearchContainer from "@/components/search/SearchContainer";
 
 const SearchPage = () => {
-  const { setSearch } = useSearchStore((state) => state.actions);
+  const { setSearch, setSearchType } = useSearchStore((state) => state.actions);
+  const searchType = useSearchStore((state) => state.searchType);
 
   const navigation = useNavigation();
   const searchBarRef = useRef<SearchBarCommands>();
@@ -57,6 +58,20 @@ const SearchPage = () => {
 
   return (
     <SafeAreaView className="flex-1">
+      <View className="flex-row gap-3">
+        <TouchableOpacity
+          onPress={() => setSearchType("title")}
+          className={`p-2 border ${searchType === "title" ? "bg-red-400" : "bg-blue-300"}`}
+        >
+          <Text>Title</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setSearchType("person")}
+          className={`p-2 border ${searchType === "person" ? "bg-red-400" : "bg-blue-300"}`}
+        >
+          <Text>Person</Text>
+        </TouchableOpacity>
+      </View>
       <SearchContainer />
     </SafeAreaView>
   );
