@@ -1,19 +1,22 @@
-import { View, Text, Image, TouchableOpacity, FlatList } from "react-native";
-import React from "react";
-import { usePageSearch, useSearchResults } from "@/store/query.search";
+import { View, Text, Image, FlatList } from "react-native";
+import React, { useCallback } from "react";
+import { FetchNextPageFn } from "@/store/query.search";
 import { MovieSearchResults, useSearchStore } from "@/store/store.search";
-import SearchResult from "./SearchResult";
-import MovieImage from "../common/MovieImage";
+import SearchResult from "@/components/search/SearchResult";
 import useMovieStore from "@/store/store.shows";
 
-const SearchContainer = () => {
+type Props = {
+  movies: MovieSearchResults[];
+  fetchNextPage: FetchNextPageFn<MovieSearchResults[]> | undefined;
+};
+const SearchContainer = ({ movies, fetchNextPage }: Props) => {
   // const { isLoading } = useSearchResults();
-  const { movies, isLoading, fetchNextPage } = usePageSearch();
-  const searchType = useSearchStore((state) => state.searchType);
-  // const { setNextPage } = useSearchStore((state) => state.actions);
+  // const { movies, isLoading, fetchNextPage } = useTitleSearch();
+
   const movieActions = useMovieStore((state) => state.actions);
-  console.log("MOVIES", movies.length);
-  const renderItem = ({ item }: { item: MovieSearchResults }) => {
+  const fetchNextPageFunc = fetchNextPage ? fetchNextPage : () => {};
+
+  const renderItem = ({ item, index }: { item: MovieSearchResults; index: number }) => {
     return (
       <SearchResult
         movie={item}
@@ -23,12 +26,8 @@ const SearchContainer = () => {
     );
   };
 
-  if (searchType === "person") {
-    console.log("PERSON", movies);
-    return null;
-  }
   return (
-    <View className="flex-1 mt-2" style={{ marginTop: 2 }}>
+    <View className="flex-1">
       <FlatList
         data={movies}
         renderItem={renderItem}
@@ -36,9 +35,12 @@ const SearchContainer = () => {
         numColumns={3}
         contentContainerStyle={{
           paddingHorizontal: 15,
+          paddingVertical: 5,
         }}
         columnWrapperStyle={{ justifyContent: "space-between" }}
-        onEndReached={fetchNextPage}
+        onEndReached={({ distanceFromEnd }) => {
+          fetchNextPageFunc();
+        }}
         // onEndReached={setNextPage}
         onEndReachedThreshold={0.5}
         keyboardDismissMode="on-drag" // Dismiss keyboard when scrolling starts

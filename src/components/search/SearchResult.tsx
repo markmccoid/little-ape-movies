@@ -28,7 +28,6 @@ const SearchResult = ({ movie, onAddMovie, onRemoveMovie }: Props) => {
   const { colors } = useCustomTheme();
   // const [color, setColor] = useState({ from: "green", to: colors.primary });
   const handleAddRemoveMovie = () => {
-    console.log("movie add/remove", movie.existsInSaved, movie.id);
     if (movie.existsInSaved) {
       // setColor({ from: "green", to: colors.primary });
       onRemoveMovie(movie.id);
@@ -38,21 +37,35 @@ const SearchResult = ({ movie, onAddMovie, onRemoveMovie }: Props) => {
     }
   };
   return (
-    <View className={`my-1 mb-[20]`} style={{ width: imageWidth + 1, height: imageHeight + 20 }}>
-      <Link href={`./search/${movie.id}`} style={{ zIndex: 0 }}>
-        <View className="border-hairline border-border rounded-lg rounded-b-none">
+    <View
+      className={`my-1 mb-[20] border-hairline border-border rounded-lg`}
+      style={{
+        width: imageWidth + 1,
+        height: imageHeight + 20,
+        shadowColor: colors.border,
+        shadowOffset: { width: 0.5, height: 0.5 },
+        shadowOpacity: 0.8,
+        shadowRadius: 1,
+      }}
+    >
+      <Link href={`/(auth)/(drawer)/(tabs)/search/${movie.id}`} style={{ zIndex: 0 }}>
+        <View>
           <MovieImage
             imageWidth={imageWidth}
             imageHeight={imageHeight}
             posterURL={movie.posterURL}
             title={movie.title}
+            imageStyle={{
+              borderBottomLeftRadius: 0,
+              borderBottomRightRadius: 0,
+            }}
           />
         </View>
       </Link>
       <TouchableOpacity className="flex-1" activeOpacity={0.9} onPress={handleAddRemoveMovie}>
         <View
           style={[{ alignItems: "center", justifyContent: "center", marginTop: -5, height: 20 }]}
-          className={`flex-1 border-hairline border-border rounded-b-lg ${
+          className={`flex-1 border-t-hairline border-t-border rounded-b-lg ${
             movie.existsInSaved ? "bg-selected" : "bg-card"
           }`}
         >

@@ -1,7 +1,13 @@
 import {
+  movieDiscover,
+  movieGetNowPlaying,
+  movieGetPersonCredits,
+  movieGetPopular,
   movieSearchByTitle,
   movieSearchByTitle_Results,
+  SearchForPerson_Results,
   searchForPersonId,
+  searchForPersonId_typedef,
 } from "@markmccoid/tmdb_api";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
@@ -10,8 +16,17 @@ import React from "react";
 import { tagSavedMovies } from "./store.utils";
 import useMovieStore from "./store.shows";
 import { eventBus } from "./eventBus";
+import {
+  InfiniteData,
+  InfiniteQueryObserverResult,
+  FetchNextPageOptions,
+} from "@tanstack/react-query";
 
-export const usePageSearch = () => {
+export type FetchNextPageFn<Data> = (
+  options?: FetchNextPageOptions
+) => Promise<InfiniteQueryObserverResult<InfiniteData<Data>, Error>>;
+
+export const useTitleSearch = () => {
   const queryClient = useQueryClient();
   const searchVal = useSearchStore((state) => state.searchVal);
   const searchType = useSearchStore((state) => state.searchType);
@@ -27,7 +42,9 @@ export const usePageSearch = () => {
   const { data, isLoading, fetchNextPage } = useInfiniteQuery({
     queryKey: ["moviesearch", searchVal],
     queryFn: async ({ pageParam }) => {
-      if (!searchVal) return undefined;
+      if (!searchVal) {
+        return movieGetNowPlaying(pageParam);
+      }
       return movieSearchByTitle(searchVal, pageParam);
     },
     initialPageParam: 1,
@@ -47,12 +64,49 @@ export const usePageSearch = () => {
     // enabled: !!searchVal && !!(totalPages >= currentPage) && !!(lastProcessedPage < currentPage),
   });
 
+  //!! Pub/Sub tagging of data
+  useEffect(() => {
+    const handleExternalEvent = () => {
+      const taggedMovies = tagSavedMovies(moviesRef.current, useMovieStore.getState().shows);
+      setMovies(taggedMovies);
+    };
+    // Subscribe to the Tag result event
+    const unsubFunc = eventBus.subscribe("TAG_SEARCH_RESULTS", handleExternalEvent);
+    return unsubFunc;
+  }, []);
+
+  //~~ Whenever we get new data we get the results and combine to a single array
+  //~~ The infiniteQuery returns the data in separate pages keys on the data object.
+  //~~ We have to run the .filter() to get rid of undefined values.
+  useEffect(() => {
+    const moviesHold =
+      (data?.pages
+        .flatMap((page) => page?.data.results)
+        .filter((el) => el) as MovieSearchResults[]) || [];
+    // Tag with existsInSaved key
+    const taggedMovies = tagSavedMovies(moviesHold, useMovieStore.getState().shows);
+    setMovies(taggedMovies);
+    // Need to store a ref so it can be used in the eventBus callback
+    moviesRef.current = taggedMovies;
+  }, [data]);
+  // Flatten Data
+  // const moviesHold: MovieSearchResults[] = React.useMemo(() => {
+  //   if (!data) return [];
+  //   return data.pages
+  //     .flatMap((page) => page?.data.results)
+  //     .filter((el) => el) as MovieSearchResults[];
+  // }, [data]);
+
+  return { movies, isLoading, fetchNextPage };
+};
+
+export const usePersonSearch = () => {
+  const searchVal = useSearchStore((state) => state.searchVal);
+  const searchType = useSearchStore((state) => state.searchType);
+  const [persons, setPersons] = useState<SearchForPerson_Results[]>([]);
+
   //~~ USEINFINITEQUERY Person Movie Search Value Hook
-  const {
-    data: personData,
-    isLoading: personLoading,
-    fetchNextPage: personFetchNextPage,
-  } = useInfiniteQuery({
+  const { data, isLoading, fetchNextPage } = useInfiniteQuery({
     queryKey: ["personSearch", searchVal],
     queryFn: async ({ pageParam }) => {
       console.log("searchval person", searchVal);
@@ -76,6 +130,39 @@ export const usePageSearch = () => {
     // enabled: !!searchVal && !!(totalPages >= currentPage) && !!(lastProcessedPage < currentPage),
   });
 
+  //~~ Whenever we get new data we get the results and combine to a single array
+  //~~ The infiniteQuery returns the data in separate pages keys on the data object.
+  //~~ We have to run the .filter() to get rid of undefined values.
+  useEffect(() => {
+    const personHold =
+      data?.pages
+        .flatMap((page) => page?.data?.results || [])
+        .filter((el) => el?.popularity > 0.01) || [];
+    // console.log("PersonsHOLD", personHold);
+    setPersons(personHold);
+  }, [data]);
+
+  return { persons, isLoading, fetchNextPage };
+};
+
+export const usePersonMovieSearch = (personId: number) => {
+  // const searchVal = useSearchStore((state) => state.searchVal);
+  // const searchType = useSearchStore((state) => state.searchType);
+  const [movies, setMovies] = useState<MovieSearchResults[]>([]);
+  const moviesRef = useRef(movies);
+
+  //~~ USEQUERY TITLE Movie Search Value Hook
+  const { data, isLoading } = useQuery({
+    queryKey: ["personMovieSearch", personId],
+    queryFn: async () => {
+      if (!personId) return [];
+      return movieGetPersonCredits(personId);
+      // return movieDiscover({ cast: [personId], sortBy: "primary_release_date.desc" }, pageParam);
+      // return movieSearchByTitle(searchVal, pageParam);
+    },
+    // enabled: searchType === "title",
+  });
+
   //!! Pub/Sub tagging of data
   useEffect(() => {
     const handleExternalEvent = () => {
@@ -91,26 +178,35 @@ export const usePageSearch = () => {
   //~~ The infiniteQuery returns the data in separate pages keys on the data object.
   //~~ We have to run the .filter() to get rid of undefined values.
   useEffect(() => {
-    if (searchType === "title") {
-      const moviesHold =
-        (data?.pages
-          .flatMap((page) => page?.data.results)
-          .filter((el) => el) as MovieSearchResults[]) || [];
-      // Tag with existsInSaved key
-      const taggedMovies = tagSavedMovies(moviesHold, useMovieStore.getState().shows);
-      setMovies(taggedMovies);
-      // Need to store a ref so it can be used in the eventBus callback
-      moviesRef.current = taggedMovies;
-    } else if (searchType === "person") {
-      const moviesHold =
-        (personData?.pages
-          .flatMap((page) => page?.data.results)
-          .filter((el) => el) as MovieSearchResults[]) || [];
-      // Tag with existsInSaved key
-      // const taggedMovies = tagSavedMovies(moviesHold, useMovieStore.getState().shows);
-      setMovies(moviesHold);
-    }
-  }, [data, personData]);
+    if (!data?.data?.cast) return;
+
+    const castMovies = data?.data?.cast.map<MovieSearchResults>((member) => ({
+      id: member.movieId,
+      backdropURL: member.backdropURL,
+      genres: member.genres,
+      posterURL: member.posterURL,
+      releaseDate: member.releaseDate,
+      title: member.title,
+      overview: member.overview,
+      existsInSaved: false,
+    }));
+    // const crewMovies = data?.data?.cast.map<MovieSearchResults>(member => ({
+    //   id: member.movieId,
+    //   backdropURL: member.backdropURL,
+    //   genres: member.genres,
+    //   posterURL: member.posterURL,
+    //   releaseDate: member.releaseDate,
+    //   title: member.title,
+    //   overview: member.overview,
+    //   existsInSaved: false
+    // }));
+
+    // Tag with existsInSaved key
+    const taggedMovies = tagSavedMovies(castMovies, useMovieStore.getState().shows);
+    setMovies(taggedMovies);
+    // Need to store a ref so it can be used in the eventBus callback
+    moviesRef.current = taggedMovies;
+  }, [data]);
   // Flatten Data
   // const moviesHold: MovieSearchResults[] = React.useMemo(() => {
   //   if (!data) return [];
@@ -118,8 +214,7 @@ export const usePageSearch = () => {
   //     .flatMap((page) => page?.data.results)
   //     .filter((el) => el) as MovieSearchResults[];
   // }, [data]);
-
-  return { movies, isLoading, fetchNextPage };
+  return { movies, isLoading };
 };
 /**
  *
@@ -135,7 +230,7 @@ export const usePageSearch = () => {
  *
  *  - The "next" page updater MUST also look at the total pages so that we know when to "end" the query pulls
  */
-export const useSearchResults = () => {
+export const useSearchResults__Depricated = () => {
   const queryClient = useQueryClient();
   const searchVal = useSearchStore((state) => state.searchVal);
   const prevSearchVal = useRef<string | undefined>(undefined);

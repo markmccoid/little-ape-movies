@@ -9,7 +9,7 @@ export const useMovieData = (movieId: number) => {
 
   const fetchAdditionalMovieData = async (id: number) => {
     const response = await movieGetDetails(id);
-    console.log("RESPONSE", response);
+    // console.log("RESPONSE", response);
     return response.data;
   };
 

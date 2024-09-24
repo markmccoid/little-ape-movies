@@ -6,22 +6,32 @@ import {
   TouchableOpacity,
   NativeSyntheticEvent,
   TextInputChangeEventData,
+  Button,
+  Pressable,
+  StyleSheet,
 } from "react-native";
 import React, { useCallback, useState, useRef } from "react";
 import { Link, Stack, useNavigation } from "expo-router";
 import { SearchBarCommands } from "react-native-screens";
 import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle";
 import { debounce } from "lodash";
-import axios from "axios";
-import { ScrollView } from "react-native-gesture-handler";
-import { movieSearchByTitle } from "@markmccoid/tmdb_api";
 import { useSearchStore } from "@/store/store.search";
-import { usePageSearch } from "@/store/query.search";
-import SearchContainer from "@/components/search/SearchContainer";
+import PersonSearchContainer from "@/components/search/personSearch/PersonSearchContainer";
+import MovieSearchContainer from "@/components/search/movieTitleSearch/MovieSearchContainer";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useHeaderHeight } from "@react-navigation/elements";
+import { MotiText, MotiView } from "moti";
+import { useCustomTheme } from "@/utils/colorThemes";
 
 const SearchPage = () => {
+  const { colors } = useCustomTheme();
+  const headerHeight = useHeaderHeight();
   const { setSearch, setSearchType } = useSearchStore((state) => state.actions);
+  const searchVal = useSearchStore((state) => state.searchVal);
   const searchType = useSearchStore((state) => state.searchType);
+  const [viewHeight, setViewHeight] = useState(0);
+  const [isSearchEmpty, setIsSearchEmpty] = useState(true);
+  const [hideTypeSelect, setHideTypeSelect] = useState(true);
 
   const navigation = useNavigation();
   const searchBarRef = useRef<SearchBarCommands>();
@@ -32,18 +42,29 @@ const SearchPage = () => {
     }, 300),
     []
   );
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerShown: true,
+      // headerShown: true,
       title: "Search",
       headerLeft: () => <NestedStackDrawerToggle />,
       headerSearchBarOptions: {
+        onFocus: () => setHideTypeSelect(false),
+        onBlur: () => setHideTypeSelect(true),
         autoCapitalize: "none",
-        placeholder: "Search Title",
+        placeholder: "Search",
         ref: searchBarRef,
         hideNavigationBar: false,
-        onChangeText: (event: NativeSyntheticEvent<TextInputChangeEventData>) =>
-          debouncedSetSearchText(event.nativeEvent.text),
+        onChangeText: (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
+          debouncedSetSearchText(event.nativeEvent.text);
+          if (event.nativeEvent.text.length === 0) {
+            setIsSearchEmpty(true);
+            setHideTypeSelect(false);
+          } else {
+            setIsSearchEmpty(false);
+            setHideTypeSelect(true);
+          }
+        },
       },
     });
   }, [navigation]);
@@ -58,21 +79,61 @@ const SearchPage = () => {
 
   return (
     <SafeAreaView className="flex-1">
-      <View className="flex-row gap-3">
-        <TouchableOpacity
-          onPress={() => setSearchType("title")}
-          className={`p-2 border ${searchType === "title" ? "bg-red-400" : "bg-blue-300"}`}
-        >
-          <Text>Title</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setSearchType("person")}
-          className={`p-2 border ${searchType === "person" ? "bg-red-400" : "bg-blue-300"}`}
-        >
-          <Text>Person</Text>
-        </TouchableOpacity>
-      </View>
-      <SearchContainer />
+      <MotiView
+        from={{ translateY: 0 }}
+        animate={{ translateY: isSearchEmpty && !hideTypeSelect ? 1 : -100 }}
+        transition={{
+          type: "timing",
+          duration: 300,
+        }}
+        style={{
+          position: "absolute",
+          top: headerHeight + 7,
+          width: "100%",
+          // height: 40,
+          backgroundColor: colors.card,
+          borderBottomWidth: StyleSheet.hairlineWidth,
+          borderBottomColor: colors.border,
+          zIndex: 1,
+        }}
+        onLayout={(event) => {
+          const { height } = event.nativeEvent.layout;
+          setViewHeight(height);
+        }}
+      >
+        <View className="flex-row gap-3 ml-4">
+          <Pressable onPress={() => setSearchType("title")} className={`p-2`}>
+            <MotiText
+              from={{ opacity: searchType === "title" ? 0.5 : 1 }}
+              animate={{ opacity: searchType === "title" ? 1 : 0.5 }}
+              transition={{
+                type: "timing",
+                duration: 300,
+              }}
+              className={`text-text ${searchType === "title" ? "" : "opacity-50"}`}
+            >
+              Title
+            </MotiText>
+          </Pressable>
+          <Pressable onPress={() => setSearchType("person")} className={`p-2`}>
+            <MotiText
+              from={{ opacity: searchType === "person" ? 0.5 : 1 }}
+              animate={{ opacity: searchType === "person" ? 1 : 0.5 }}
+              transition={{
+                type: "timing",
+                duration: 300,
+              }}
+              className={`text-text`}
+            >
+              Person
+            </MotiText>
+          </Pressable>
+        </View>
+      </MotiView>
+      {/* Spacer for when searchType field is shown */}
+      {isSearchEmpty && !hideTypeSelect && <View style={{ height: viewHeight }} />}
+      {searchType === "title" && <MovieSearchContainer />}
+      {searchType === "person" && <PersonSearchContainer />}
     </SafeAreaView>
   );
 };

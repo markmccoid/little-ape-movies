@@ -19,7 +19,7 @@ const Layout = () => {
         }}
       />
       <Tabs.Screen
-        name="page3"
+        name="tags"
         options={{
           tabBarIcon: ({ color }) => <TagIcon size={25} color={color} />,
         }}

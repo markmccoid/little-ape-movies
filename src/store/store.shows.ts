@@ -12,7 +12,7 @@ export type ShowItemType = {
   backdropURL?: string;
   releaseDateEpoch: number;
   dateAddedEpoch: number; // milliseconds elapsed since January 1, 1970
-  genres: string[];
+  genres: string[]; // Genres as strings
   rating: number;
   tags: string[];
   // Add other movie properties
@@ -50,9 +50,9 @@ const useMovieStore = create<MovieStore>()(
           const newShow: ShowItemType = {
             id: show.id,
             title: show.title,
-            posterURL: show.posterURL,
-            backdropURL: show.backdropURL,
-            releaseDateEpoch: show.releaseDate.epoch,
+            posterURL: show?.posterURL,
+            backdropURL: show?.backdropURL,
+            releaseDateEpoch: show?.releaseDate?.epoch || 0,
             dateAddedEpoch: Date.now(),
             genres: show?.genres,
             rating: 0,

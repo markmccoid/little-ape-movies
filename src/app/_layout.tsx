@@ -2,7 +2,7 @@ import "../global.css";
 
 import { useRootNavigationState, useSegments } from "expo-router";
 import { View, Text, SafeAreaView, ActivityIndicator } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import React, { useEffect, useState } from "react";
 import { Slot, Stack, useRouter } from "expo-router";
 import { useFonts } from "expo-font";

@@ -41,13 +41,11 @@ const MovieImage = ({
     );
   }
   return (
-    <View>
-      <Image
-        className="border-hairline border-border rounded-lg rounded-b-none"
-        source={{ uri: posterURL }}
-        style={{ width: imageWidth, height: imageHeight, resizeMode, ...imageStyle }}
-      />
-    </View>
+    <Image
+      className="border-hairline border-border rounded-lg"
+      source={{ uri: posterURL }}
+      style={{ width: imageWidth, height: imageHeight, resizeMode, ...imageStyle }}
+    />
   );
 };
 

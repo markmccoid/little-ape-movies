@@ -45,12 +45,12 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
 //~~  - A movie is added to saved
 //~~  - A movie is removed from saved
 //~~ =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-eventBus.subscribe("TAG_SEARCH_RESULTS", () => {
-  const savedMovies = useMovieStore.getState().shows;
-  useSearchStore.setState((state) => ({
-    results: tagSavedMovies(state.results, savedMovies),
-  }));
-});
+// eventBus.subscribe("TAG_SEARCH_RESULTS", () => {
+//   const savedMovies = useMovieStore.getState().shows;
+//   useSearchStore.setState((state) => ({
+//     results: tagSavedMovies(state.results, savedMovies),
+//   }));
+// });
 
 eventBus.subscribe("CLEAR_SEARCH_STORES", () => {
   console.log("Clearing search state");
