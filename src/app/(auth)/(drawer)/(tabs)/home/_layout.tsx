@@ -9,7 +9,7 @@ const HomeLayout = () => {
   return (
     <Stack screenOptions={{}}>
       <Stack.Screen name="index" options={{ headerStyle: { backgroundColor: colors.card } }} />
-      <Stack.Screen name="[movieid]" />
+      <Stack.Screen name="[movieid]" options={{ headerTransparent: true }} />
       <Stack.Screen name="filtermodal" options={{ presentation: "modal" }} />
     </Stack>
   );

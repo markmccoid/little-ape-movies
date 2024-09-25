@@ -1,14 +1,14 @@
 import { View, Text, Dimensions, FlatList, Animated } from "react-native";
 import React from "react";
 import useMovieStore, { ShowItemType } from "@/store/store.shows";
-import MovieItem from "./MovieItem";
+import MovieItem from "./movieitem/MovieItem";
 import {
   getViewMoviesOpacity,
   getViewMoviesRotates,
   getViewMoviesScale,
   getViewMoviesTranslates,
 } from "@/components/common/animations/animationHelpers";
-import MovieAnimatedView from "./MovieAnimatedView";
+import MovieAnimatedView from "./movieitem/MovieAnimatedView";
 
 const { width, height } = Dimensions.get("window");
 const POSTER_WIDTH = width / 2.2;
@@ -73,14 +73,14 @@ const MoviesContainer = () => {
       data={movies}
       // renderItem={flatListRenderItem}
       renderItem={({ item, index }) => (
-        <MovieAnimatedView index={index} offsetY={offsetY} numColumns={2}>
+        <MovieAnimatedView index={index} offsetY={offsetY}>
           <MovieItem movie={item} />
         </MovieAnimatedView>
       )}
       keyExtractor={(item, index) => index.toString()}
       numColumns={2}
       style={{ paddingTop: 10 }}
-      columnWrapperStyle={{ justifyContent: "space-between" }}
+      columnWrapperStyle={{ justifyContent: "space-around" }}
       onScroll={(e) => {
         // show or hide search input
         // if (e.nativeEvent.contentOffset.y < -50) {

@@ -1,19 +1,25 @@
 import { View, Text, Dimensions, Animated } from "react-native";
-import React from "react";
+import React, { ReactNode } from "react";
 import {
   getViewMoviesOpacity,
   getViewMoviesRotates,
   getViewMoviesScale,
   getViewMoviesTranslates,
-} from "../common/animations/animationHelpers";
+} from "../../common/animations/animationHelpers";
+import useImageSize from "@/hooks/useImageSize";
+import { getMovieItemSizing } from "./movieItemHelpers";
 
-const { width, height } = Dimensions.get("window");
-const POSTER_WIDTH = width / 2.2;
-const POSTER_HEIGHT = POSTER_WIDTH * 1.5; // Height is 1.5 times the width
-const MARGIN = 5;
-const ITEM_SIZE = POSTER_HEIGHT + MARGIN * 2;
-const MovieAnimatedView = ({ index, offsetY, children }) => {
-  // const pURL = item.posterURL;
+const { imageHeight, imageWidth, itemHeight, margin } = getMovieItemSizing();
+const MARGIN = margin;
+const ITEM_SIZE = itemHeight;
+
+type MovieAnimatedViewProps = {
+  index: number;
+  offsetY: Animated.Value; // Assuming you're using Animated.Value from React Native
+  children: ReactNode; // Allows any valid React child
+};
+
+const MovieAnimatedView: React.FC<MovieAnimatedViewProps> = ({ index, offsetY, children }) => {
   // Since we have two rows, this is the correct index
   // index 0,1 -> 0,0  index 2,3 => 1,1  etc...
   const ITEM_INDEX = Math.floor(index / 2);
@@ -22,8 +28,8 @@ const MovieAnimatedView = ({ index, offsetY, children }) => {
     itemSize: ITEM_SIZE,
     itemIndex: ITEM_INDEX,
     absIndex: index,
-    posterHeight: POSTER_HEIGHT,
-    posterWidth: POSTER_WIDTH,
+    posterHeight: imageHeight,
+    posterWidth: imageWidth,
     margin: MARGIN,
   };
 

@@ -11,7 +11,7 @@
   "dependencies": {
     "@expo-google-fonts/lato": "^0.2.3",
     "@expo/vector-icons": "^14.0.2",
-    "@markmccoid/tmdb_api": "../../tmdb/tmdb_api",
+    "@markmccoid/tmdb_api": "^0.3.1",
     "@react-native-async-storage/async-storage": "^2.0.0",
     "@react-native-community/netinfo": "^11.3.2",
     "@react-navigation/drawer": "^6.7.2",
