@@ -13,3 +13,6 @@ const colors = {
     "950": "#2b2055",
   },
 };
+
+// Dark ape - #2E4657, #192D3C
+// Light ape = #536A81, #9EB5BD

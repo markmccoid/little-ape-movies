@@ -1,12 +1,11 @@
-import { View, Text, Dimensions, Animated } from "react-native";
 import React, { ReactNode } from "react";
+import Animated, { useAnimatedStyle, SharedValue, FadeOut } from "react-native-reanimated";
 import {
   getViewMoviesOpacity,
   getViewMoviesRotates,
   getViewMoviesScale,
   getViewMoviesTranslates,
 } from "../../common/animations/animationHelpers";
-import useImageSize from "@/hooks/useImageSize";
 import { getMovieItemSizing } from "./movieItemHelpers";
 
 const { imageHeight, imageWidth, itemHeight, margin } = getMovieItemSizing();
@@ -15,13 +14,11 @@ const ITEM_SIZE = itemHeight;
 
 type MovieAnimatedViewProps = {
   index: number;
-  offsetY: Animated.Value; // Assuming you're using Animated.Value from React Native
-  children: ReactNode; // Allows any valid React child
+  scrollY: SharedValue<number>;
+  children: ReactNode;
 };
 
-const MovieAnimatedView: React.FC<MovieAnimatedViewProps> = ({ index, offsetY, children }) => {
-  // Since we have two rows, this is the correct index
-  // index 0,1 -> 0,0  index 2,3 => 1,1  etc...
+const MovieAnimatedView: React.FC<MovieAnimatedViewProps> = ({ index, scrollY, children }) => {
   const ITEM_INDEX = Math.floor(index / 2);
 
   const animConstants = {
@@ -33,30 +30,19 @@ const MovieAnimatedView: React.FC<MovieAnimatedViewProps> = ({ index, offsetY, c
     margin: MARGIN,
   };
 
-  const scale = getViewMoviesScale(offsetY, animConstants);
-  const opacity = getViewMoviesOpacity(offsetY, animConstants);
-  const [translateX, translateY] = getViewMoviesTranslates(offsetY, animConstants);
-  const [rotateX, rotateY, rotateZ] = getViewMoviesRotates(offsetY, animConstants);
-  const animStyle = {
-    transform: [
-      { scale },
-      { translateX },
-      { translateY },
-      // { rotateX },
-      // { rotateY },
-      // { rotateZ },
-    ],
-  };
-  return (
-    <Animated.View
-      style={{
-        opacity,
-        ...animStyle,
-      }}
-    >
-      {children}
-    </Animated.View>
-  );
+  const animatedStyle = useAnimatedStyle(() => {
+    const scale = getViewMoviesScale(scrollY.value, animConstants);
+    const opacity = getViewMoviesOpacity(scrollY.value, animConstants);
+    const [translateX, translateY] = getViewMoviesTranslates(scrollY.value, animConstants);
+    // const [rotateX, rotateY, rotateZ] = getViewMoviesRotates(scrollY.value, animConstants);
+
+    return {
+      opacity,
+      transform: [{ scale }, { translateX }, { translateY }],
+    };
+  });
+
+  return <Animated.View style={animatedStyle}>{children}</Animated.View>;
 };
 
 export default MovieAnimatedView;

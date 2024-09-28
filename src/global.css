@@ -3,8 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #0e203d;
-  --color-secondary: #b9d0f9;
+  --color-primary: #192D3C;
+  --color-secondary: #9EB5BD;
+  /* --color-secondary: #b9d0f9; */
   --color-accent: #0844a6;
   --color-background: #ebebf0;
   --color-card: #fbfbfe;
@@ -20,8 +21,9 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-primary: #a0b7db;
-    --color-secondary: #061e46;
+    --color-primary: #9EB5BD;
+    --color-secondary: #192D3C;
+    /* --color-secondary: #061e46; */
     --color-accent: #5996f7;
     --color-background: #0f0f14;
     --color-card: #010104;

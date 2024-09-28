@@ -12,7 +12,7 @@ import { Link, useNavigation, usePathname, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCustomTheme } from "@/utils/colorThemes";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { FilterIcon } from "../common/Icons";
+import { CheckSquareIcon, FilterIcon } from "../common/Icons";
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const { currentUser, onLogout } = useAuth();
@@ -34,9 +34,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       <View className="bg-card">
         <Link href="/home" className="mt-2 mx-2">
           <View
-            className={`px-[10] py-[5] bg-card flex-row items-center gap-3 rounded-lg w-full ${
-              pathname === "/home" && "bg-secondary"
-            }`}
+            className={`px-[10] py-[5] bg-card flex-row items-center gap-3 rounded-lg w-full`}
             style={{ margin: 10 }}
           >
             <SymbolView
@@ -47,17 +45,14 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
               colors={[colors.text, colors.text]}
             />
             <Text className="text-lg text-text">Home</Text>
+            {/* {pathname === "/home" && <CheckSquareIcon />} */}
           </View>
         </Link>
         {/* Divider Line */}
         <View className="w-full border-b-hairline" />
 
         <Link href="/settings" className="m-2  mx-2">
-          <View
-            className={`px-[10] py-[5] bg-card flex-row items-center gap-3 w-full rounded-lg ${
-              pathname === "/settings" && "bg-secondary"
-            }`}
-          >
+          <View className={`px-[10] py-[5] bg-card flex-row items-center gap-3 w-full rounded-lg`}>
             <SymbolView
               name="gear"
               size={20}

@@ -1,11 +1,12 @@
 import { View, Text, Dimensions, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MovieImage from "../common/MovieImage";
 import { MovieSearchResults } from "@/store/store.search";
 import { MovieStore } from "@/store/store.shows";
 import { AddCircleIcon, AddIcon, CheckCircleIcon } from "../common/Icons";
 import { useCustomTheme } from "@/utils/colorThemes";
 import { Link } from "expo-router";
+import useImageSize from "@/hooks/useImageSize";
 
 const { width, height } = Dimensions.get("window");
 const NUMCOLUMNS = 3;
@@ -14,41 +15,55 @@ const GAP = 10; // Desired gap between images
 // Calculate the available width for images
 const availableWidth = width - 2 * CONTAINER_PADDING;
 // Calculate the width of each image
-const imageWidth = (availableWidth - (NUMCOLUMNS - 1) * GAP) / NUMCOLUMNS;
+const imageWidth3 = (availableWidth - (NUMCOLUMNS - 1) * GAP) / NUMCOLUMNS;
 // Calculate the height of each image (assuming 1.5 aspect ratio)
-const imageHeight = imageWidth * 1.5;
+const imageHeight3 = imageWidth3 * 1.5;
 
 //~~  SearchResult Component
 type Props = {
   movie: MovieSearchResults;
+  numColumns: number;
   onAddMovie: MovieStore["actions"]["addShow"];
   onRemoveMovie: MovieStore["actions"]["removeShow"];
 };
-const SearchResult = ({ movie, onAddMovie, onRemoveMovie }: Props) => {
+const SearchResult = ({ movie, numColumns = 3, onAddMovie, onRemoveMovie }: Props) => {
+  const [isLocallyAdded, setIsLocallyAdded] = useState(movie.existsInSaved);
+  const { imageHeight: imageHeight2, imageWidth: imageWidth2 } = useImageSize("2column");
+  let imageWidth = imageWidth3;
+  let imageHeight = imageHeight3;
+  if (numColumns === 2) {
+    imageWidth = imageWidth2;
+    imageHeight = imageHeight2;
+  }
   const { colors } = useCustomTheme();
-  // const [color, setColor] = useState({ from: "green", to: colors.primary });
+  useEffect(() => {
+    setIsLocallyAdded(movie.existsInSaved);
+  }, [movie.existsInSaved]);
+
   const handleAddRemoveMovie = () => {
-    if (movie.existsInSaved) {
-      // setColor({ from: "green", to: colors.primary });
+    setIsLocallyAdded((prev) => !prev);
+    if (isLocallyAdded) {
       onRemoveMovie(movie.id);
     } else {
-      // setColor({ from: colors.primary, to: "green" });
       onAddMovie(movie);
     }
   };
+
   return (
     <View
-      className={`my-1 mb-[20] border-hairline border-border rounded-lg`}
+      className={`my-1 mb-[20] border-hairline border-border `}
       style={{
-        width: imageWidth + 1,
+        width: imageWidth,
         height: imageHeight + 20,
+        overflow: "hidden",
+        borderRadius: 10,
         shadowColor: colors.border,
         shadowOffset: { width: 0.5, height: 0.5 },
         shadowOpacity: 0.8,
         shadowRadius: 1,
       }}
     >
-      <Link href={`/(auth)/(drawer)/(tabs)/search/${movie.id}`} style={{ zIndex: 0 }}>
+      <Link href={`./search/${movie.id}`} style={{ zIndex: 0 }}>
         <View>
           <MovieImage
             imageWidth={imageWidth}
@@ -56,8 +71,10 @@ const SearchResult = ({ movie, onAddMovie, onRemoveMovie }: Props) => {
             posterURL={movie.posterURL}
             title={movie.title}
             imageStyle={{
+              borderRadius: 10,
               borderBottomLeftRadius: 0,
               borderBottomRightRadius: 0,
+              overflow: "hidden",
             }}
           />
         </View>
@@ -66,7 +83,7 @@ const SearchResult = ({ movie, onAddMovie, onRemoveMovie }: Props) => {
         <View
           style={[{ alignItems: "center", justifyContent: "center", marginTop: -5, height: 20 }]}
           className={`flex-1 border-t-hairline border-t-border rounded-b-lg ${
-            movie.existsInSaved ? "bg-selected" : "bg-card"
+            isLocallyAdded ? "bg-selected" : "bg-card"
           }`}
         >
           <Text numberOfLines={1} className="px-1 text-text">
@@ -75,7 +92,7 @@ const SearchResult = ({ movie, onAddMovie, onRemoveMovie }: Props) => {
         </View>
         <View
           className={`absolute rounded-t-md border-hairline border-border border-b-0 ${
-            movie.existsInSaved ? "bg-selected" : "bg-card"
+            isLocallyAdded ? "bg-selected" : "bg-card"
           }`}
           style={{
             left: imageWidth / 2 - imageWidth / 4 / 2,
@@ -85,7 +102,7 @@ const SearchResult = ({ movie, onAddMovie, onRemoveMovie }: Props) => {
           }}
         >
           <View className="flex-1 items-center justify-center">
-            {movie.existsInSaved ? (
+            {isLocallyAdded ? (
               <CheckCircleIcon color={colors.text} size={18} />
             ) : (
               <AddIcon color={colors.text} size={15} />
@@ -96,33 +113,5 @@ const SearchResult = ({ movie, onAddMovie, onRemoveMovie }: Props) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    width: 100,
-    height: 150,
-    position: "relative", // Ensure the container can be a reference for overlay
-    marginBottom: 10,
-  },
-  image: {
-    width: 100,
-    height: 150,
-    backgroundColor: "green",
-  },
-  overlay: {
-    position: "absolute",
-    bottom: -10, // Align at the bottom of the image
-    left: 0,
-    right: 0,
-    height: 22,
-    // backgroundColor: "rgba(0, 0, 0, 1)", // Semi-transparent strip
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  overlayText: {
-    color: "white",
-    fontSize: 14,
-  },
-});
 
 export default React.memo(SearchResult);

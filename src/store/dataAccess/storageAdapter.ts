@@ -34,14 +34,14 @@ export const deleteUserStorage = (currentUser: string) => {
 
   console.log(`Storage for user ${currentUser} has been deleted.`);
 };
-// const storage = new MMKV();
+
 //~ -----  STORAGE ADAPTER ------------------------------------
 export const StorageAdapter: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
     if (!storage) {
       throw new Error("Storage is not initialized");
     }
-    console.log("STORAGE GET", storage.getString("name"));
+    // console.log("STORAGE GET", name);
     const value = storage.getString(name);
     return value ?? null;
   },
@@ -49,6 +49,7 @@ export const StorageAdapter: StateStorage = {
     if (!storage) {
       throw new Error("Storage is not initialized");
     }
+    // console.log("SET", name, value);
     storage.set(name, value);
   },
   removeItem: async (name: string): Promise<void> => {

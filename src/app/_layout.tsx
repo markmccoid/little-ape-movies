@@ -30,7 +30,6 @@ SplashScreen.preventAutoHideAsync();
 const InitialLayout = () => {
   // true after initialize function done
   const [initialized, setInitialized] = useState(false);
-  const [userId, setUserId] = useState<string | undefined>(undefined);
   const [loaded, error] = useFonts({
     ...FontAwesome.font,
     Lato_100Thin,
@@ -55,6 +54,7 @@ const InitialLayout = () => {
       const tmdbKey = process.env.EXPO_PUBLIC_TMDB_API_KEY;
       if (!tmdbKey) throw new Error("TMDB API Key not defined");
       await initTMDB(tmdbKey);
+      
       setInitialized(true);
     };
     mainInit();

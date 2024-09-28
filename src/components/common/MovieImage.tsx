@@ -2,7 +2,7 @@ import { View, Text, Image, ImageStyle, ImageProps } from "react-native";
 import React from "react";
 
 type Props = {
-  posterURL: string;
+  posterURL: string | undefined;
   title: string;
   imageWidth: number;
   imageHeight?: number;
@@ -16,7 +16,7 @@ const MovieImage = ({
   title,
   imageWidth,
   imageHeight,
-  resizeMode = "cover",
+  resizeMode = "contain",
 }: Props) => {
   if (!imageHeight) {
     imageHeight = imageWidth * 1.5;
@@ -42,9 +42,15 @@ const MovieImage = ({
   }
   return (
     <Image
-      className="border-hairline border-border rounded-lg"
+      className="border-hairline border-border"
       source={{ uri: posterURL }}
-      style={{ width: imageWidth, height: imageHeight, resizeMode, ...imageStyle }}
+      style={{
+        width: imageWidth,
+        height: imageHeight,
+        resizeMode,
+        overflow: "hidden",
+        ...imageStyle,
+      }}
     />
   );
 };

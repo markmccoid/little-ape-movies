@@ -1,11 +1,10 @@
 import { View, Text, Image, Dimensions } from "react-native";
 import React from "react";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { Link } from "expo-router";
-import useMovieStore, { ShowItemType } from "@/store/store.shows";
-import dayjs from "dayjs";
-import useImageSize from "@/hooks/useImageSize";
+import { Link, useNavigation } from "expo-router";
+import { ShowItemType } from "@/store/store.shows";
 import { getMovieItemSizing } from "./movieItemHelpers";
+import MovieImage from "@/components/common/MovieImage";
+import MovieItemActionBar from "./MovieItemActionBar";
 
 // const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 // const availableWidth = screenWidth - 20; // Subtract left and right margins
@@ -38,15 +37,26 @@ const MovieItem = ({ movie }: Props) => {
         className="absolute p-1 bottom-0 w-full z-0 bg-red-500 rounded-b-lg"
         style={{ maxHeight: extraHeight + margin }}
       >
-        <TouchableOpacity className="" onPress={() => console.log("HI Pressed")}>
-          <Text>Action Bar</Text>
-        </TouchableOpacity>
+        <MovieItemActionBar movie={movie} />
       </View>
       <Link href={`./home/${movie.id}`}>
-        <Image
+        {/* <Image
           source={{ uri: movie.posterURL }}
           style={{ width: imageWidth, height: imageHeight, resizeMode: "contain" }}
           className="rounded-t-lg"
+        /> */}
+        <MovieImage
+          posterURL={movie?.posterURL}
+          imageWidth={imageWidth}
+          imageHeight={imageHeight}
+          title={movie?.title}
+          resizeMode="contain"
+          imageStyle={{
+            borderRadius: 10,
+            borderBottomLeftRadius: 0,
+            borderBottomRightRadius: 0,
+            overflow: "hidden",
+          }}
         />
       </Link>
     </View>

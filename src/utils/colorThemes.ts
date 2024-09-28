@@ -21,8 +21,8 @@ export const CustomLightTheme: CustomTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: "#0e203d",
-    secondary: "#b9d0f9",
+    primary: "#192D3C",
+    secondary: "#9EB5BD",
     background: "#ebebf0",
     card: "#fbfbfe",
     cardInverted: "#010104",
@@ -41,8 +41,8 @@ export const CustomDarkTheme: CustomTheme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
-    primary: "#a0b7db",
-    secondary: "#0e203d",
+    primary: "#9EB5BD",
+    secondary: "#192D3C",
     background: "#0f0f14",
     card: "#010104",
     cardInverted: "#fbfbfe",

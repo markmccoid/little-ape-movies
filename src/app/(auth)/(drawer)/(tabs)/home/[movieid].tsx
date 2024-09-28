@@ -5,16 +5,12 @@ import MovieDetailsContainer from "@/components/movies/details/MovieDetailsConta
 import { useMovieData } from "@/store/dataHooks";
 
 const MovieDetailHome = () => {
-  const { movieid } = useGlobalSearchParams();
-  const navigation = useNavigation();
+  const { movieId } = useGlobalSearchParams<{ movieId: string }>();
 
-  // useEffect(() => {
-  //   navigation.setOptions({ title: `Movie - ${movieid}` });
-  // }, []);
+  console.log("MOVIE ID HOME/", movieId);
 
-  console.log("MOVIE ID HOME/", movieid);
-
-  return <MovieDetailsContainer movieId={movieid} />;
+  // - Title is set in MovieDetailsContainer useFocusEffect()
+  return <MovieDetailsContainer movieId={parseInt(movieId, 10)} />;
 };
 
 export default MovieDetailHome;

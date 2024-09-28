@@ -11,7 +11,7 @@ import {
   StyleSheet,
 } from "react-native";
 import React, { useCallback, useState, useRef } from "react";
-import { Link, Stack, useNavigation } from "expo-router";
+import { Link, Stack, useFocusEffect, useNavigation } from "expo-router";
 import { SearchBarCommands } from "react-native-screens";
 import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle";
 import { debounce } from "lodash";
@@ -22,12 +22,15 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { MotiText, MotiView } from "moti";
 import { useCustomTheme } from "@/utils/colorThemes";
+import { SymbolView } from "expo-symbols";
+import useSettingsStore from "@/store/store.settings";
 
 const SearchPage = () => {
+  const searchColumns = useSettingsStore((state) => state.searchColumns);
+  const settingsActions = useSettingsStore((state) => state.actions);
   const { colors } = useCustomTheme();
   const headerHeight = useHeaderHeight();
   const { setSearch, setSearchType } = useSearchStore((state) => state.actions);
-  const searchVal = useSearchStore((state) => state.searchVal);
   const searchType = useSearchStore((state) => state.searchType);
   const [viewHeight, setViewHeight] = useState(0);
   const [isSearchEmpty, setIsSearchEmpty] = useState(true);
@@ -49,8 +52,14 @@ const SearchPage = () => {
       title: "Search",
       headerLeft: () => <NestedStackDrawerToggle />,
       headerSearchBarOptions: {
-        onFocus: () => setHideTypeSelect(false),
-        onBlur: () => setHideTypeSelect(true),
+        onFocus: () => {
+          // navigation.setOptions({searchBarOptions: { active: true}})
+          setHideTypeSelect(false)
+        },
+        onBlur: () => {
+          navigation.setOptions({searchBarOptions: { active: false}})
+          setHideTypeSelect(true)
+        },
         autoCapitalize: "none",
         placeholder: "Search",
         ref: searchBarRef,
@@ -71,11 +80,14 @@ const SearchPage = () => {
 
   React.useEffect(() => {
     if (searchBarRef?.current) {
-      searchBarRef.current.clearText();
+      searchBarRef.current.blur()
+      // navigation.setOptions({searchBarOptions: { active: false}})
+      setHideTypeSelect(true)
+      // searchBarRef.current.clearText();
       //setSearchBarClearFn(() => searchBarRef.current.clearText());
     }
-    //return () => setSearchBarClearFn(() => {});
-  }, []);
+    
+  }, [searchBarRef?.current]);
 
   return (
     <SafeAreaView className="flex-1">
@@ -101,7 +113,7 @@ const SearchPage = () => {
           setViewHeight(height);
         }}
       >
-        <View className="flex-row gap-3 ml-4">
+        <View className="flex-row gap-3 ml-4 items-center">
           <Pressable onPress={() => setSearchType("title")} className={`p-2`}>
             <MotiText
               from={{ opacity: searchType === "title" ? 0.5 : 1 }}
@@ -127,6 +139,25 @@ const SearchPage = () => {
             >
               Person
             </MotiText>
+          </Pressable>
+
+          <Pressable
+            onPress={settingsActions.toggleSearchColumns}
+            className="flex-row justify-end flex-1 mr-4 "
+          >
+            {searchColumns === 3 ? (
+              <SymbolView
+                name="rectangle.expand.vertical"
+                style={{ width: 20, height: 20, transform: [{ rotateZ: "90deg" }] }}
+                type="hierarchical"
+              />
+            ) : (
+              <SymbolView
+                name="rectangle.compress.vertical"
+                style={{ width: 20, height: 20, transform: [{ rotateZ: "90deg" }] }}
+                type="hierarchical"
+              />
+            )}
           </Pressable>
         </View>
       </MotiView>

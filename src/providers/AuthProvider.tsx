@@ -11,6 +11,7 @@ import {
 import { deleteUserStorage, initCurrentUserStorage } from "@/store/dataAccess/storageAdapter";
 import useMovieStore from "@/store/store.shows";
 import { eventBus } from "@/store/eventBus";
+import useSettingsStore from "@/store/store.settings";
 
 type AuthProps = {
   currentUser: string | undefined;
@@ -52,6 +53,7 @@ export const AuthProvider = ({ children }: any) => {
       useMovieStore.getState().actions.clearStore();
     }
     useMovieStore.persist.rehydrate();
+    useSettingsStore.persist.rehydrate();
 
     setCurrentUser(currUser);
     setAllUsers(getUsers());
@@ -69,6 +71,7 @@ export const AuthProvider = ({ children }: any) => {
       useMovieStore.getState().actions.clearStore();
     }
     useMovieStore.persist.rehydrate();
+    useSettingsStore.persist.rehydrate();
     // Current user exposed in the Auth Context
     setCurrentUser(user);
   };
