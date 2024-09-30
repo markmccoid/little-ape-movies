@@ -6,7 +6,7 @@ const SearchLayout = () => {
   return (
     <Stack>
       <Stack.Screen name="index" />
-      <Stack.Screen name="[movieId]" options={{headerTransparent: true, title: ""}} />
+      <Stack.Screen name="[showId]" options={{ headerTransparent: true, title: "" }} />
       <Stack.Screen name="personmovies/[personId]" />
     </Stack>
   );

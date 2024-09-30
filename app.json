@@ -3,7 +3,7 @@
     "scheme": "littleapemovies",
     "userInterfaceStyle": "automatic",
     "orientation": "default",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "web": {
       "output": "static",
       "bundler": "metro"

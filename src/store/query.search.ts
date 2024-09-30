@@ -1,4 +1,5 @@
 import {
+  getPersonDetails,
   movieDiscover,
   movieGetNowPlaying,
   movieGetPersonCredits,
@@ -216,6 +217,20 @@ export const usePersonMovieSearch = (personId: number) => {
   // }, [data]);
   return { movies, isLoading };
 };
+
+export const usePersonDetails = (personId: number) => {
+  //~~ USEQUERY TITLE Movie Search Value Hook
+  const { data, isLoading, ...rest } = useQuery({
+    queryKey: ["personDetailsSearch", personId],
+    queryFn: async () => {
+      if (!personId) return {};
+      return getPersonDetails(personId);
+    },
+  });
+
+  return { data, isLoading, ...rest };
+};
+
 /**
  *
  * My thought is to have a hook that accepts a title(searchValue) and nextPage bool -> default "false"

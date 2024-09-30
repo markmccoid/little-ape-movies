@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { ShowItemType, useMovieActions } from '@/store/store.shows';
-import { DeleteIcon } from '@/components/common/Icons';
+import React from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import { ShowItemType, useMovieActions } from "@/store/store.shows";
+import { DeleteIcon } from "@/components/common/Icons";
 
 type MovieItemActionBarProps = {
   movie: ShowItemType;
@@ -15,7 +15,7 @@ const MovieItemActionBar: React.FC<MovieItemActionBarProps> = ({ movie }) => {
         <Text className="text-white text-center">Action Bar</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => movieActions.removeShow(movie.id)}>
-        <DeleteIcon size={15} color="black"/>
+        <DeleteIcon size={15} color="black" />
       </TouchableOpacity>
     </View>
   );

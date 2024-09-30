@@ -2,7 +2,7 @@ import React from "react";
 import { Stack, useGlobalSearchParams, useNavigation } from "expo-router";
 import { usePersonMovieSearch } from "@/store/query.search";
 import SearchContainer from "@/components/search/SearchContainer";
-
+import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 /**
  * If a person search is performed, this is the route when a user
  * selects a person to view their movies.
@@ -13,9 +13,11 @@ const PersonDetailsRoute = () => {
   const { movies } = usePersonMovieSearch(parseInt(personId as string));
 
   React.useLayoutEffect(() => {
-    navigation.setOptions({
-      title: personName,
-    });
+    const options: NativeStackNavigationOptions = {
+      title: personName as string,
+      headerBackTitle: "Back",
+    };
+    navigation.setOptions(options);
   }, [navigation]);
 
   return (

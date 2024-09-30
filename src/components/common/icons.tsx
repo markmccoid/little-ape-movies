@@ -4,6 +4,7 @@ import {
   Feather,
   FontAwesome,
   FontAwesome5,
+  FontAwesome6,
   Fontisto,
   MaterialIcons,
   MaterialCommunityIcons,
@@ -23,6 +24,9 @@ type Props = {
 //~~ ------------------
 export const MovieIcon = ({ size = 25, color, style }: Props) => {
   return <MaterialIcons name="movie" size={size} color={color} style={style} />;
+};
+export const IMDBIcon = ({ size = 25, color, style }: Props) => {
+  return <FontAwesome6 name="imdb" size={size} color={color} style={style} />;
 };
 export const AddCircleIcon = ({ size = 25, color, style }: Props) => {
   return <Ionicons name="add-circle-outline" size={size} color={color} style={style} />;

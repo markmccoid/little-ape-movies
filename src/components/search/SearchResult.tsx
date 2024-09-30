@@ -1,11 +1,11 @@
 import { View, Text, Dimensions, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import MovieImage from "../common/MovieImage";
 import { MovieSearchResults } from "@/store/store.search";
 import { MovieStore } from "@/store/store.shows";
 import { AddCircleIcon, AddIcon, CheckCircleIcon } from "../common/Icons";
 import { useCustomTheme } from "@/utils/colorThemes";
-import { Link } from "expo-router";
+import { Link, usePathname } from "expo-router";
 import useImageSize from "@/hooks/useImageSize";
 
 const { width, height } = Dimensions.get("window");
@@ -27,6 +27,8 @@ type Props = {
   onRemoveMovie: MovieStore["actions"]["removeShow"];
 };
 const SearchResult = ({ movie, numColumns = 3, onAddMovie, onRemoveMovie }: Props) => {
+  const pathName = usePathname();
+  const linkPath = useMemo(() => (pathName === "/search" ? "./search/" : "../"), [pathName]);
   const [isLocallyAdded, setIsLocallyAdded] = useState(movie.existsInSaved);
   const { imageHeight: imageHeight2, imageWidth: imageWidth2 } = useImageSize("2column");
   let imageWidth = imageWidth3;
@@ -63,7 +65,7 @@ const SearchResult = ({ movie, numColumns = 3, onAddMovie, onRemoveMovie }: Prop
         shadowRadius: 1,
       }}
     >
-      <Link href={`./search/${movie.id}`} style={{ zIndex: 0 }}>
+      <Link href={`${linkPath}${movie.id}`} style={{ zIndex: 0 }}>
         <View>
           <MovieImage
             imageWidth={imageWidth}

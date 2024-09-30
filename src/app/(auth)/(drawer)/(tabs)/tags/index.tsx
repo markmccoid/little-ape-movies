@@ -3,12 +3,12 @@ import React from "react";
 import { Link, Stack } from "expo-router";
 import { useTheme } from "@react-navigation/native";
 import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle";
-
+import Temp from "@/components/common/animations/Temp";
 const Page3 = () => {
   const { colors } = useTheme();
 
   return (
-    <View className="">
+    <View className="flex-1">
       <Stack.Screen
         options={{
           headerShown: true,
@@ -16,7 +16,7 @@ const Page3 = () => {
         }}
       />
 
-      <Text>Tags</Text>
+      <Temp />
     </View>
   );
 };

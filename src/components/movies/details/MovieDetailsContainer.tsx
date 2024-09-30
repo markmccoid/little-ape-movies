@@ -24,7 +24,6 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
     };
   }, []);
   useFocusEffect(() => {
-    console.log("MOiveID", movieId);
     const options: NativeStackNavigationOptions = {
       title: movie?.title || "",
     };

@@ -1,7 +1,14 @@
-import { View, Text, Dimensions, FlatList } from "react-native";
-import React from "react";
-import Animated, { useSharedValue, useAnimatedScrollHandler } from "react-native-reanimated";
-import useMovieStore, { ShowItemType } from "@/store/store.shows";
+import React, { useCallback, useState, useEffect } from "react";
+import { Dimensions, View, Text, TouchableOpacity, ScrollView } from "react-native";
+import Animated, {
+  FadeOut,
+  Layout,
+  LinearTransition,
+  FadeIn,
+  useSharedValue,
+  useAnimatedScrollHandler,
+} from "react-native-reanimated";
+import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
 import MovieItem from "./movieitem/MovieItem";
 import MovieAnimatedView from "./movieitem/MovieAnimatedView";
 
@@ -21,22 +28,26 @@ const MoviesContainer = () => {
     },
   });
 
+  const renderItem = useCallback(
+    ({ item, index }: { item: ShowItemType; index: number }) => (
+      <MovieAnimatedView index={index} scrollY={scrollY}>
+        <MovieItem movie={item} />
+      </MovieAnimatedView>
+    ),
+    []
+  );
+
   return (
     <Animated.FlatList
       data={movies}
-      renderItem={({ item, index }) => (
-        <MovieAnimatedView index={index} scrollY={scrollY}>
-          <MovieItem movie={item} />
-        </MovieAnimatedView>
-      )}
-      keyExtractor={(item, index) => index.toString()}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id.toString()}
       numColumns={2}
       style={{ paddingTop: 10 }}
       columnWrapperStyle={{ justifyContent: "space-around" }}
       onScroll={scrollHandler}
-      scrollEventThrottle={16}
     />
   );
 };
 
-export default MoviesContainer;
+export default React.memo(MoviesContainer);
