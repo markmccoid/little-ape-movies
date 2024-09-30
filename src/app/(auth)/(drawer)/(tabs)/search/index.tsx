@@ -49,54 +49,11 @@ const SearchPage = () => {
     setSearchType(type);
   };
 
-  // React.useLayoutEffect(() => {
-  //   navigation.setOptions({
-  //     // headerShown: true,
-  //     title: "Search",
-  //     headerLeft: () => <NestedStackDrawerToggle />,
-  //     headerSearchBarOptions: {
-  //       onFocus: () => {
-  //         // navigation.setOptions({searchBarOptions: { active: true}})
-  //         setHideTypeSelect(false)
-  //       },
-  //       onBlur: () => {
-  //         navigation.setOptions({searchBarOptions: { active: false}})
-  //         setHideTypeSelect(true)
-  //       },
-  //       autoCapitalize: "none",
-  //       placeholder: "Search",
-  //       ref: searchBarRef,
-  //       hideNavigationBar: false,
-  //       onChangeText: (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
-  //         debouncedSetSearchText(event.nativeEvent.text);
-  //         if (event.nativeEvent.text.length === 0) {
-  //           setIsSearchEmpty(true);
-  //           setHideTypeSelect(false);
-  //         } else {
-  //           setIsSearchEmpty(false);
-  //           setHideTypeSelect(true);
-  //         }
-  //       },
-  //     },
-  //   });
-  // }, [navigation]);
-
-  // React.useEffect(() => {
-  //   if (searchBarRef?.current) {
-  //     searchBarRef.current.blur()
-  //     // navigation.setOptions({searchBarOptions: { active: false}})
-  //     setHideTypeSelect(true)
-  //     // searchBarRef.current.clearText();
-  //     //setSearchBarClearFn(() => searchBarRef.current.clearText());
-  //   }
-
-  // }, [searchBarRef?.current]);
-  // console.log("ISFOC", isFocused);
   return (
     <View className="flex-1">
       <View className="bg-card border-b-hairline border-border" style={{ paddingTop: top }}>
-        <View className="flex-row w-full items-center">
-          <View className="mr-2 ml-2 flex-1 ">
+        <View className="flex-row w-full items-center" style={{ marginTop: 10 }}>
+          <View className="mr-2 flex-1" style={{ marginLeft: 18 }}>
             <SearchInput
               onChange={debouncedSetSearchText}
               setIsFocused={setIsFocused}
@@ -127,7 +84,7 @@ const SearchPage = () => {
             )}
           </Pressable>
         </View>
-        <View className="flex-row gap-3 ml-4 items-center">
+        <View className="flex-row gap-3 items-center" style={{ marginLeft: 20 }}>
           <Pressable
             onPress={() => {
               handleSearchType("title");

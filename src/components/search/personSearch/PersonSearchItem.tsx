@@ -17,8 +17,9 @@ const PersonSearchItem = ({ person, imageWidth }: Props) => {
     const details = await getPersonDetails(person.id);
     const imdbId = details.data.imdbId;
     Linking.openURL(`imdb:///name/${imdbId}`).catch((err) => {
-      console.log("Caught", imdbId);
-      Linking.openURL("https://apps.apple.com/us/app/imdb-movies-tv-shows/id342792525");
+      // console.log("Caught", imdbId);
+      // Linking.openURL("https://apps.apple.com/us/app/imdb-movies-tv-shows/id342792525");
+      Linking.openURL(`https://imdb.com/name/${imdbId}`);
     });
   };
   return (
