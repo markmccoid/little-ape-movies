@@ -66,15 +66,15 @@ export const useTitleSearch = () => {
   });
 
   //!! Pub/Sub tagging of data
-  useEffect(() => {
-    const handleExternalEvent = () => {
-      const taggedMovies = tagSavedMovies(moviesRef.current, useMovieStore.getState().shows);
-      setMovies(taggedMovies);
-    };
-    // Subscribe to the Tag result event
-    const unsubFunc = eventBus.subscribe("TAG_SEARCH_RESULTS", handleExternalEvent);
-    return unsubFunc;
-  }, []);
+  // useEffect(() => {
+  //   const handleExternalEvent = () => {
+  //     const taggedMovies = tagSavedMovies(moviesRef.current, useMovieStore.getState().shows);
+  //     setMovies(taggedMovies);
+  //   };
+  //   // Subscribe to the Tag result event
+  //   const unsubFunc = eventBus.subscribe("TAG_SEARCH_RESULTS", handleExternalEvent);
+  //   return unsubFunc;
+  // }, []);
 
   //~~ Whenever we get new data we get the results and combine to a single array
   //~~ The infiniteQuery returns the data in separate pages keys on the data object.

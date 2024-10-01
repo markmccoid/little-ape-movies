@@ -29,7 +29,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
     };
     navigation.setOptions(options);
   });
-  console.log(movie.posterColors);
+  // console.log(movie.posterColors);
   //
   // useLayoutEffect(() => {
   //   navigation.setOptions({

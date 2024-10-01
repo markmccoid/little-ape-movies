@@ -11,7 +11,6 @@ const MovieSearchContainer = () => {
   const searchType = useSearchStore((state) => state.searchType);
   // const { setNextPage } = useSearchStore((state) => state.actions);
   const movieActions = useMovieStore((state) => state.actions);
-  // console.log("MOVIES", movies.length);
 
   return <SearchContainer movies={movies} fetchNextPage={fetchNextPage} />;
 };

@@ -6,6 +6,7 @@ import SearchResult from "@/components/search/SearchResult";
 import useMovieStore from "@/store/store.shows";
 import { SymbolView } from "expo-symbols";
 import useSettingsStore from "@/store/store.settings";
+import { MotiView } from "moti";
 
 type Props = {
   movies: MovieSearchResults[];

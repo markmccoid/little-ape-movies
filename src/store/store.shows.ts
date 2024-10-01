@@ -61,7 +61,7 @@ const useMovieStore = create<MovieStore>()(
           };
           set((state) => ({ shows: [...state.shows, newShow] }));
           eventBus.publish("TAG_SEARCH_RESULTS");
-          console.log("Calling GET COLORS");
+          // console.log("Calling GET COLORS");
           eventBus.publish("GET_SHOW_COLORS", newShow.id, newShow?.posterURL);
         },
         updateShow: (id, updatedShow) =>
@@ -87,7 +87,7 @@ const useMovieStore = create<MovieStore>()(
       storage: createJSONStorage(() => StorageAdapter),
       partialize: (state) => ({ shows: state.shows }),
       onRehydrateStorage: (state) => {
-        console.log("Rehydrating", state.shows.length);
+        // console.log("Rehydrating", state.shows.length);
       },
     }
   )

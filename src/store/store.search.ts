@@ -7,7 +7,7 @@ import { tagSavedMovies } from "./store.utils";
 export type MovieSearchResults = movieSearchByTitle_Results & {
   existsInSaved: boolean;
 };
-type SearchType = "title" | "person";
+export type SearchType = "title" | "person";
 type SearchStore = {
   searchVal: string | undefined;
   searchType: SearchType;

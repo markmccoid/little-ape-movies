@@ -45,6 +45,9 @@ const SearchInput = forwardRef(
           placeholder={placeholder}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
+          autoCapitalize="none"
+          autoCorrect={false}
+          autoFocus
         />
         {inputValue !== "" && (
           <Pressable

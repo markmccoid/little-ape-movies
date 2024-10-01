@@ -1,4 +1,5 @@
-import { View, Text, Image, ImageStyle, ImageProps } from "react-native";
+import { View, Text, ImageStyle, ImageProps } from "react-native";
+import { Image, ImageContentFit } from "expo-image";
 import React from "react";
 
 type Props = {
@@ -6,7 +7,7 @@ type Props = {
   title: string;
   imageWidth: number;
   imageHeight?: number;
-  resizeMode?: "cover" | "contain" | "center" | "repeat" | "stretch";
+  resizeMode?: ImageContentFit;
   imageStyle?: ImageStyle;
 };
 
@@ -22,17 +23,22 @@ const MovieImage = ({
     imageHeight = imageWidth * 1.5;
   }
 
+  const blurhash =
+    "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
+
   if (!posterURL) {
     return (
       <View className="flex-row">
         <Image
-          className={`border rounded-lg rounded-b-none opacity-35`}
+          className={`border rounded-lg rounded-b-none`}
           source={require("../../../assets/images/DefaultImage.png")}
-          style={{ width: imageWidth, height: imageHeight, resizeMode, ...imageStyle }}
+          style={{ width: imageWidth, height: imageHeight, opacity: 0.7, ...imageStyle }}
+          contentFit={resizeMode}
+          placeholder={{ blurhash }}
         />
         <Text
-          className="absolute text-text text-center font-semibold text-base bottom-5"
-          style={{ width: imageWidth }}
+          className="absolute text-text text-center font-semibold text-white"
+          style={{ width: imageWidth, top: 8, paddingHorizontal: 6 }}
           numberOfLines={2}
         >
           {title}{" "}
@@ -43,11 +49,14 @@ const MovieImage = ({
   return (
     <Image
       className="border-hairline border-border"
-      source={{ uri: posterURL }}
+      source={posterURL}
+      // source={{ uri: posterURL }}
+      contentFit="contain"
+      placeholder={{ blurhash }}
       style={{
         width: imageWidth,
         height: imageHeight,
-        resizeMode,
+        // resizeMode,
         overflow: "hidden",
         ...imageStyle,
       }}
