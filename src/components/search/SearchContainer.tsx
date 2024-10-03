@@ -7,16 +7,15 @@ import useMovieStore from "@/store/store.shows";
 import { SymbolView } from "expo-symbols";
 import useSettingsStore from "@/store/store.settings";
 import { MotiView } from "moti";
+import useImageSize from "@/hooks/useImageSize";
 
 type Props = {
   movies: MovieSearchResults[];
   fetchNextPage: FetchNextPageFn<MovieSearchResults[]> | undefined;
 };
 const SearchContainer = ({ movies, fetchNextPage }: Props) => {
-  // const { isLoading } = useSearchResults();
-  // const { movies, isLoading, fetchNextPage } = useTitleSearch();
   const numColumns = useSettingsStore((state) => state.searchColumns);
-  // const [numColumns, toggleNumColumns] = useReducer((state) => (state === 2 ? 3 : 2), 3);
+  const { imageHeight, imageWidth } = useImageSize(numColumns);
   const movieActions = useMovieStore((state) => state.actions);
   const fetchNextPageFunc = fetchNextPage ? fetchNextPage : () => {};
 
@@ -31,24 +30,14 @@ const SearchContainer = ({ movies, fetchNextPage }: Props) => {
     );
   };
 
+  const getItemLayout = (_, index: number) => ({
+    length: imageHeight + 20 + 10, // Item height plus in SearchResult there is 10 bottom margin and extra 20 units added to imageHeight
+    offset: (imageHeight + 20 + 10) * index, // Offset for the current index
+    index,
+  });
+
   return (
     <View className="flex-1">
-      {/* <TouchableOpacity onPress={() => toggleNumColumns()} className="absolute z-10">
-        {numColumns === 3 ? (
-          <SymbolView
-            name="rectangle.expand.vertical"
-            style={{ width: 20, height: 20, transform: [{ rotateZ: "90deg" }] }}
-            type="hierarchical"
-          />
-        ) : (
-          <SymbolView
-            name="rectangle.compress.vertical"
-            style={{ width: 20, height: 20, transform: [{ rotateZ: "90deg" }] }}
-            type="hierarchical"
-          />
-        )}
-      </TouchableOpacity> */}
-
       <FlatList
         data={movies}
         renderItem={renderItem}
@@ -64,9 +53,10 @@ const SearchContainer = ({ movies, fetchNextPage }: Props) => {
           fetchNextPageFunc();
         }}
         // onEndReached={setNextPage}
-        onEndReachedThreshold={0.5}
+        onEndReachedThreshold={0.7}
         keyboardDismissMode="on-drag" // Dismiss keyboard when scrolling starts
         keyboardShouldPersistTaps="handled" // Prevent keyboard from persisting when tapping on items
+        getItemLayout={getItemLayout}
       />
     </View>
   );

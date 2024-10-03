@@ -28,7 +28,9 @@ module.exports = {
           DEFAULT: "var(--color-text)",
           inverted: "var(--color-text-inverted)",
         },
-
+        textinput: {
+          DEFAULT: "var(--color-textinput)",
+        },
         card: {
           DEFAULT: "var(--color-card)",
           inverted: "var(--color-card-inverted)",

@@ -5,6 +5,7 @@
 :root {
   --color-primary: #192D3C;
   --color-secondary: #9EB5BD;
+  --color-textinput: #dfdfdf;
   /* --color-secondary: #b9d0f9; */
   --color-accent: #0844a6;
   --color-background: #ebebf0;
@@ -23,6 +24,7 @@
   :root {
     --color-primary: #9EB5BD;
     --color-secondary: #192D3C;
+    --color-textinput: #4d595d;
     /* --color-secondary: #061e46; */
     --color-accent: #5996f7;
     --color-background: #0f0f14;

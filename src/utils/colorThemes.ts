@@ -6,6 +6,7 @@ type CustomTheme = Theme & {
     button: string;
     buttontext: string;
     textInverted: string;
+    textInput: string;
     cardInverted: string;
     colorSelected: string;
   };
@@ -27,6 +28,7 @@ export const CustomLightTheme: CustomTheme = {
     card: "#fbfbfe",
     cardInverted: "#010104",
     text: "#040316",
+    textInput: "#dfdfdf",
     textInverted: "#eae9fc",
     border: "#09080c", // Make border same as primary??
     // border: "#262323",
@@ -47,6 +49,7 @@ export const CustomDarkTheme: CustomTheme = {
     card: "#010104",
     cardInverted: "#fbfbfe",
     text: "#fbfbfe",
+    textInput: "#4d595d",
     textInverted: "#040316",
     border: "#eae9fc",
     button: "#9fb6db",

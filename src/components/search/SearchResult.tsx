@@ -9,20 +9,20 @@ import { Link, usePathname } from "expo-router";
 import useImageSize from "@/hooks/useImageSize";
 
 const { width, height } = Dimensions.get("window");
-const NUMCOLUMNS = 3;
-const CONTAINER_PADDING = 15; // Left and right padding for the container
-const GAP = 10; // Desired gap between images
-// Calculate the available width for images
-const availableWidth = width - 2 * CONTAINER_PADDING;
-// Calculate the width of each image
-const imageWidth3 = (availableWidth - (NUMCOLUMNS - 1) * GAP) / NUMCOLUMNS;
-// Calculate the height of each image (assuming 1.5 aspect ratio)
-const imageHeight3 = imageWidth3 * 1.5;
+// const NUMCOLUMNS = 3;
+// const CONTAINER_PADDING = 15; // Left and right padding for the container
+// const GAP = 10; // Desired gap between images
+// // Calculate the available width for images
+// const availableWidth = width - 2 * CONTAINER_PADDING;
+// // Calculate the width of each image
+// const imageWidth3 = (availableWidth - (NUMCOLUMNS - 1) * GAP) / NUMCOLUMNS;
+// // Calculate the height of each image (assuming 1.5 aspect ratio)
+// const imageHeight3 = imageWidth3 * 1.5;
 
 //~~  SearchResult Component
 type Props = {
   movie: MovieSearchResults;
-  numColumns: number;
+  numColumns: 2 | 3;
   onAddMovie: MovieStore["actions"]["addShow"];
   onRemoveMovie: MovieStore["actions"]["removeShow"];
 };
@@ -30,13 +30,8 @@ const SearchResult = ({ movie, numColumns = 3, onAddMovie, onRemoveMovie }: Prop
   const pathName = usePathname();
   const linkPath = useMemo(() => (pathName === "/search" ? "./search/" : "../"), [pathName]);
   const [isLocallyAdded, setIsLocallyAdded] = useState(movie.existsInSaved);
-  const { imageHeight: imageHeight2, imageWidth: imageWidth2 } = useImageSize("2column");
-  let imageWidth = imageWidth3;
-  let imageHeight = imageHeight3;
-  if (numColumns === 2) {
-    imageWidth = imageWidth2;
-    imageHeight = imageHeight2;
-  }
+  const { imageHeight, imageWidth } = useImageSize(numColumns);
+
   const { colors } = useCustomTheme();
   useEffect(() => {
     setIsLocallyAdded(movie.existsInSaved);
@@ -53,10 +48,11 @@ const SearchResult = ({ movie, numColumns = 3, onAddMovie, onRemoveMovie }: Prop
 
   return (
     <View
-      className={`my-1 mb-[20] border-hairline border-border `}
+      className={`border-hairline border-border `}
       style={{
         width: imageWidth,
         height: imageHeight + 20,
+        marginBottom: 10,
         overflow: "hidden",
         borderRadius: 10,
         shadowColor: colors.border,

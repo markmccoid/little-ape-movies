@@ -8,8 +8,8 @@ import {
 } from "../../common/animations/animationHelpers";
 import { getMovieItemSizing } from "./movieItemHelpers";
 
-const { imageHeight, imageWidth, itemHeight, margin } = getMovieItemSizing();
-const MARGIN = margin;
+const { imageHeight, imageWidth, itemHeight, verticalMargin } = getMovieItemSizing();
+const MARGIN = verticalMargin;
 const ITEM_SIZE = itemHeight;
 
 type MovieAnimatedViewProps = {

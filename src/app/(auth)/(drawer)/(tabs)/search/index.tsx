@@ -16,6 +16,7 @@ import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import SearchInput from "@/components/search/SearchInput";
 
 const SearchPage = () => {
+  const { colors } = useCustomTheme();
   const searchColumns = useSettingsStore((state) => state.searchColumns);
   const settingsActions = useSettingsStore((state) => state.actions);
   const { setSearch, setSearchType } = useSearchStore((state) => state.actions);
@@ -50,7 +51,7 @@ const SearchPage = () => {
     if (routeFocused) {
       setTimeout(() => inputRef.current?.focus(), 0);
     }
-  }, [routeFocused]);
+  }, []);
 
   return (
     <View className="flex-1">
@@ -68,23 +69,21 @@ const SearchPage = () => {
             onPress={settingsActions.toggleSearchColumns}
             className="flex-row items-center h-full pr-4 pl-2"
           >
-            {searchColumns === 2 ? (
+            <MotiView
+              from={{ transform: [{ rotateZ: searchColumns === 2 ? "180deg" : "0deg" }] }}
+              animate={{ transform: [{ rotateZ: searchColumns === 2 ? "0deg" : "180deg" }] }}
+            >
               <SymbolView
-                name="rectangle.expand.vertical"
+                name="arrow.left.and.right.text.vertical"
+                // name="rectangle.expand.vertical"
                 style={{
                   width: 25,
                   height: 25,
-                  transform: [{ rotateZ: "90deg" }],
                 }}
-                type="hierarchical"
+                colors={searchColumns === 2 ? [colors.primary, "green"] : ["green", colors.primary]}
+                type="palette"
               />
-            ) : (
-              <SymbolView
-                name="rectangle.compress.vertical"
-                style={{ width: 25, height: 25, transform: [{ rotateZ: "90deg" }] }}
-                type="hierarchical"
-              />
-            )}
+            </MotiView>
           </Pressable>
         </View>
         <View className="flex-row gap-3 items-center" style={{ marginLeft: 20 }}>

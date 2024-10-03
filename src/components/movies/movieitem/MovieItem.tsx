@@ -16,13 +16,15 @@ type Props = {
   movie: ShowItemType;
 };
 const MovieItem = ({ movie }: Props) => {
-  const { imageHeight, imageWidth, margin, extraHeight } = getMovieItemSizing();
+  const { imageHeight, imageWidth, verticalMargin, extraHeight, horizontalMargin, gap } =
+    getMovieItemSizing();
 
   return (
     <View
       className="rounded-lg relative"
       style={{
-        marginVertical: margin,
+        marginVertical: verticalMargin,
+        marginRight: gap,
         height: imageHeight + extraHeight,
         shadowColor: "#000",
         shadowOffset: {
@@ -35,7 +37,7 @@ const MovieItem = ({ movie }: Props) => {
     >
       <View
         className="absolute p-1 bottom-0 w-full z-0 bg-red-500 rounded-b-lg"
-        style={{ maxHeight: extraHeight + margin }}
+        style={{ height: extraHeight + verticalMargin }}
       >
         <MovieItemActionBar movie={movie} />
       </View>
