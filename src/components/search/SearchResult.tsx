@@ -23,10 +23,11 @@ const { width, height } = Dimensions.get("window");
 type Props = {
   movie: MovieSearchResults;
   numColumns: 2 | 3;
+  spacing: { bottomMargin: number; extraHeight: number };
   onAddMovie: MovieStore["actions"]["addShow"];
   onRemoveMovie: MovieStore["actions"]["removeShow"];
 };
-const SearchResult = ({ movie, numColumns = 3, onAddMovie, onRemoveMovie }: Props) => {
+const SearchResult = ({ movie, spacing, numColumns = 3, onAddMovie, onRemoveMovie }: Props) => {
   const pathName = usePathname();
   const linkPath = useMemo(() => (pathName === "/search" ? "./search/" : "../"), [pathName]);
   const [isLocallyAdded, setIsLocallyAdded] = useState(movie.existsInSaved);
@@ -51,8 +52,8 @@ const SearchResult = ({ movie, numColumns = 3, onAddMovie, onRemoveMovie }: Prop
       className={`border-hairline border-border `}
       style={{
         width: imageWidth,
-        height: imageHeight + 20,
-        marginBottom: 10,
+        height: imageHeight + spacing.extraHeight,
+        marginBottom: spacing.bottomMargin,
         overflow: "hidden",
         borderRadius: 10,
         shadowColor: colors.border,

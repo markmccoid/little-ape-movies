@@ -1,5 +1,5 @@
 import { View, Text, Image, FlatList, TouchableOpacity } from "react-native";
-import React, { useCallback, useReducer, useState } from "react";
+import React, { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { FetchNextPageFn } from "@/store/query.search";
 import { MovieSearchResults, useSearchStore } from "@/store/store.search";
 import SearchResult from "@/components/search/SearchResult";
@@ -13,11 +13,19 @@ type Props = {
   movies: MovieSearchResults[];
   fetchNextPage: FetchNextPageFn<MovieSearchResults[]> | undefined;
 };
+
+//-- Used in SearchResult and in getItemLayout --
+// Bottom Margin
+const BOTTOM_MARGIN = 10;
+// extra height for the bottom "button" to select/unselect movie
+const EXTRA_HEIGHT = 20;
+
 const SearchContainer = ({ movies, fetchNextPage }: Props) => {
   const numColumns = useSettingsStore((state) => state.searchColumns);
   const { imageHeight, imageWidth } = useImageSize(numColumns);
   const movieActions = useMovieStore((state) => state.actions);
   const fetchNextPageFunc = fetchNextPage ? fetchNextPage : () => {};
+  const flatListRef = useRef<FlatList>(null);
 
   const renderItem = ({ item, index }: { item: MovieSearchResults; index: number }) => {
     return (
@@ -26,13 +34,14 @@ const SearchContainer = ({ movies, fetchNextPage }: Props) => {
         onAddMovie={movieActions.addShow}
         onRemoveMovie={movieActions.removeShow}
         numColumns={numColumns}
+        spacing={{ bottomMargin: BOTTOM_MARGIN, extraHeight: EXTRA_HEIGHT }}
       />
     );
   };
 
   const getItemLayout = (_, index: number) => ({
-    length: imageHeight + 20 + 10, // Item height plus in SearchResult there is 10 bottom margin and extra 20 units added to imageHeight
-    offset: (imageHeight + 20 + 10) * index, // Offset for the current index
+    length: imageHeight + BOTTOM_MARGIN + EXTRA_HEIGHT, // Item height plus in SearchResult there is A bottom margin and extra height added to imageHeight
+    offset: (imageHeight + BOTTOM_MARGIN + EXTRA_HEIGHT) * index, // Offset for the current index
     index,
   });
 
@@ -40,6 +49,7 @@ const SearchContainer = ({ movies, fetchNextPage }: Props) => {
     <View className="flex-1">
       <FlatList
         data={movies}
+        ref={flatListRef}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
         numColumns={numColumns}

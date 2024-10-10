@@ -16,6 +16,7 @@ export type ShowItemType = {
   genres: string[]; // Genres as strings
   rating: number;
   tags: string[];
+  existsInSaved: boolean;
   // Add other movie properties
 };
 
@@ -46,7 +47,7 @@ const useMovieStore = create<MovieStore>()(
             show.id
           );
           // If movie exists do nothing
-          if (showExists) return;
+          if (showExists || !show.id) return;
 
           const newShow: ShowItemType = {
             id: show.id,
@@ -58,6 +59,7 @@ const useMovieStore = create<MovieStore>()(
             genres: show?.genres,
             rating: 0,
             tags: [],
+            existsInSaved: true,
           };
           set((state) => ({ shows: [...state.shows, newShow] }));
           eventBus.publish("TAG_SEARCH_RESULTS");

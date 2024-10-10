@@ -60,6 +60,7 @@ const MoviesContainer = () => {
       data={movies}
       ref={flatListRef}
       renderItem={renderItem}
+      // keyExtractor={(item, index) => index.toString()}
       keyExtractor={(item) => item.id.toString()}
       numColumns={2}
       style={{ paddingTop: 10 }}
