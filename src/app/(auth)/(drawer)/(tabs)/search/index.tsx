@@ -1,4 +1,13 @@
-import { View, Pressable, TextInput } from "react-native";
+import {
+  View,
+  Pressable,
+  TextInput,
+  InputAccessoryView,
+  Text,
+  Button,
+  KeyboardAvoidingView,
+  StyleSheet,
+} from "react-native";
 import React, { useCallback, useState, useRef, useEffect } from "react";
 import { useFocusEffect, useNavigation } from "expo-router";
 import { useIsFocused } from "@react-navigation/native";
@@ -14,6 +23,7 @@ import { SymbolView } from "expo-symbols";
 import useSettingsStore from "@/store/store.settings";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import SearchInput from "@/components/search/SearchInput";
+import SearchInputAccessoryView from "@/components/search/SearchInputAccessoryView";
 
 const SearchPage = () => {
   const { colors } = useCustomTheme();
@@ -41,10 +51,10 @@ const SearchPage = () => {
     navigation.setOptions(options);
   }, []);
 
-  const handleSearchType = (type: SearchType) => {
-    inputRef.current?.focus();
-    setSearchType(type);
-  };
+  // const handleSearchType = (type: SearchType) => {
+  //   inputRef.current?.focus();
+  //   setSearchType(type);
+  // };
 
   const routeFocused = useIsFocused();
   useEffect(() => {
@@ -57,14 +67,14 @@ const SearchPage = () => {
     <View className="flex-1">
       <View className="bg-card border-b-hairline border-border" style={{ paddingTop: top }}>
         <View className="flex-row w-full items-center" style={{ marginTop: 10 }}>
-          <View className="mr-2 flex-1" style={{ marginLeft: 18 }}>
+          <View className="mr-2 mb-2 flex-1" style={{ marginLeft: 18 }}>
             <SearchInput
               onChange={debouncedSetSearchText}
               setIsFocused={setIsFocused}
               ref={inputRef}
             />
           </View>
-
+          {/* Toggle from 3 to 2 or 2 to 3 columns being shown */}
           <Pressable
             onPress={settingsActions.toggleSearchColumns}
             className="flex-row items-center h-full pr-4 pl-2"
@@ -86,7 +96,7 @@ const SearchPage = () => {
             </MotiView>
           </Pressable>
         </View>
-        <View className="flex-row gap-3 items-center" style={{ marginLeft: 20 }}>
+        {/* <View className="flex-row gap-3 items-center" style={{ marginLeft: 20 }}>
           <Pressable
             onPress={() => {
               handleSearchType("title");
@@ -118,7 +128,8 @@ const SearchPage = () => {
               Person
             </MotiText>
           </Pressable>
-        </View>
+        </View> */}
+        <SearchInputAccessoryView />
       </View>
 
       {/* Spacer for when searchType field is shown */}

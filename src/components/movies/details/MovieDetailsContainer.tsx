@@ -1,8 +1,7 @@
 import { View, Text, TouchableOpacity, Dimensions, ScrollView } from "react-native";
 import React, { useCallback, useLayoutEffect, useState } from "react";
 import { useFocusEffect, useNavigation, useRouter } from "expo-router";
-import MovieImage from "@/components/common/MovieImage";
-import { useMovieData, useMovieDetailData } from "@/store/dataHooks";
+import { MovieDetails, useMovieData, useMovieDetailData } from "@/store/dataHooks";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradient } from "expo-linear-gradient";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
@@ -24,6 +23,8 @@ import Animated, {
 } from "react-native-reanimated";
 import MotiDetailImage from "./MotiDetailImage";
 import AnimatedLinearGradient from "./AnimatedLinearGradient";
+import MDImageDescRow from "./MDImageDescRow";
+import MDDetails from "./MDDetails";
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   useDynamicAnimation();
@@ -111,60 +112,24 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const backgroundEndColor = storedMovie?.posterColors?.lightestColor || "#FFFFFF";
 
   return (
-    <View className="flex-1">
+    <View className="flex-1 ">
       <LinearGradient
         colors={[backgroundStartColor, backgroundEndColor]}
         style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, opacity: 0.5 }}
       />
-      <View className="flex-1 flex-col" style={{ marginTop: headerHeight }}>
-        <View
-          className="border"
-          style={{
-            flexDirection: "row",
-            justifyContent: existsInSaved ? "flex-start" : "flex-end",
-          }}
-        >
-          {/* {existsInSaved ? ( */}
-          <View className="flex-row flex-1 mx-1">
-            <Animated.View
-              sharedTransitionTag="detailImage"
-              key={1}
-              layout={SequencedTransition.duration(1000).reverse().reduceMotion(ReduceMotion.Never)}
-              exiting={FadeOut.duration(1000)}
-              entering={FadeIn.duration(1000)}
-            >
-              <MotiDetailImage existsInSaved={existsInSaved} posterURL={movieDetails?.posterURL} />
-            </Animated.View>
-            <Animated.View
-              className="flex-1 ml-2"
-              key={2}
-              layout={SequencedTransition.duration(1000).reverse().reduceMotion(ReduceMotion.Never)}
-              exiting={FadeOut.duration(1000)}
-              entering={FadeIn.duration(1000)}
-            >
-              <Overview overview={movieDetails?.overview} />
-            </Animated.View>
-          </View>
+      <View className="flex-1 flex-col" style={{ marginTop: headerHeight + 5 }}>
+        <View className="px-2">
+          <MDImageDescRow
+            movieDetails={movieDetails as MovieDetails}
+            existsInSaved={existsInSaved}
+          />
         </View>
-        <Text className="text-text">MovieId {movieDetails?.id}</Text>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text>GO BACK</Text>
-        </TouchableOpacity>
+
+        <View className="pt-1">
+          <MDDetails movieDetails={movieDetails as MovieDetails} existsInSaved={existsInSaved} />
+        </View>
       </View>
     </View>
-  );
-};
-
-const Overview = ({ overview }: { overview: string | undefined }) => {
-  return (
-    <ScrollView>
-      <Animated.Text entering={FadeInRight.duration(1000)}>{overview}</Animated.Text>
-    </ScrollView>
-    // <View className="border border-red-600">
-    //   <Text lineBreakMode="tail" numberOfLines={5}>
-    //     {overview}
-    //   </Text>
-    // </View>
   );
 };
 

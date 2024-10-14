@@ -1,15 +1,16 @@
 import useMovieStore from "./store.shows";
-import { movieGetDetails } from "@markmccoid/tmdb_api";
+import { movieGetDetails, movieDetails_typedef } from "@markmccoid/tmdb_api";
 import { useQuery } from "@tanstack/react-query";
 import { add } from "lodash";
 import { useEffect, useState } from "react";
 
+export type MovieDetails = movieDetails_typedef["data"];
 export const useMovieDetailData = (movieId: number) => {
   // console.log("StoredMovie", storedMovie.existsInSaved, storedMovie.id);
   const fetchAdditionalMovieData = async (id: number) => {
     const response = await movieGetDetails(id);
     // console.log("RESPONSE", response);
-    return response.data;
+    return response.data as MovieDetails;
   };
 
   const {

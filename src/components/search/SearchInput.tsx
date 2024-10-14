@@ -1,7 +1,15 @@
 import { SymbolView } from "expo-symbols";
 import { MotiView } from "moti";
 import React, { useState, ChangeEvent, useRef, forwardRef, useImperativeHandle } from "react";
-import { View, TextInput, TouchableOpacity, Text, Pressable } from "react-native";
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  Pressable,
+  InputAccessoryView,
+  Button,
+} from "react-native";
 
 interface SearchInputProps {
   placeholder?: string;
@@ -45,9 +53,10 @@ const SearchInput = forwardRef(
           placeholder={placeholder}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          autoCapitalize="none"
+          // autoCapitalize="none"
           autoCorrect={false}
           autoFocus
+          inputAccessoryViewID="searchInputVID"
         />
         {inputValue !== "" && (
           <Pressable

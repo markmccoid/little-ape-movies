@@ -41,10 +41,10 @@ const MotiDetailImage = ({ existsInSaved, posterURL }: Props) => {
         shadowColor: "#000000",
         shadowOffset: {
           width: 0,
-          height: 4,
+          height: 0,
         },
-        shadowOpacity: 0.5,
-        shadowRadius: 16,
+        shadowOpacity: 0.8,
+        shadowRadius: 5,
       }}
     >
       <MotiImage

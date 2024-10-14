@@ -22,7 +22,6 @@ const PersonSearchContainer = () => {
       <FlatList
         data={persons}
         keyExtractor={(person) => person.id.toString()} // Ensure keys are strings
-        onEndReached={() => fetchNextPage()}
         renderItem={renderPerson}
         numColumns={searchColumns}
         key={searchColumns}
@@ -31,6 +30,10 @@ const PersonSearchContainer = () => {
           paddingVertical: 10,
         }}
         columnWrapperStyle={{ justifyContent: "space-between" }}
+        onEndReached={() => fetchNextPage()}
+        onEndReachedThreshold={0.7}
+        keyboardDismissMode="on-drag" // Dismiss keyboard when scrolling starts
+        keyboardShouldPersistTaps="handled" // Prevent keyboard from persisting when tapping on items
       />
     </View>
   );
