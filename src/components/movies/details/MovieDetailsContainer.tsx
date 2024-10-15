@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Dimensions, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import React, { useCallback, useLayoutEffect, useState } from "react";
 import { useFocusEffect, useNavigation, useRouter } from "expo-router";
 import { MovieDetails, useMovieData, useMovieDetailData } from "@/store/dataHooks";
@@ -9,22 +9,12 @@ import { AddIcon, DeleteIcon } from "@/components/common/Icons";
 import showConfirmationPrompt from "@/components/common/showConfirmationPrompt";
 import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
 import { movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
-import { MotiView, useDynamicAnimation } from "moti";
+import { useDynamicAnimation } from "moti";
 
-import Animated, {
-  FadeIn,
-  FadeOut,
-  Easing,
-  LinearTransition,
-  ReduceMotion,
-  SequencedTransition,
-  FadeInLeft,
-  FadeInRight,
-} from "react-native-reanimated";
-import MotiDetailImage from "./MotiDetailImage";
-import AnimatedLinearGradient from "./AnimatedLinearGradient";
 import MDImageDescRow from "./MDImageDescRow";
 import MDDetails from "./MDDetails";
+import HiddenContainer from "@/components/common/HiddenContainer/HiddenContainer";
+import HiddenContainer2 from "@/components/common/HiddenContainer/HiddenContainer2";
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   useDynamicAnimation();
@@ -112,23 +102,50 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const backgroundEndColor = storedMovie?.posterColors?.lightestColor || "#FFFFFF";
 
   return (
-    <View className="flex-1 ">
-      <LinearGradient
-        colors={[backgroundStartColor, backgroundEndColor]}
-        style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, opacity: 0.5 }}
+    <View className="flex-1">
+      <Image
+        source={{ uri: movieDetails?.posterURL }}
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          opacity: 0.2,
+          resizeMode: "stretch",
+        }}
       />
-      <View className="flex-1 flex-col" style={{ marginTop: headerHeight + 5 }}>
-        <View className="px-2">
-          <MDImageDescRow
-            movieDetails={movieDetails as MovieDetails}
-            existsInSaved={existsInSaved}
-          />
-        </View>
+      <ScrollView style={{ marginTop: headerHeight + 5, flexGrow: 1 }}>
+        {/* <LinearGradient
+          colors={[backgroundStartColor, backgroundEndColor]}
+          style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, opacity: 0.5 }}
+        /> */}
 
-        <View className="pt-1">
-          <MDDetails movieDetails={movieDetails as MovieDetails} existsInSaved={existsInSaved} />
+        <View className="flex-1 flex-col">
+          <View className="">
+            <MDImageDescRow
+              movieDetails={movieDetails as MovieDetails}
+              existsInSaved={existsInSaved}
+            />
+          </View>
+          <View className="pt-1">
+            <MDDetails movieDetails={movieDetails as MovieDetails} existsInSaved={existsInSaved} />
+          </View>
         </View>
-      </View>
+        <View className="flex-1">
+          <HiddenContainer2
+            title="Watch"
+            // titleInfo="Testing"
+            style={{ height: 75 }}
+            height={75}
+            // leftIconFunction={() => updateSearchObject({ genres: undefined })}
+          >
+            <View className=" ">
+              <Text>Hidden now showing</Text>
+            </View>
+          </HiddenContainer2>
+        </View>
+      </ScrollView>
     </View>
   );
 };

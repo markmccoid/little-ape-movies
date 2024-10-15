@@ -1,4 +1,4 @@
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import React from "react";
 import Animated, {
   FadeIn,
@@ -9,6 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import MotiDetailImage from "./MotiDetailImage";
 import { MovieDetails } from "@/store/dataHooks";
+import useDetailImageSize from "@/hooks/useDetailImageSize";
 
 type Props = {
   existsInSaved: boolean;
@@ -25,6 +26,22 @@ const MDImageDescRow = ({ existsInSaved, movieDetails }: Props) => {
     >
       {/* {existsInSaved ? ( */}
       <View className="flex-row flex-1">
+        <View
+          style={{
+            backgroundColor: "white",
+            opacity: 0.5,
+            borderRadius: 10,
+            shadowColor: "#000000",
+            shadowOffset: {
+              width: 0,
+              height: 0,
+            },
+            shadowOpacity: 0.4,
+            shadowRadius: 2,
+            ...StyleSheet.absoluteFillObject,
+            position: "absolute",
+          }}
+        />
         <Animated.View
           sharedTransitionTag="detailImage"
           key={1}
@@ -35,7 +52,7 @@ const MDImageDescRow = ({ existsInSaved, movieDetails }: Props) => {
           <MotiDetailImage existsInSaved={existsInSaved} posterURL={movieDetails?.posterURL} />
         </Animated.View>
         <Animated.View
-          className="flex-1 ml-2"
+          className="flex-1"
           key={2}
           layout={SequencedTransition.duration(700).reverse().reduceMotion(ReduceMotion.Never)}
           exiting={FadeOut.duration(700)}
@@ -49,9 +66,16 @@ const MDImageDescRow = ({ existsInSaved, movieDetails }: Props) => {
 };
 
 const Overview = ({ overview }: { overview: string | undefined }) => {
+  const { imageWidth, imageHeight } = useDetailImageSize();
+
   return (
-    <ScrollView>
-      <Animated.Text entering={FadeInRight.duration(700)}>{overview}</Animated.Text>
+    <ScrollView
+      style={{ maxHeight: imageHeight, marginLeft: 8, marginRight: 3, paddingTop: 4 }}
+      contentContainerStyle={{ paddingBottom: 10 }}
+    >
+      <Animated.Text style={{ fontSize: 16 }} entering={FadeInRight.duration(700)}>
+        {overview}
+      </Animated.Text>
     </ScrollView>
     // <View className="border border-red-600">
     //   <Text lineBreakMode="tail" numberOfLines={5}>

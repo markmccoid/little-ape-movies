@@ -1,5 +1,7 @@
 import { Dimensions } from "react-native";
-
+//~~ ------------------------------------------------------
+//~~ FOR Main view and Search View
+//~~ ------------------------------------------------------
 /**
  * Calculates image sizes based on layout and spacing.
  *

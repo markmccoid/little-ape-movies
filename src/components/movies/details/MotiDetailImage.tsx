@@ -1,11 +1,7 @@
+import useDetailImageSize from "@/hooks/useDetailImageSize";
 import { MotiImage, MotiView } from "moti";
 import React from "react";
-import { Dimensions } from "react-native";
-import { FadeInLeft } from "react-native-reanimated";
-const { width, height } = Dimensions.get("window");
-console.log("WIDTH", width, width * 0.35);
-const IMAGE_WIDTH = width * 0.35;
-const IMAGE_HEIGHT = IMAGE_WIDTH * 1.5;
+
 type Props = {
   existsInSaved: boolean;
   posterURL: string | undefined;
@@ -14,6 +10,7 @@ type Props = {
  *
  */
 const MotiDetailImage = ({ existsInSaved, posterURL }: Props) => {
+  const { imageWidth, imageHeight } = useDetailImageSize();
   // Radius once added
   const BORDER_RADIUS_ADDED = 20;
   // Radius when NOT added
@@ -36,8 +33,8 @@ const MotiDetailImage = ({ existsInSaved, posterURL }: Props) => {
         duration: 600,
       }}
       style={{
-        width: IMAGE_WIDTH,
-        height: IMAGE_HEIGHT,
+        width: imageWidth,
+        height: imageHeight,
         shadowColor: "#000000",
         shadowOffset: {
           width: 0,
@@ -58,8 +55,9 @@ const MotiDetailImage = ({ existsInSaved, posterURL }: Props) => {
           duration: 600,
         }}
         style={{
-          width: IMAGE_WIDTH,
-          height: IMAGE_HEIGHT,
+          width: imageWidth,
+          height: imageHeight,
+          resizeMode: "contain",
         }}
       />
     </MotiView>

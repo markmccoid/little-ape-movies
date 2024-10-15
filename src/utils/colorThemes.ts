@@ -9,6 +9,7 @@ type CustomTheme = Theme & {
     textInput: string;
     cardInverted: string;
     colorSelected: string;
+    deleteRed: string;
   };
 };
 
@@ -36,6 +37,7 @@ export const CustomLightTheme: CustomTheme = {
     buttontext: "#040316",
     colorSelected: "#90ee90",
     notification: "rgb(255, 59, 48)",
+    deleteRed: "#c70000",
   },
 };
 
@@ -56,5 +58,6 @@ export const CustomDarkTheme: CustomTheme = {
     buttontext: "#040316",
     colorSelected: "#2f6b2f",
     notification: "rgb(255, 59, 48)",
+    deleteRed: "#c70000",
   },
 };
