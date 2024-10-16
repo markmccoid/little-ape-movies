@@ -29,25 +29,27 @@ const MDDetails = ({ movieDetails }: Props) => {
         {/* Left Side Info */}
         <View className="flex-col">
           <View className="flex-row">
-            <Text className="font-semibold pr-1">Released:</Text>
-            <Text>{movieDetails?.releaseDate.formatted}</Text>
+            <Text style={styles.textLabel}>Released:</Text>
+            <Text style={styles.textDesc}>{movieDetails?.releaseDate.formatted}</Text>
           </View>
           <View className="flex-row">
-            <Text className="font-semibold pr-1">Length:</Text>
-            <Text>{formatTime(movieDetails.runtime).verbose}</Text>
+            <Text style={styles.textLabel}>Length:</Text>
+            <Text style={styles.textDesc}>{formatTime(movieDetails.runtime).verbose}</Text>
           </View>
           {movieDetails?.budget !== 0 && (
             <View className="flex-row">
-              <Text className="font-semibold pr-1">Budget:</Text>
-              <Text>{formatAsUSDCurrency(movieDetails?.budget, false)}</Text>
+              <Text style={styles.textLabel}>Budget:</Text>
+              <Text style={styles.textDesc}>
+                {formatAsUSDCurrency(movieDetails?.budget, false)}
+              </Text>
             </View>
           )}
         </View>
         {/* Right Side Info */}
         <View className="flex-1 ml-4 flex-col">
-          <Text className="font-semibold">Genres:</Text>
+          <Text style={styles.textLabel}>Genres:</Text>
           <View className="flex-row gap-2">
-            <Text>{addDelimitersToArray(movieDetails.genres, ", ")}</Text>
+            <Text style={styles.textDesc}>{addDelimitersToArray(movieDetails.genres, ", ")}</Text>
           </View>
         </View>
       </View>
@@ -55,4 +57,14 @@ const MDDetails = ({ movieDetails }: Props) => {
   );
 };
 
+const styles = StyleSheet.create({
+  textLabel: {
+    fontWeight: "600",
+    paddingRight: 4,
+    fontSize: 15,
+  },
+  textDesc: {
+    fontSize: 15,
+  },
+});
 export default MDDetails;

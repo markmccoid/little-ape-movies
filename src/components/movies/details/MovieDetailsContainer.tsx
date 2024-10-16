@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, Image, ScrollView, useColorScheme } from "react-native";
 import React, { useCallback, useLayoutEffect, useState } from "react";
 import { useFocusEffect, useNavigation, useRouter } from "expo-router";
 import { MovieDetails, useMovieData, useMovieDetailData } from "@/store/dataHooks";
@@ -8,16 +8,20 @@ import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { AddIcon, DeleteIcon } from "@/components/common/Icons";
 import showConfirmationPrompt from "@/components/common/showConfirmationPrompt";
 import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
-import { movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
+import { movieGetWatchProviders, movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
 import { useDynamicAnimation } from "moti";
 
 import MDImageDescRow from "./MDImageDescRow";
 import MDDetails from "./MDDetails";
 import HiddenContainer from "@/components/common/HiddenContainer/HiddenContainer";
-import HiddenContainer2 from "@/components/common/HiddenContainer/HiddenContainer2";
+import HiddenContainerAnimated from "@/components/common/HiddenContainer/HiddenContainerAnimated";
+import { useCustomTheme } from "@/utils/colorThemes";
+import { ColorSpace } from "react-native-reanimated";
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   useDynamicAnimation();
+  const { colors } = useCustomTheme();
+  const colorScheme = useColorScheme();
   const [movieAdding, setMovieAdding] = useState(false);
   const navigation = useNavigation();
   const router = useRouter();
@@ -29,8 +33,17 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const existsInSaved = !!storedMovie?.id;
   const { movieDetails, isLoading } = useMovieDetailData(movieId);
 
+  //! TEMP
+  React.useEffect(() => {
+    const wp = async () => {
+      const x = await movieGetWatchProviders(movieId.toString(), ["AU", "US"]);
+      const y = x.data.results.US;
+      y;
+      console.log("WP", x.data.results.US);
+    };
+    wp();
+  }, []);
   //-- HEADER RIGHT ----------
-
   const handleAddMovie = useCallback(() => {
     if (!movieDetails) return;
     setMovieAdding(true);
@@ -48,40 +61,41 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
 
     movieActions.addShow(movieToAdd);
     setMovieAdding(false);
-  }, [movieId, isLoading]);
+  }, [movieId, isLoading, existsInSaved]);
 
-  let HeaderRight = () => (
-    <TouchableOpacity
-      className="pr-2 mr-[-10] pl-1"
-      activeOpacity={0.5}
-      onPress={() => handleAddMovie()}
-      disabled={movieAdding}
-    >
-      <AddIcon />
-    </TouchableOpacity>
-  );
-  if (storedMovie) {
-    HeaderRight = () => (
+  const HeaderRight = useCallback(() => {
+    // console.log("UseCallbac", existsInSaved, storedMovie);
+    if (storedMovie) {
+      return (
+        <TouchableOpacity
+          className="pr-2 mr-[-10] pl-1"
+          activeOpacity={0.5}
+          onPress={async () => {
+            const yesDelete = await showConfirmationPrompt("Delete Movie", "Delete Movie");
+            if (yesDelete) {
+              movieActions.removeShow(storedMovie.id);
+              router.back();
+            }
+          }}
+        >
+          <DeleteIcon />
+        </TouchableOpacity>
+      );
+    }
+    return (
       <TouchableOpacity
         className="pr-2 mr-[-10] pl-1"
         activeOpacity={0.5}
-        onPress={async () => {
-          const yesDelete = await showConfirmationPrompt("Delete Movie", "Delete Movie");
-          if (yesDelete) {
-            movieActions.removeShow(storedMovie.id);
-            router.back();
-          }
-        }}
+        onPress={() => handleAddMovie()}
+        disabled={movieAdding}
       >
-        <DeleteIcon />
+        <AddIcon color={colors.text} />
       </TouchableOpacity>
     );
-  }
-  //-- HEADER RIGHT END ---------
-  // React.useEffect(() => {
-  //   setStoredMovie(movieActions.getShowById(movieId));
-  // }, [movieId]);
+  }, [colorScheme, storedMovie, existsInSaved, isLoading]);
 
+  // NOTE: any changes to when affects the useCallback on the HeaderRight
+  //  needs to be added to the useLayoutEffect []
   useLayoutEffect(() => {
     const options: NativeStackNavigationOptions = {
       title: storedMovie?.title || movieDetails?.title || "",
@@ -89,7 +103,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
       headerBackTitle: "Back",
     };
     navigation.setOptions(options);
-  }, [movieId, isLoading, storedMovie]);
+  }, [movieId, isLoading, storedMovie, colorScheme]);
 
   if (isLoading)
     return (
@@ -98,43 +112,60 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
       </View>
     );
 
-  const backgroundStartColor = storedMovie?.posterColors?.background?.color || "#000000";
-  const backgroundEndColor = storedMovie?.posterColors?.lightestColor || "#FFFFFF";
+  const backgroundStartColor = "#000000";
+  const backgroundEndColor = "#FFFFFF";
+  // const backgroundStartColor = storedMovie?.posterColors?.background?.color || "#000000";
+  // const backgroundEndColor = storedMovie?.posterColors?.lightestColor || "#FFFFFF";
 
   return (
     <View className="flex-1">
-      <Image
-        source={{ uri: movieDetails?.posterURL }}
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: 0,
-          opacity: 0.2,
-          resizeMode: "stretch",
-        }}
-      />
-      <ScrollView style={{ marginTop: headerHeight + 5, flexGrow: 1 }}>
-        {/* <LinearGradient
+      {existsInSaved ? (
+        <Image
+          source={{ uri: movieDetails?.posterURL }}
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            opacity: 0.2,
+            resizeMode: "stretch",
+          }}
+        />
+      ) : (
+        <LinearGradient
           colors={[backgroundStartColor, backgroundEndColor]}
           style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, opacity: 0.5 }}
-        /> */}
-
-        <View className="flex-1 flex-col">
-          <View className="">
-            <MDImageDescRow
-              movieDetails={movieDetails as MovieDetails}
-              existsInSaved={existsInSaved}
-            />
-          </View>
-          <View className="pt-1">
-            <MDDetails movieDetails={movieDetails as MovieDetails} existsInSaved={existsInSaved} />
-          </View>
+        />
+      )}
+      <ScrollView style={{ marginTop: headerHeight + 5, flexGrow: 1 }}>
+        {/* <View className="flex-1 flex-col"> */}
+        <View>
+          <MDImageDescRow
+            movieDetails={movieDetails as MovieDetails}
+            existsInSaved={existsInSaved}
+          />
         </View>
-        <View className="flex-1">
-          <HiddenContainer2
-            title="Watch"
+        <View className="pt-1 my-1">
+          <MDDetails movieDetails={movieDetails as MovieDetails} existsInSaved={existsInSaved} />
+        </View>
+        {/* WHERE TO WATCH */}
+        <View className="flex-1 my-1">
+          <HiddenContainerAnimated
+            title="Where to Watch"
+            style={{ height: 75 }}
+            height={75}
+            // leftIconFunction={() => updateSearchObject({ genres: undefined })}
+          >
+            <View className=" ">
+              <Text>Hidden now showing</Text>
+            </View>
+          </HiddenContainerAnimated>
+        </View>
+        {/* Other movie recomendations */}
+        <View className="flex-1 my-1">
+          <HiddenContainerAnimated
+            title="Recommended"
             // titleInfo="Testing"
             style={{ height: 75 }}
             height={75}
@@ -143,7 +174,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
             <View className=" ">
               <Text>Hidden now showing</Text>
             </View>
-          </HiddenContainer2>
+          </HiddenContainerAnimated>
         </View>
       </ScrollView>
     </View>

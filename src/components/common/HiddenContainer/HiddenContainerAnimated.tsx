@@ -19,7 +19,7 @@ type Props = {
   startOpen?: boolean;
 };
 
-const HiddenContainer: React.FC<Props> = ({
+const HiddenContainerAnimated: React.FC<Props> = ({
   children,
   style,
   title,
@@ -27,25 +27,27 @@ const HiddenContainer: React.FC<Props> = ({
   startOpen = false,
 }) => {
   const [viewContents, setViewContents] = useState(startOpen);
+  const [isMounted, setIsMounted] = useState(false);
 
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: "#ffffff85",
         borderTopColor: "#777",
-        borderBottomColor: "#aaa",
-        borderBottomWidth: viewContents ? 1 : 1,
-        borderTopWidth: 1,
-        marginVertical: 5,
+        borderBottomColor: "#777",
+        borderBottomWidth: StyleSheet.hairlineWidth, //viewContents ? StyleSheet.hairlineWidth : StyleSheet.hairlineWidth,
+        borderTopWidth: StyleSheet.hairlineWidth,
       }}
-      className="pt-2"
+      className="py-2"
     >
       <Pressable
         style={({ pressed }) => [
           {
             flex: 1,
-            paddingVertical: 10,
             borderBottomColor: "#777",
             borderBottomWidth: 1,
             backgroundColor: "#ffffff77",
@@ -61,18 +63,18 @@ const HiddenContainer: React.FC<Props> = ({
           <View className="pr-4">
             <MotiView
               key="1"
-              from={{ transform: [{ rotateZ: viewContents ? "0deg" : "180deg" }] }}
-              animate={{ transform: [{ rotateZ: viewContents ? "180deg" : "0deg" }] }}
+              from={{ transform: [{ rotateZ: !isMounted || viewContents ? "0deg" : "180deg" }] }}
+              animate={{ transform: [{ rotateZ: !isMounted || viewContents ? "180deg" : "0deg" }] }}
             >
-              <ExpandDownIcon style={{ marginTop: 5 }} size={20} />
+              <ExpandDownIcon size={20} />
             </MotiView>
           </View>
         </View>
       </Pressable>
 
       <MotiView
-        from={{ height: viewContents ? 0 : height }}
-        animate={{ height: viewContents ? height : 0 }}
+        from={{ height: !isMounted || viewContents ? 0 : height }}
+        animate={{ height: !isMounted || viewContents ? height : 0 }}
         transition={{ type: "timing", duration: 500 }}
       >
         <AnimatePresence>
@@ -87,6 +89,6 @@ const HiddenContainer: React.FC<Props> = ({
   );
 };
 
-export default HiddenContainer;
+export default HiddenContainerAnimated;
 
 const styles = StyleSheet.create({});

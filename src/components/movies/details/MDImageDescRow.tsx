@@ -25,7 +25,7 @@ const MDImageDescRow = ({ existsInSaved, movieDetails }: Props) => {
       }}
     >
       {/* {existsInSaved ? ( */}
-      <View className="flex-row flex-1">
+      <View className="flex-row flex-1 py-2 pl-2">
         <View
           style={{
             backgroundColor: "white",
@@ -45,18 +45,18 @@ const MDImageDescRow = ({ existsInSaved, movieDetails }: Props) => {
         <Animated.View
           sharedTransitionTag="detailImage"
           key={1}
-          layout={SequencedTransition.duration(700).reverse().reduceMotion(ReduceMotion.Never)}
-          exiting={FadeOut.duration(700)}
-          entering={FadeIn.duration(700)}
+          layout={SequencedTransition.duration(300).reverse().reduceMotion(ReduceMotion.Never)}
+          exiting={FadeOut.duration(300)}
+          entering={FadeIn.duration(300)}
         >
           <MotiDetailImage existsInSaved={existsInSaved} posterURL={movieDetails?.posterURL} />
         </Animated.View>
         <Animated.View
           className="flex-1"
           key={2}
-          layout={SequencedTransition.duration(700).reverse().reduceMotion(ReduceMotion.Never)}
-          exiting={FadeOut.duration(700)}
-          entering={FadeIn.duration(700)}
+          layout={SequencedTransition.duration(300).reverse().reduceMotion(ReduceMotion.Never)}
+          exiting={FadeOut.duration(300)}
+          entering={FadeIn.duration(300)}
         >
           <Overview overview={movieDetails?.overview} />
         </Animated.View>
