@@ -12,6 +12,7 @@ import {
   Alert,
   ScrollView,
   Touchable,
+  Pressable,
 } from "react-native";
 import React, { useState } from "react";
 import { useTheme } from "@react-navigation/native";
@@ -23,6 +24,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { addNewUser, removeItem } from "@/store/dataAccess/localStorage-users";
 import { useCustomTheme } from "@/utils/colorThemes";
 import { DeleteIcon } from "../common/Icons";
+import { SymbolView } from "expo-symbols";
 
 const handleNewUserPrompt = (registerUser: (user: string) => void) => {
   Alert.prompt(
@@ -102,39 +104,47 @@ const SignIn = () => {
         className="rounded-[100] border"
         source={require("../../../assets/images/little-ape-movie-image.jpg")}
       />
-      <ScrollView
-        className="max-h-[100] border mb-[20] bg-card rounded-lg"
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
-        {allUsers &&
-          allUsers?.length > 0 &&
-          allUsers.map((user) => {
-            return (
-              <View key={user} className="bg-card">
-                <View className="flex-row justify-between items-center" key={user}>
-                  <TouchableOpacity
-                    className="flex-1 px-3 py-2 mr-2"
-                    onPress={() => handleLogin(user)}
-                  >
-                    <Text className="text-text">{user}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => onRemoveUser(user)}>
-                    <View className="border-l bg-card-inverted p-2">
-                      <DeleteIcon size={15} color={colors.textInverted} />
-                    </View>
-                  </TouchableOpacity>
+      {allUsers && (
+        <ScrollView
+          className="max-h-[100] border mb-[20] bg-card rounded-lg"
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
+          {allUsers &&
+            allUsers?.length > 0 &&
+            allUsers.map((user) => {
+              return (
+                <View key={user} className="bg-card">
+                  <View className="flex-row justify-between items-center" key={user}>
+                    <TouchableOpacity
+                      className="flex-1 px-3 py-2 mr-2"
+                      onPress={() => handleLogin(user)}
+                    >
+                      <Text className="text-text">{user}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => onRemoveUser(user)}>
+                      <View className="border-l bg-card-inverted p-2">
+                        <DeleteIcon size={15} color={colors.textInverted} />
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                  <View className="border-b border-border" />
                 </View>
-                <View className="border-b" />
-              </View>
-            );
-          })}
-      </ScrollView>
+              );
+            })}
+        </ScrollView>
+      )}
 
-      <Button
-        title="Create New User"
-        color={"#fff"}
+      <Pressable
+        className="flex-col items-center"
         onPress={() => handleNewUserPrompt(handleRegisterUser)}
-      />
+      >
+        {!allUsers && (
+          <View className="mt-10">
+            <SymbolView name="person.badge.plus" tintColor="#000" type="palette" size={35} />
+          </View>
+        )}
+        <Text className="text-white text-2xl">Create New User</Text>
+      </Pressable>
     </View>
   );
 };
