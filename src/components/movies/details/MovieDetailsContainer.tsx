@@ -1,22 +1,22 @@
 import { View, Text, TouchableOpacity, Image, ScrollView, useColorScheme } from "react-native";
 import React, { useCallback, useLayoutEffect, useState } from "react";
 import { useFocusEffect, useNavigation, useRouter } from "expo-router";
-import { MovieDetails, useMovieData, useMovieDetailData } from "@/store/dataHooks";
+import { MovieDetails, useMovieDetailData } from "@/store/dataHooks";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradient } from "expo-linear-gradient";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { AddIcon, DeleteIcon } from "@/components/common/Icons";
 import showConfirmationPrompt from "@/components/common/showConfirmationPrompt";
 import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
-import { movieGetWatchProviders, movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
+import { movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
 import { useDynamicAnimation } from "moti";
 
 import MDImageDescRow from "./MDImageDescRow";
+import MDWatchProviders from "./watchProviders/MDWatchProviders";
 import MDDetails from "./MDDetails";
-import HiddenContainer from "@/components/common/HiddenContainer/HiddenContainer";
 import HiddenContainerAnimated from "@/components/common/HiddenContainer/HiddenContainerAnimated";
 import { useCustomTheme } from "@/utils/colorThemes";
-import { ColorSpace } from "react-native-reanimated";
+import HiddenContainerWatchProviders from "@/components/common/HiddenContainer/HiddenContainerWatchProviders";
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   useDynamicAnimation();
@@ -33,16 +33,6 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const existsInSaved = !!storedMovie?.id;
   const { movieDetails, isLoading } = useMovieDetailData(movieId);
 
-  //! TEMP
-  React.useEffect(() => {
-    const wp = async () => {
-      const x = await movieGetWatchProviders(movieId.toString(), ["AU", "US"]);
-      const y = x.data.results.US;
-      y;
-      console.log("WP", x.data.results.US);
-    };
-    wp();
-  }, []);
   //-- HEADER RIGHT ----------
   const handleAddMovie = useCallback(() => {
     if (!movieDetails) return;
@@ -150,27 +140,14 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
           <MDDetails movieDetails={movieDetails as MovieDetails} existsInSaved={existsInSaved} />
         </View>
         {/* WHERE TO WATCH */}
-        <View className="flex-1 my-1">
-          <HiddenContainerAnimated
-            title="Where to Watch"
-            style={{ height: 75 }}
-            height={75}
-            // leftIconFunction={() => updateSearchObject({ genres: undefined })}
-          >
-            <View className=" ">
-              <Text>Hidden now showing</Text>
-            </View>
-          </HiddenContainerAnimated>
+        <View className="my-1">
+          <HiddenContainerWatchProviders title="Where to Watch" movieId={movieId} height={85}>
+            <MDWatchProviders movieId={movieId} />
+          </HiddenContainerWatchProviders>
         </View>
         {/* Other movie recomendations */}
         <View className="flex-1 my-1">
-          <HiddenContainerAnimated
-            title="Recommended"
-            // titleInfo="Testing"
-            style={{ height: 75 }}
-            height={75}
-            // leftIconFunction={() => updateSearchObject({ genres: undefined })}
-          >
+          <HiddenContainerAnimated title="Recommended" style={{ height: 75 }} height={75}>
             <View className=" ">
               <Text>Hidden now showing</Text>
             </View>

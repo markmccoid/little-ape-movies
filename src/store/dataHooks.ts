@@ -1,8 +1,10 @@
+import { WatchProvider } from "./../../node_modules/@markmccoid/tmdb_api/types/APICurated/API_TV.d";
 import useMovieStore from "./store.shows";
 import {
   movieGetDetails,
   movieDetails_typedef,
   movieGetWatchProviders,
+  ProviderInfo,
 } from "@markmccoid/tmdb_api";
 import { useQuery } from "@tanstack/react-query";
 import { add } from "lodash";
@@ -36,12 +38,30 @@ export const useMovieDetailData = (movieId: number) => {
 
 //~ --------------------------------------------------------------------------------
 //~ useMovieWatchProviders - watch providers for a given movie ID
+//~  Currently ONLY US region supported
 //~ --------------------------------------------------------------------------------
+export type WatchProviderOnly = {
+  type: "stream" | "rent" | "buy";
+  title: string;
+  providers: ProviderInfo[] | undefined;
+};
 export const useMovieWatchProviders = (movieId: number, region: string = "US") => {
   const fetchMovieWatchProviders = async () => {
     const tempData = await movieGetWatchProviders(movieId.toString(), [region]);
+    return tempData.data.results.US;
   };
-  return { movieId, region };
+
+  const { data, isLoading, ...rest } = useQuery({
+    queryKey: ["watchProviders", movieId, region],
+    queryFn: fetchMovieWatchProviders,
+  });
+
+  const watchProviders: WatchProviderOnly[] = [
+    { type: "stream", title: "Stream", providers: data?.stream },
+    { type: "rent", title: "Rent", providers: data?.rent },
+    { type: "buy", title: "Buy", providers: data?.buy },
+  ];
+  return { watchProviders, justWatchLink: data?.justWatchLink, isLoading, ...rest };
 };
 
 //!!

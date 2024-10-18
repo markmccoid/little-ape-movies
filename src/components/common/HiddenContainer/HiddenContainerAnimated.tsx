@@ -56,7 +56,7 @@ const HiddenContainerAnimated: React.FC<Props> = ({
         ]}
         onPress={() => setViewContents((prev) => !prev)}
       >
-        <View className="flex-row justify-between">
+        <View className="flex-row justify-between items-center">
           <View className="pl-4">
             <Text style={{ fontSize: 20, fontWeight: "bold", marginRight: 15 }}>{title}</Text>
           </View>
