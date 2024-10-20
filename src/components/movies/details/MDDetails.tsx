@@ -34,7 +34,9 @@ const MDDetails = ({ movieDetails }: Props) => {
           </View>
           <View className="flex-row">
             <Text style={styles.textLabel}>Length:</Text>
-            <Text style={styles.textDesc}>{formatTime(movieDetails.runtime).verbose}</Text>
+            <Text style={styles.textDesc}>
+              {movieDetails?.runtime && formatTime(movieDetails.runtime).verbose}
+            </Text>
           </View>
           {movieDetails?.budget !== 0 && (
             <View className="flex-row">
@@ -49,7 +51,7 @@ const MDDetails = ({ movieDetails }: Props) => {
         <View className="flex-1 ml-4 flex-col">
           <Text style={styles.textLabel}>Genres:</Text>
           <View className="flex-row gap-2">
-            <Text style={styles.textDesc}>{addDelimitersToArray(movieDetails.genres, ", ")}</Text>
+            <Text style={styles.textDesc}>{addDelimitersToArray(movieDetails?.genres, ", ")}</Text>
           </View>
         </View>
       </View>

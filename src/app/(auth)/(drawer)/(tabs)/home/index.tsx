@@ -9,15 +9,13 @@ import { ScrollView } from "react-native-gesture-handler";
 
 import useMovieStore from "@/store/store.shows";
 import { getCurrentUser } from "@/store/dataAccess/localStorage-users";
+import { useCustomTheme } from "@/utils/colorThemes";
 
 const Page = () => {
-  const { colors } = useTheme();
-  // const [movies, setMovies] = useState([]);
-  // const movies = useMovieData();
+  const { colors } = useCustomTheme();
   const [state, setState] = useState(false);
   const movies = useMovieStore((state) => state.shows);
 
-  const addMovie = useMovieStore((state) => state.actions.addShow);
   const currUser = getCurrentUser();
 
   return (

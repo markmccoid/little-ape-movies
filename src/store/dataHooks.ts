@@ -41,7 +41,7 @@ export const useMovieDetailData = (movieId: number) => {
 //~  Currently ONLY US region supported
 //~ --------------------------------------------------------------------------------
 export type WatchProviderOnly = {
-  type: "stream" | "rent" | "buy";
+  type: "stream" | "rent" | "buy" | "justWatchLink";
   title: string;
   providers: ProviderInfo[] | undefined;
 };
@@ -52,7 +52,7 @@ export const useMovieWatchProviders = (movieId: number, region: string = "US") =
   };
 
   const { data, isLoading, ...rest } = useQuery({
-    queryKey: ["watchProviders", movieId, region],
+    queryKey: ["watchProviders", movieId],
     queryFn: fetchMovieWatchProviders,
   });
 

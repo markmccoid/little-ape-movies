@@ -16,8 +16,9 @@ import { CustomLightTheme, CustomDarkTheme } from "../utils/colorThemes";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { initTMDB } from "@markmccoid/tmdb_api";
+import { setupEvents } from "../store/events";
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 10000,
@@ -54,7 +55,9 @@ const InitialLayout = () => {
       const tmdbKey = process.env.EXPO_PUBLIC_TMDB_API_KEY;
       if (!tmdbKey) throw new Error("TMDB API Key not defined");
       await initTMDB(tmdbKey);
-      
+
+      //Setup Event Bus Events
+      setupEvents(queryClient);
       setInitialized(true);
     };
     mainInit();

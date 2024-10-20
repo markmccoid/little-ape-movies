@@ -5,7 +5,11 @@
  *
  */
 type Listener = (...args: any[]) => void;
-type Events = "TAG_SEARCH_RESULTS" | "CLEAR_SEARCH_STORES" | "GET_SHOW_COLORS";
+type Events =
+  | "TAG_SEARCH_RESULTS"
+  | "CLEAR_SEARCH_STORES"
+  | "GET_SHOW_COLORS"
+  | "UPDATE_SHOW_PROVIDERS";
 class EventBus {
   private listeners: { [event: string]: Listener[] } = {};
   // Subscribe is like "on"  This is where we setup what we are going to do

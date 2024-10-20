@@ -81,7 +81,7 @@ const SearchResult = ({ movie, spacing, numColumns = 3, onAddMovie, onRemoveMovi
       <TouchableOpacity className="flex-1" activeOpacity={0.9} onPress={handleAddRemoveMovie}>
         <View
           style={[{ alignItems: "center", justifyContent: "center", marginTop: -5, height: 20 }]}
-          className={`flex-1 border-t-hairline border-t-border rounded-b-lg ${
+          className={`flex-1 border-t-hairline border-t-border rounded-b-lg  ${
             isLocallyAdded ? "bg-selected" : "bg-card"
           }`}
         >
@@ -90,12 +90,12 @@ const SearchResult = ({ movie, spacing, numColumns = 3, onAddMovie, onRemoveMovi
           </Text>
         </View>
         <View
-          className={`absolute rounded-t-md border-hairline border-border border-b-0 ${
+          className={`absolute rounded-t-md border-hairline border-border ${
             isLocallyAdded ? "bg-selected" : "bg-card"
           }`}
           style={{
             left: imageWidth / 2 - imageWidth / 4 / 2,
-            bottom: 23,
+            bottom: 24,
             width: imageWidth / 4,
             height: imageHeight / 7.5,
           }}

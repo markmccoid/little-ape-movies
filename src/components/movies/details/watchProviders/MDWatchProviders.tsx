@@ -1,6 +1,6 @@
 import { View, Text, Image, ScrollView, FlatList, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
-import { useMovieWatchProviders } from "@/store/dataHooks";
+import { useMovieWatchProviders, WatchProviderOnly } from "@/store/dataHooks";
 import WatchProviderSection from "./WatchProviderSection";
 import { ProviderInfo } from "@markmccoid/tmdb_api";
 import Animated, {
@@ -10,7 +10,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
-import * as WebBrowser from "expo-web-browser";
 
 type Props = {
   movieId: number;
@@ -50,12 +49,29 @@ const MDWatchProviders = ({ movieId }: Props) => {
   const finalWatchProviders = watchProviders.filter(
     (el) => el?.providers && el?.providers.length > 0
   );
+  //! ------------
+  //! Cramming this into the watch providers so that we get a "justWatch"
+  //! icon at the end of the list that can be clicked on.
+  //! NOTE: Custom code in WatchProviderSection.tsx to handle these fields
+  //! ------------
+  const justWatchProvider: WatchProviderOnly = {
+    type: "justWatchLink",
+    title: "JustWatch",
+    providers: [
+      {
+        provider: "justWatch",
+        logoURL: "https://www.justwatch.com/blog/images/icon.png",
+        providerId: justWatchLink,
+        displayPriority: 1000,
+      },
+    ],
+  };
   // console.log("WatchProv", finalWatchProviders);
   return (
     <View>
       <Animated.FlatList
         horizontal
-        data={finalWatchProviders}
+        data={[...finalWatchProviders, justWatchProvider]}
         keyExtractor={(item) => item.type}
         renderItem={({ item, index }) => (
           // <ListItem item={item} index={index} scrollOffset={scrollOffset} />
@@ -70,9 +86,9 @@ const MDWatchProviders = ({ movieId }: Props) => {
         scrollEventThrottle={16}
         onScroll={onScroll}
       />
-      <TouchableOpacity onPress={async () => WebBrowser.openBrowserAsync(justWatchLink)}>
+      {/* <TouchableOpacity onPress={async () => WebBrowser.openBrowserAsync(justWatchLink)}>
         <Text>JustWatch Site</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };

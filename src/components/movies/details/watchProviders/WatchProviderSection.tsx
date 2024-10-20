@@ -1,4 +1,4 @@
-import { View, Image, Text } from "react-native";
+import { View, Image, Text, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import Animated, {
   Extrapolation,
@@ -7,6 +7,7 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 import { WatchProviderOnly } from "@/store/dataHooks";
+import * as WebBrowser from "expo-web-browser";
 
 type Props = {
   item: WatchProviderOnly;
@@ -77,20 +78,42 @@ const WatchProviderSection = ({ item, index, scrollOffset, watchProviders }: Pro
           {item.title}
         </Animated.Text>
       </View>
-      <View className="flex-row" style={{ paddingTop: 5 }}>
-        {item?.providers &&
-          item.providers.length > 0 &&
-          item.providers?.map((el) => {
-            return (
-              <View key={el.providerId} style={{ marginHorizontal: ICON_MARGIN }}>
-                <Image
-                  source={{ uri: el.logoURL }}
-                  style={{ width: PROVIDER_ICON_SIZE, height: PROVIDER_ICON_SIZE, borderRadius: 8 }}
-                />
-              </View>
-            );
-          })}
-      </View>
+      {item?.type === "justWatchLink" ? (
+        <TouchableOpacity
+          onPress={async () => WebBrowser.openBrowserAsync(item.providers[0].providerId)}
+          style={{ paddingTop: 5 }}
+        >
+          <View key={1} style={{ marginHorizontal: ICON_MARGIN }}>
+            <Image
+              source={require("../../../../../assets/images/justWatch.png")}
+              style={{
+                width: PROVIDER_ICON_SIZE,
+                height: PROVIDER_ICON_SIZE,
+                borderRadius: 8,
+              }}
+            />
+          </View>
+        </TouchableOpacity>
+      ) : (
+        <View className="flex-row" style={{ paddingTop: 5 }}>
+          {item?.providers &&
+            item.providers.length > 0 &&
+            item.providers?.map((el) => {
+              return (
+                <View key={el.providerId} style={{ marginHorizontal: ICON_MARGIN }}>
+                  <Image
+                    source={{ uri: el.logoURL }}
+                    style={{
+                      width: PROVIDER_ICON_SIZE,
+                      height: PROVIDER_ICON_SIZE,
+                      borderRadius: 8,
+                    }}
+                  />
+                </View>
+              );
+            })}
+        </View>
+      )}
     </View>
   );
 };

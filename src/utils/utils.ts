@@ -57,6 +57,7 @@ export function formatTime(value: number | string): TimeFormat {
 }
 
 export function addDelimitersToArray(arr: any[], delimiter: string = ", ") {
+  if (!arr) return "";
   return arr.reduce((fin, el, index) => {
     if (index == 0) return el;
     fin = `${fin}${delimiter}${el}`;

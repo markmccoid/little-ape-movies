@@ -1,10 +1,15 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { StorageAdapter } from "./dataAccess/storageAdapter";
-import { movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
+import { movieSearchByTitle_Results, ProviderInfo } from "@markmccoid/tmdb_api";
 import { eventBus } from "./eventBus";
 import { getImageColors, ImageColors } from "@/utils/color.utils";
 
+type ShowStreamingProviders = {
+  dateAddedEpoch: number;
+  // Just store the providerId
+  providers: number[];
+};
 export type ShowItemType = {
   id: number;
   title: string;
@@ -17,6 +22,7 @@ export type ShowItemType = {
   rating: number;
   tags: string[];
   existsInSaved: boolean;
+  streaming: ShowStreamingProviders;
   // Add other movie properties
 };
 
@@ -62,14 +68,17 @@ const useMovieStore = create<MovieStore>()(
             existsInSaved: true,
           };
           set((state) => ({ shows: [...state.shows, newShow] }));
+
+          eventBus.publish("UPDATE_SHOW_PROVIDERS", show.id);
           eventBus.publish("TAG_SEARCH_RESULTS");
           // console.log("Calling GET COLORS");
           eventBus.publish("GET_SHOW_COLORS", newShow.id, newShow?.posterURL);
         },
-        updateShow: (id, updatedShow) =>
+        updateShow: (id, updatedShow) => {
           set((state) => ({
             shows: state.shows.map((m) => (m.id === id ? { ...m, ...updatedShow } : m)),
-          })),
+          }));
+        },
         removeShow: (id) => {
           set((state) => ({
             shows: state.shows.filter((m) => m.id !== id),
@@ -104,11 +113,11 @@ const doesShowExist = (allShows: number[], showToCheck: number) => {
   return allShows.includes(showToCheck);
 };
 
-//-- Subscribe
-eventBus.subscribe("GET_SHOW_COLORS", async (movieId: number, posterURL) => {
-  // console.log("EVENT BUS", movieId, posterURL)
-  const imageColors = await getImageColors(posterURL);
-  // console.log("IMAGE COL gotten");
-  useMovieStore.getState().actions.updateShow(movieId, { posterColors: imageColors });
-});
+// //-- Subscribe
+// eventBus.subscribe("GET_SHOW_COLORS", async (movieId: number, posterURL) => {
+//   // console.log("EVENT BUS", movieId, posterURL)
+//   const imageColors = await getImageColors(posterURL);
+//   // console.log("IMAGE COL gotten");
+//   useMovieStore.getState().actions.updateShow(movieId, { posterColors: imageColors });
+// });
 export default useMovieStore;
