@@ -7,7 +7,7 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 import { WatchProviderOnly } from "@/store/dataHooks";
-import * as WebBrowser from "expo-web-browser";
+import * as Linking from "expo-linking";
 
 type Props = {
   item: WatchProviderOnly;
@@ -80,7 +80,11 @@ const WatchProviderSection = ({ item, index, scrollOffset, watchProviders }: Pro
       </View>
       {item?.type === "justWatchLink" ? (
         <TouchableOpacity
-          onPress={async () => WebBrowser.openBrowserAsync(item.providers[0].providerId)}
+          onPress={async () => {
+            Linking.openURL(item.providers[0].providerId).catch((err) =>
+              console.log("Error opening WatchProvider", err)
+            );
+          }}
           style={{ paddingTop: 5 }}
         >
           <View key={1} style={{ marginHorizontal: ICON_MARGIN }}>
