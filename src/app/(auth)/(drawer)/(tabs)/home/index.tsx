@@ -1,23 +1,23 @@
 import { View, Text, Pressable, useColorScheme, TouchableOpacity } from "react-native";
-import React, { useEffect, useState } from "react";
-import { Link, Stack } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import { Link, Stack, useFocusEffect } from "expo-router";
 import { FilterIcon } from "@/components/common/Icons";
-import { useTheme } from "@react-navigation/native";
 import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle";
 import MoviesContainer from "@/components/movies/MoviesContainer";
-import { ScrollView } from "react-native-gesture-handler";
-
-import useMovieStore from "@/store/store.shows";
 import { getCurrentUser } from "@/store/dataAccess/localStorage-users";
 import { useCustomTheme } from "@/utils/colorThemes";
+import { useSearchStore } from "@/store/store.search";
 
 const Page = () => {
   const { colors } = useCustomTheme();
-  const [state, setState] = useState(false);
-  const movies = useMovieStore((state) => state.shows);
-
   const currUser = getCurrentUser();
+  const setDetailTarget = useSearchStore((state) => state.actions.setTarget);
 
+  useFocusEffect(
+    useCallback(() => {
+      setDetailTarget(["home"]);
+    }, [])
+  );
   return (
     <View className="bg-background flex-1">
       <Stack.Screen

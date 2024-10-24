@@ -1,30 +1,44 @@
-import { View, Text, TouchableOpacity, Image, ScrollView, useColorScheme } from "react-native";
-import React, { useCallback, useLayoutEffect, useState } from "react";
-import { useFocusEffect, useNavigation, useRouter } from "expo-router";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  useColorScheme,
+  SafeAreaView,
+  Pressable,
+} from "react-native";
+import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useNavigation, usePathname, useRouter, useSegments } from "expo-router";
 import { MovieDetails, useMovieDetailData } from "@/store/dataHooks";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradient } from "expo-linear-gradient";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
-import { AddIcon, DeleteIcon } from "@/components/common/Icons";
+import { AddIcon, BackIcon, DeleteIcon } from "@/components/common/Icons";
 import showConfirmationPrompt from "@/components/common/showConfirmationPrompt";
 import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
 import { movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
-import { useDynamicAnimation } from "moti";
-
 import MDImageDescRow from "./MDImageDescRow";
 import MDWatchProviders from "./watchProviders/MDWatchProviders";
 import MDDetails from "./MDDetails";
 import HiddenContainerAnimated from "@/components/common/HiddenContainer/HiddenContainerAnimated";
 import { useCustomTheme } from "@/utils/colorThemes";
 import HiddenContainerWatchProviders from "@/components/common/HiddenContainer/HiddenContainerWatchProviders";
+import MDMovieRecommendations from "./MDMovieRecommendations";
+import { SymbolView } from "expo-symbols";
+import { useSearchStore } from "@/store/store.search";
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
-  useDynamicAnimation();
+  //!!
+  const target = useSearchStore((state) => state.detailTarget);
+  //!!
   const { colors } = useCustomTheme();
   const colorScheme = useColorScheme();
   const [movieAdding, setMovieAdding] = useState(false);
   const navigation = useNavigation();
   const router = useRouter();
+  const pathname = usePathname();
+  const segments = useSegments();
   const headerHeight = useHeaderHeight();
   const movieActions = useMovieActions();
   const { storedMovie } = useMovieStore((state) => ({
@@ -32,6 +46,8 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   }));
   const existsInSaved = !!storedMovie?.id;
   const { movieDetails, isLoading } = useMovieDetailData(movieId);
+
+  const isFocused = navigation.isFocused();
 
   //-- HEADER RIGHT ----------
   const handleAddMovie = useCallback(() => {
@@ -82,30 +98,29 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
         <AddIcon color={colors.text} />
       </TouchableOpacity>
     );
-  }, [colorScheme, storedMovie, existsInSaved, isLoading]);
+  }, [colorScheme, existsInSaved, isLoading, movieId]);
 
   // NOTE: any changes to when affects the useCallback on the HeaderRight
   //  needs to be added to the useLayoutEffect []
+
   useLayoutEffect(() => {
     const options: NativeStackNavigationOptions = {
       title: storedMovie?.title || movieDetails?.title || "",
       headerRight: HeaderRight,
-      headerBackTitle: "Back",
     };
     navigation.setOptions(options);
-  }, [movieId, isLoading, storedMovie, colorScheme]);
-
-  if (isLoading)
-    return (
-      <View>
-        <Text>Loading</Text>
-      </View>
-    );
+  }, [movieId, isLoading, existsInSaved, colorScheme]);
 
   const backgroundStartColor = "#000000";
   const backgroundEndColor = "#FFFFFF";
-  // const backgroundStartColor = storedMovie?.posterColors?.background?.color || "#000000";
-  // const backgroundEndColor = storedMovie?.posterColors?.lightestColor || "#FFFFFF";
+
+  if (!isFocused)
+    return (
+      <LinearGradient
+        colors={[backgroundStartColor, backgroundEndColor]}
+        style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, opacity: 0.5 }}
+      />
+    );
 
   return (
     <View className="flex-1">
@@ -130,6 +145,9 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
       )}
       <ScrollView style={{ marginTop: headerHeight + 5, flexGrow: 1 }}>
         {/* <View className="flex-1 flex-col"> */}
+        {/* <Pressable onPress={() => router.push("/home/1184918/917496")}>
+          <Text>Link to 1184918/917496</Text>
+        </Pressable> */}
         <View>
           <MDImageDescRow
             movieDetails={movieDetails as MovieDetails}
@@ -147,10 +165,8 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
         </View>
         {/* Other movie recomendations */}
         <View className="flex-1 my-1">
-          <HiddenContainerAnimated title="Recommended" style={{ height: 75 }} height={75}>
-            <View className=" ">
-              <Text>Hidden now showing</Text>
-            </View>
+          <HiddenContainerAnimated title="Recommended" style={{ height: 75 }} height={200}>
+            <MDMovieRecommendations movieId={movieId} />
           </HiddenContainerAnimated>
         </View>
       </ScrollView>

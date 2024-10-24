@@ -1,23 +1,28 @@
-import { View, Text, Dimensions, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Dimensions, StyleSheet, TouchableOpacity, Pressable } from "react-native";
 import React, { useState, useEffect, useMemo } from "react";
 import MovieImage from "../common/MovieImage";
-import { MovieSearchResults } from "@/store/store.search";
+import { MovieSearchResults, useSearchStore } from "@/store/store.search";
 import { MovieStore } from "@/store/store.shows";
 import { AddCircleIcon, AddIcon, CheckCircleIcon } from "../common/Icons";
 import { useCustomTheme } from "@/utils/colorThemes";
-import { Link, usePathname } from "expo-router";
+import { Link, router, usePathname, useSegments } from "expo-router";
 import useImageSize from "@/hooks/useImageSize";
 
-const { width, height } = Dimensions.get("window");
-// const NUMCOLUMNS = 3;
-// const CONTAINER_PADDING = 15; // Left and right padding for the container
-// const GAP = 10; // Desired gap between images
-// // Calculate the available width for images
-// const availableWidth = width - 2 * CONTAINER_PADDING;
-// // Calculate the width of each image
-// const imageWidth3 = (availableWidth - (NUMCOLUMNS - 1) * GAP) / NUMCOLUMNS;
-// // Calculate the height of each image (assuming 1.5 aspect ratio)
-// const imageHeight3 = imageWidth3 * 1.5;
+function getProcessedPath(pathname: string) {
+  const segments = pathname.split("/").filter(Boolean); // Split and filter empty segments
+  console.log("P/S", pathname, segments);
+  if (segments.length === 1) {
+    // If the path is "/home" or "/search"
+    return `/${segments[0]}/`;
+  }
+
+  // if (segments.length === 2 && !isNaN(Number(segments[1]))) {
+  // If the path is "/home/1234" or "/search/1234"
+  return `/${segments[0]}/${segments[1]}/`;
+  // }
+
+  // return pathname; // Return the original path if no conditions match
+}
 
 //~~  SearchResult Component
 type Props = {
@@ -29,10 +34,20 @@ type Props = {
 };
 const SearchResult = ({ movie, spacing, numColumns = 3, onAddMovie, onRemoveMovie }: Props) => {
   const pathName = usePathname();
-  const linkPath = useMemo(() => (pathName === "/search" ? "./search/" : "../"), [pathName]);
+  const segments = useSegments();
+  const target = useSearchStore((state) => state.detailTarget);
+  // const linkPath = "/(auth)/(drawer)/_detailshowid/"; // getProcessedPath(pathName);
+
+  // const linkPath = useMemo(() => (pathName === "/search" ? "./search/" : "../"), [pathName]);
+  const linkPath = useMemo(
+    () => (pathName.includes("/search") ? "/search/" : "/home/"),
+    [pathName]
+  );
+  // console.log("SearchResult.tsx", pathName, segments, target, movie.id);
   const [isLocallyAdded, setIsLocallyAdded] = useState(movie.existsInSaved);
   const { imageHeight, imageWidth } = useImageSize(numColumns);
 
+  // console.log("SearchResult -LinkPath", linkPath, pathName, `${linkPath}${movie.id}`);
   const { colors } = useCustomTheme();
   useEffect(() => {
     setIsLocallyAdded(movie.existsInSaved);
@@ -62,7 +77,8 @@ const SearchResult = ({ movie, spacing, numColumns = 3, onAddMovie, onRemoveMovi
         shadowRadius: 1,
       }}
     >
-      <Link href={`${linkPath}${movie.id}`} style={{ zIndex: 0 }}>
+      {/* <Link href={`${linkPath}${movie.id}`} style={{ zIndex: 0 }} push> */}
+      <Pressable onPress={() => router.push(`${linkPath}${movie.id}`)} style={{ zIndex: 0 }}>
         <View>
           <MovieImage
             imageWidth={imageWidth}
@@ -77,7 +93,8 @@ const SearchResult = ({ movie, spacing, numColumns = 3, onAddMovie, onRemoveMovi
             }}
           />
         </View>
-      </Link>
+      </Pressable>
+      {/* </Link> */}
       <TouchableOpacity className="flex-1" activeOpacity={0.9} onPress={handleAddRemoveMovie}>
         <View
           style={[{ alignItems: "center", justifyContent: "center", marginTop: -5, height: 20 }]}

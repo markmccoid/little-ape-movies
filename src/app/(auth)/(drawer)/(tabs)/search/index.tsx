@@ -34,6 +34,16 @@ const SearchPage = () => {
   const { top } = useSafeAreaInsets();
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<TextInput>(null);
+  //!!
+  const setDetailTarget = useSearchStore((state) => state.actions.setTarget);
+
+  useFocusEffect(
+    useCallback(() => {
+      setDetailTarget(["search"]);
+    }, [])
+  );
+
+  //!!
 
   const navigation = useNavigation();
   // Setup react navigation search bar in header

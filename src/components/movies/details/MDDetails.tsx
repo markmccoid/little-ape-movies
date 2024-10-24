@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import { MovieDetails } from "@/store/dataHooks";
 import { addDelimitersToArray, formatAsUSDCurrency, formatTime } from "@/utils/utils";
-import Animated, { FadeIn } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 type Props = {
   existsInSaved: boolean;
@@ -11,7 +11,11 @@ type Props = {
 
 const MDDetails = ({ movieDetails }: Props) => {
   return (
-    <Animated.View className="mt-1 relative" entering={FadeIn.duration(700)}>
+    <Animated.View
+      className="mt-1 relative"
+      // entering={FadeIn.duration(700)}
+      // exiting={FadeOut.duration(500)}
+    >
       <View
         className="absolute bg-white opacity-50"
         style={{
@@ -30,7 +34,7 @@ const MDDetails = ({ movieDetails }: Props) => {
         <View className="flex-col">
           <View className="flex-row">
             <Text style={styles.textLabel}>Released:</Text>
-            <Text style={styles.textDesc}>{movieDetails?.releaseDate.formatted}</Text>
+            <Text style={styles.textDesc}>{movieDetails?.releaseDate?.formatted}</Text>
           </View>
           <View className="flex-row">
             <Text style={styles.textLabel}>Length:</Text>

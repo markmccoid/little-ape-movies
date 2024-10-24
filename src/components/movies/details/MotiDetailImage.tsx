@@ -21,12 +21,12 @@ const MotiDetailImage = ({ existsInSaved, posterURL }: Props) => {
       from={{
         borderRadius: existsInSaved ? BORDER_RADIUS_SEARCH : BORDER_RADIUS_ADDED,
         opacity: 0.5,
-        translateX: -100,
+        // translateX: -100,
       }}
       animate={{
         borderRadius: existsInSaved ? BORDER_RADIUS_ADDED : BORDER_RADIUS_SEARCH,
         opacity: 1,
-        translateX: 0,
+        // translateX: 0,
       }}
       transition={{
         type: "timing",

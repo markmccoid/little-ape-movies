@@ -41,7 +41,7 @@ const MovieItem = ({ movie }: Props) => {
       >
         <MovieItemActionBar movie={movie} />
       </View>
-      <Link href={`./home/${movie.id}`}>
+      <Link href={`/(auth)/(drawer)/(tabs)/home/${movie.id}`} push>
         {/* <Image
           source={{ uri: movie.posterURL }}
           style={{ width: imageWidth, height: imageHeight, resizeMode: "contain" }}

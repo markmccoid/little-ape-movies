@@ -42,24 +42,24 @@ const MDImageDescRow = ({ existsInSaved, movieDetails }: Props) => {
             position: "absolute",
           }}
         />
-        <Animated.View
-          sharedTransitionTag="detailImage"
+        <View
+          // sharedTransitionTag="detailImage"
           key={1}
-          layout={SequencedTransition.duration(300).reverse().reduceMotion(ReduceMotion.Never)}
-          exiting={FadeOut.duration(300)}
-          entering={FadeIn.duration(300)}
+          // layout={SequencedTransition.duration(300).reverse().reduceMotion(ReduceMotion.Never)}
+          // exiting={FadeOut.duration(300)}
+          // entering={FadeIn.duration(300)}
         >
           <MotiDetailImage existsInSaved={existsInSaved} posterURL={movieDetails?.posterURL} />
-        </Animated.View>
-        <Animated.View
+        </View>
+        <View
           className="flex-1"
           key={2}
-          layout={SequencedTransition.duration(300).reverse().reduceMotion(ReduceMotion.Never)}
-          exiting={FadeOut.duration(300)}
-          entering={FadeIn.duration(300)}
+          // layout={SequencedTransition.duration(300).reverse().reduceMotion(ReduceMotion.Never)}
+          // exiting={FadeOut.duration(300)}
+          // entering={FadeIn.duration(300)}
         >
           <Overview overview={movieDetails?.overview} />
-        </Animated.View>
+        </View>
       </View>
     </View>
   );
@@ -73,7 +73,10 @@ const Overview = ({ overview }: { overview: string | undefined }) => {
       style={{ maxHeight: imageHeight, marginLeft: 8, marginRight: 3, paddingTop: 4 }}
       contentContainerStyle={{ paddingBottom: 10 }}
     >
-      <Animated.Text style={{ fontSize: 16 }} entering={FadeInRight.duration(700)}>
+      <Animated.Text
+        style={{ fontSize: 16 }}
+        // entering={FadeInRight.duration(700)}
+      >
         {overview}
       </Animated.Text>
     </ScrollView>

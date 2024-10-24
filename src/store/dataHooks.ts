@@ -5,6 +5,7 @@ import {
   movieDetails_typedef,
   movieGetWatchProviders,
   ProviderInfo,
+  movieGetRecommendations,
 } from "@markmccoid/tmdb_api";
 import { useQuery } from "@tanstack/react-query";
 import { add } from "lodash";
@@ -36,10 +37,10 @@ export const useMovieDetailData = (movieId: number) => {
   return { movieDetails, isLoading, ...rest };
 };
 
-//~ --------------------------------------------------------------------------------
+//~~ --------------------------------------------------------------------------------
 //~ useMovieWatchProviders - watch providers for a given movie ID
 //~  Currently ONLY US region supported
-//~ --------------------------------------------------------------------------------
+//~~ --------------------------------------------------------------------------------
 export type WatchProviderOnly = {
   type: "stream" | "rent" | "buy" | "justWatchLink";
   title: string;
@@ -64,44 +65,28 @@ export const useMovieWatchProviders = (movieId: number, region: string = "US") =
   return { watchProviders, justWatchLink: data?.justWatchLink, isLoading, ...rest };
 };
 
-//!!
-// export const useMovieData = (movieId: number) => {
-//   console.log("Calling useMovieData");
-//   const getMovieById = useMovieStore((state) => state.actions.getShowById);
-//   // Replace with your actual selector
-//   // const storedMovieTemp = getMovieById(movieId);
-//   const storedMovies = useMovieStore((state) => state.shows);
-//   const storedMovieTemp = storedMovies.find((el) => el.id === movieId);
-//   console.log("StoredMovieTemp", storedMovieTemp);
-//   const storedMovie = storedMovieTemp
-//     ? { ...storedMovieTemp, existsInSaved: true }
-//     : { existsInSaved: false };
-//   const existsInSaved = storedMovieTemp ? true : false;
-//   const [finalData, setFinalData] = useState(storedMovie);
-
-//   // console.log("StoredMovie", storedMovie.existsInSaved, storedMovie.id);
-//   const fetchAdditionalMovieData = async (id: number) => {
-//     const response = await movieGetDetails(id);
-//     // console.log("RESPONSE", response);
-//     return response.data;
-//   };
-
-//   const {
-//     data: additionalData,
-//     isLoading,
-//     error,
-//   } = useQuery({
-//     queryKey: ["movie", movieId],
-//     queryFn: () => fetchAdditionalMovieData(movieId),
-//     enabled: !!movieId, // Only run query if movieId exists
-//     // initialData: storedMovie, // Initial data from Zustand
-//   });
-
-//   useEffect(() => {
-//     console.log("IN useMovieData Hook");
-//     const finalData = { ...storedMovie, ...additionalData };
-//     setFinalData(finalData);
-//   }, [additionalData, storedMovieTemp]);
-//   // console.log("FINAL DATA", finalData);
-//   return { data: finalData, isLoading, error, existsInSaved };
-// };
+//~~ --------------------------------------------------------------------------------
+//~ Get Movie Recommendations
+//~~ --------------------------------------------------------------------------------
+//! Type will be available in tmdb_api v3.03
+type movieRecommendationsResults = {
+  id: number;
+  title: string;
+  releaseDate: { date: Date; epoch: number; formatted: string };
+  overview: string;
+  posterURL: string;
+  backdropURL: string;
+  genres: string[];
+  popularity: number;
+  voteAverage: number;
+  voteCount: number;
+};
+export const useMovieRecommendations = (movieId: number) => {
+  return useQuery({
+    queryKey: ["movierecommendations", movieId],
+    queryFn: async () => {
+      const resp = await movieGetRecommendations(movieId);
+      return resp.data.results as movieRecommendationsResults[];
+    },
+  });
+};
