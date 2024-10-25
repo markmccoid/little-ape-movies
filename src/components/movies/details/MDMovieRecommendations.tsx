@@ -5,9 +5,11 @@ import SearchResult from "@/components/search/SearchResult";
 import useMovieStore from "@/store/store.shows";
 
 type Props = {
-  movieId: number;
+  movieId: number | undefined;
 };
 const MDMovieRecommendations = ({ movieId }: Props) => {
+  if (!movieId) return null;
+
   const { data, isLoading } = useMovieRecommendations(movieId);
   const movieActions = useMovieStore((state) => state.actions);
   if (isLoading) return null;

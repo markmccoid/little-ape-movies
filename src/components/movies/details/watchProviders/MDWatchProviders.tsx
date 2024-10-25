@@ -12,7 +12,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 type Props = {
-  movieId: number;
+  movieId: number | undefined;
 };
 
 interface WatchProviderSection {
@@ -23,6 +23,8 @@ interface WatchProviderSection {
 }
 
 const MDWatchProviders = ({ movieId }: Props) => {
+  if (!movieId) return null;
+
   const { watchProviders, justWatchLink, isLoading } = useMovieWatchProviders(movieId);
 
   const scrollOffset = useSharedValue(0);

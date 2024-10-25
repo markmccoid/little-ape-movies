@@ -10,6 +10,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { add } from "lodash";
 import { useEffect, useState } from "react";
+import { tagSavedMovies } from "./store.utils";
 
 //~ --------------------------------------------------------------------------------
 //~ useMovieDetails - Data from the movie/show details page
@@ -82,11 +83,19 @@ type movieRecommendationsResults = {
   voteCount: number;
 };
 export const useMovieRecommendations = (movieId: number) => {
-  return useQuery({
+  const { data, isLoading, ...rest } = useQuery({
     queryKey: ["movierecommendations", movieId],
     queryFn: async () => {
       const resp = await movieGetRecommendations(movieId);
       return resp.data.results as movieRecommendationsResults[];
     },
+    staleTime: 300000,
   });
+
+  // Tag the data
+  const finalData = (data || []).map((movie) => ({
+    ...movie,
+    existsInSaved: useMovieStore.getState().shows.some((savedMovie) => savedMovie.id === movie.id),
+  }));
+  return { data: finalData, isLoading, ...rest };
 };

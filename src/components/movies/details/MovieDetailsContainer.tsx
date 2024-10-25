@@ -9,14 +9,14 @@ import {
   Pressable,
 } from "react-native";
 import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
-import { useNavigation, usePathname, useRouter, useSegments } from "expo-router";
+import { useFocusEffect, useNavigation, usePathname, useRouter, useSegments } from "expo-router";
 import { MovieDetails, useMovieDetailData } from "@/store/dataHooks";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradient } from "expo-linear-gradient";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { AddIcon, BackIcon, DeleteIcon } from "@/components/common/Icons";
 import showConfirmationPrompt from "@/components/common/showConfirmationPrompt";
-import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
+import useMovieStore, { MovieStore, ShowItemType, useMovieActions } from "@/store/store.shows";
 import { movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
 import MDImageDescRow from "./MDImageDescRow";
 import MDWatchProviders from "./watchProviders/MDWatchProviders";
@@ -30,15 +30,14 @@ import { useSearchStore } from "@/store/store.search";
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   //!!
-  const target = useSearchStore((state) => state.detailTarget);
+  const [finalMovieDetails, setFinalMovieDetails] = useState<MovieDetails>();
+  const [movieTitle, setMovieTitle] = useState<string>();
   //!!
   const { colors } = useCustomTheme();
   const colorScheme = useColorScheme();
   const [movieAdding, setMovieAdding] = useState(false);
   const navigation = useNavigation();
   const router = useRouter();
-  const pathname = usePathname();
-  const segments = useSegments();
   const headerHeight = useHeaderHeight();
   const movieActions = useMovieActions();
   const { storedMovie } = useMovieStore((state) => ({
@@ -67,66 +66,109 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
 
     movieActions.addShow(movieToAdd);
     setMovieAdding(false);
-  }, [movieId, isLoading, existsInSaved]);
+  }, [finalMovieDetails]);
+  // }, [movieId, isLoading, existsInSaved]);
+  const HeaderRight = () => (
+    <TouchableOpacity
+      className="pr-2 mr-[-10] pl-1"
+      activeOpacity={0.5}
+      onPress={async () => {
+        const yesDelete = await showConfirmationPrompt("Delete Movie", "Delete Movie");
+        if (yesDelete) {
+          movieActions.removeShow(storedMovie?.id);
+          // If we are deep in a stack go back to starting point
+          router.dismissAll();
+        }
+      }}
+    >
+      <DeleteIcon />
+    </TouchableOpacity>
+  );
+  const HeaderRightAdd = () => (
+    <TouchableOpacity
+      className="pr-2 mr-[-10] pl-1"
+      activeOpacity={0.5}
+      onPress={() => handleAddMovie()}
+      disabled={movieAdding}
+    >
+      <AddIcon color={colors.text} />
+    </TouchableOpacity>
+  );
 
-  const HeaderRight = useCallback(() => {
-    // console.log("UseCallbac", existsInSaved, storedMovie);
-    if (storedMovie) {
-      return (
-        <TouchableOpacity
-          className="pr-2 mr-[-10] pl-1"
-          activeOpacity={0.5}
-          onPress={async () => {
-            const yesDelete = await showConfirmationPrompt("Delete Movie", "Delete Movie");
-            if (yesDelete) {
-              movieActions.removeShow(storedMovie.id);
-              router.back();
-            }
-          }}
-        >
-          <DeleteIcon />
-        </TouchableOpacity>
-      );
-    }
-    return (
-      <TouchableOpacity
-        className="pr-2 mr-[-10] pl-1"
-        activeOpacity={0.5}
-        onPress={() => handleAddMovie()}
-        disabled={movieAdding}
-      >
-        <AddIcon color={colors.text} />
-      </TouchableOpacity>
-    );
-  }, [colorScheme, existsInSaved, isLoading, movieId]);
+  //~~ OLD Header code
+  // const HeaderRight1 = useCallback(() => {
+  //   // console.log("UseCallbac", existsInSaved, storedMovie);
+  //   if (storedMovie) {
+  //     return (
+  //       <TouchableOpacity
+  //         className="pr-2 mr-[-10] pl-1"
+  //         activeOpacity={0.5}
+  //         onPress={async () => {
+  //           const yesDelete = await showConfirmationPrompt("Delete Movie", "Delete Movie");
+  //           if (yesDelete) {
+  //             movieActions.removeShow(storedMovie.id);
+  //             // If we are deep in a stack go back to starting point
+  //             router.dismissAll();
+  //           }
+  //         }}
+  //       >
+  //         <DeleteIcon />
+  //       </TouchableOpacity>
+  //     );
+  //   }
+  //   return (
+  //     <TouchableOpacity
+  //       className="pr-2 mr-[-10] pl-1"
+  //       activeOpacity={0.5}
+  //       onPress={() => handleAddMovie()}
+  //       disabled={movieAdding}
+  //     >
+  //       <AddIcon color={colors.text} />
+  //     </TouchableOpacity>
+  //   );
+  // }, [colorScheme, existsInSaved, isLoading, movieId, movieDetails]);
 
   // NOTE: any changes to when affects the useCallback on the HeaderRight
   //  needs to be added to the useLayoutEffect []
-
   useLayoutEffect(() => {
     const options: NativeStackNavigationOptions = {
-      title: storedMovie?.title || movieDetails?.title || "",
-      headerRight: HeaderRight,
+      title: movieTitle || "", //storedMovie?.title || movieDetails?.title || "",
+      headerRight: existsInSaved ? HeaderRight : HeaderRightAdd,
+      headerLeft: () => (
+        <Pressable onPress={() => router.back()}>
+          <View className="flex-row items-center">
+            <SymbolView name="chevron.backward" />
+            <Text className="text-lg font-semibold">Back</Text>
+          </View>
+        </Pressable>
+      ),
     };
     navigation.setOptions(options);
-  }, [movieId, isLoading, existsInSaved, colorScheme]);
+  }, [movieId, existsInSaved, movieTitle, isLoading, movieDetails]);
 
   const backgroundStartColor = "#000000";
   const backgroundEndColor = "#FFFFFF";
 
-  if (!isFocused)
-    return (
-      <LinearGradient
-        colors={[backgroundStartColor, backgroundEndColor]}
-        style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, opacity: 0.5 }}
-      />
-    );
-
+  // if (!isFocused)
+  //   return (
+  //     <LinearGradient
+  //       colors={[backgroundStartColor, backgroundEndColor]}
+  //       style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, opacity: 0.5 }}
+  //     />
+  //   );
+  // Once we are focused and not loading, update the local state
+  // Local state will be used to update the component
+  useEffect(() => {
+    if (isFocused && !isLoading) {
+      setFinalMovieDetails(movieDetails);
+      setMovieTitle(storedMovie?.title || movieDetails?.title || "");
+    }
+  }, [isFocused, isLoading]);
   return (
     <View className="flex-1">
       {existsInSaved ? (
         <Image
-          source={{ uri: movieDetails?.posterURL }}
+          source={{ uri: finalMovieDetails?.posterURL }}
           style={{
             position: "absolute",
             left: 0,
@@ -150,23 +192,26 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
         </Pressable> */}
         <View>
           <MDImageDescRow
-            movieDetails={movieDetails as MovieDetails}
+            movieDetails={finalMovieDetails as MovieDetails}
             existsInSaved={existsInSaved}
           />
         </View>
         <View className="pt-1 my-1">
-          <MDDetails movieDetails={movieDetails as MovieDetails} existsInSaved={existsInSaved} />
+          <MDDetails
+            movieDetails={finalMovieDetails as MovieDetails}
+            existsInSaved={existsInSaved}
+          />
         </View>
         {/* WHERE TO WATCH */}
         <View className="my-1">
           <HiddenContainerWatchProviders title="Where to Watch" movieId={movieId} height={85}>
-            <MDWatchProviders movieId={movieId} />
+            <MDWatchProviders movieId={finalMovieDetails?.id} />
           </HiddenContainerWatchProviders>
         </View>
         {/* Other movie recomendations */}
         <View className="flex-1 my-1">
           <HiddenContainerAnimated title="Recommended" style={{ height: 75 }} height={200}>
-            <MDMovieRecommendations movieId={movieId} />
+            <MDMovieRecommendations movieId={finalMovieDetails?.id} />
           </HiddenContainerAnimated>
         </View>
       </ScrollView>
@@ -174,4 +219,4 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   );
 };
 
-export default MovieDetailsContainer;
+export default React.memo(MovieDetailsContainer);

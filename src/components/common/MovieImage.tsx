@@ -1,5 +1,5 @@
-import { View, Text, ImageStyle, ImageProps } from "react-native";
-import { Image, ImageContentFit } from "expo-image";
+import { View, Text, ImageStyle, ImageProps, Image } from "react-native";
+import { Image as ExpoImage, ImageContentFit } from "expo-image";
 import React from "react";
 
 type Props = {
@@ -33,8 +33,8 @@ const MovieImage = ({
           className={`border rounded-lg rounded-b-none`}
           source={require("../../../assets/images/DefaultImage.png")}
           style={{ width: imageWidth, height: imageHeight, opacity: 0.7, ...imageStyle }}
-          contentFit={resizeMode}
-          placeholder={{ blurhash }}
+          // contentFit={resizeMode}
+          // placeholder={{ blurhash }}
         />
         <Text
           className="absolute text-text text-center font-semibold text-white"
@@ -49,10 +49,10 @@ const MovieImage = ({
   return (
     <Image
       className="border-hairline border-border"
-      source={posterURL}
-      // source={{ uri: posterURL }}
-      contentFit="contain"
-      placeholder={{ blurhash }}
+      // source={posterURL}
+      source={{ uri: posterURL }}
+      // contentFit="contain"
+      // placeholder={{ blurhash }}
       style={{
         width: imageWidth,
         height: imageHeight,
