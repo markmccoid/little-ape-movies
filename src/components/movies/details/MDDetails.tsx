@@ -1,8 +1,10 @@
 import { View, Text, StyleSheet } from "react-native";
+import { Image } from "expo-image";
 import React from "react";
 import { MovieDetails } from "@/store/dataHooks";
 import { addDelimitersToArray, formatAsUSDCurrency, formatTime } from "@/utils/utils";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import MDBackground from "./MDBackground";
 
 type Props = {
   existsInSaved: boolean;
@@ -11,24 +13,9 @@ type Props = {
 
 const MDDetails = ({ movieDetails }: Props) => {
   return (
-    <Animated.View
-      className="mt-1 relative"
-      // entering={FadeIn.duration(700)}
-      // exiting={FadeOut.duration(500)}
-    >
-      <View
-        className="absolute bg-white opacity-50"
-        style={{
-          ...StyleSheet.absoluteFillObject,
-          shadowColor: "#000000",
-          shadowOffset: {
-            width: 0,
-            height: 0,
-          },
-          shadowOpacity: 0.4,
-          shadowRadius: 2,
-        }}
-      />
+    <Animated.View className="relative">
+      <MDBackground />
+
       <View className="flex-row pl-3 pr-2 py-2">
         {/* Left Side Info */}
         <View className="flex-col">

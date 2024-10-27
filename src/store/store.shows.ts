@@ -66,12 +66,15 @@ const useMovieStore = create<MovieStore>()(
             rating: 0,
             tags: [],
             existsInSaved: true,
+            streaming: {
+              dateAddedEpoch: Date.now(),
+              providers: [],
+            },
           };
           set((state) => ({ shows: [...state.shows, newShow] }));
 
           eventBus.publish("UPDATE_SHOW_PROVIDERS", show.id);
           eventBus.publish("TAG_SEARCH_RESULTS");
-          // console.log("Calling GET COLORS");
           eventBus.publish("GET_SHOW_COLORS", newShow.id, newShow?.posterURL);
         },
         updateShow: (id, updatedShow) => {

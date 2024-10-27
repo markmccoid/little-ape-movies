@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useFocusEffect, useNavigation, usePathname, useRouter, useSegments } from "expo-router";
-import { MovieDetails, useMovieDetailData } from "@/store/dataHooks";
+import { MovieDetails, useMovieDetailData, useOMDBData } from "@/store/dataHooks";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradient } from "expo-linear-gradient";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
@@ -26,12 +26,15 @@ import { useCustomTheme } from "@/utils/colorThemes";
 import HiddenContainerWatchProviders from "@/components/common/HiddenContainer/HiddenContainerWatchProviders";
 import MDMovieRecommendations from "./MDMovieRecommendations";
 import { SymbolView } from "expo-symbols";
-import { useSearchStore } from "@/store/store.search";
+import useImageSize from "@/hooks/useImageSize";
+import MDRatings from "./MDRatings";
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
-  //!!
+  //!! We need have local state so that we only update component AFTER
+  //!! it has received focus (see isFocused page)
   const [finalMovieDetails, setFinalMovieDetails] = useState<MovieDetails>();
   const [movieTitle, setMovieTitle] = useState<string>();
+  const { imageHeight } = useImageSize(3);
   //!!
   const { colors } = useCustomTheme();
   const colorScheme = useColorScheme();
@@ -43,8 +46,9 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const { storedMovie } = useMovieStore((state) => ({
     storedMovie: state.actions.getShowById(movieId),
   }));
-  const existsInSaved = !!storedMovie?.id;
+  const existsInSaved = !!storedMovie?.existsInSaved;
   const { movieDetails, isLoading } = useMovieDetailData(movieId);
+  const { data: omdbData, isLoading: omdbLoading } = useOMDBData(movieDetails?.imdbId);
 
   const isFocused = navigation.isFocused();
 
@@ -67,7 +71,9 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
     movieActions.addShow(movieToAdd);
     setMovieAdding(false);
   }, [finalMovieDetails]);
-  // }, [movieId, isLoading, existsInSaved]);
+
+  //~~ --------------------------------
+  //~~ Setup Header Right Components
   const HeaderRight = () => (
     <TouchableOpacity
       className="pr-2 mr-[-10] pl-1"
@@ -94,57 +100,25 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
       <AddIcon color={colors.text} />
     </TouchableOpacity>
   );
+  //~~ --------------------------------
 
-  //~~ OLD Header code
-  // const HeaderRight1 = useCallback(() => {
-  //   // console.log("UseCallbac", existsInSaved, storedMovie);
-  //   if (storedMovie) {
-  //     return (
-  //       <TouchableOpacity
-  //         className="pr-2 mr-[-10] pl-1"
-  //         activeOpacity={0.5}
-  //         onPress={async () => {
-  //           const yesDelete = await showConfirmationPrompt("Delete Movie", "Delete Movie");
-  //           if (yesDelete) {
-  //             movieActions.removeShow(storedMovie.id);
-  //             // If we are deep in a stack go back to starting point
-  //             router.dismissAll();
-  //           }
-  //         }}
-  //       >
-  //         <DeleteIcon />
-  //       </TouchableOpacity>
-  //     );
-  //   }
-  //   return (
-  //     <TouchableOpacity
-  //       className="pr-2 mr-[-10] pl-1"
-  //       activeOpacity={0.5}
-  //       onPress={() => handleAddMovie()}
-  //       disabled={movieAdding}
-  //     >
-  //       <AddIcon color={colors.text} />
-  //     </TouchableOpacity>
-  //   );
-  // }, [colorScheme, existsInSaved, isLoading, movieId, movieDetails]);
-
-  // NOTE: any changes to when affects the useCallback on the HeaderRight
-  //  needs to be added to the useLayoutEffect []
+  // Sets the title and Header icons
+  // needs to update
   useLayoutEffect(() => {
     const options: NativeStackNavigationOptions = {
       title: movieTitle || "", //storedMovie?.title || movieDetails?.title || "",
       headerRight: existsInSaved ? HeaderRight : HeaderRightAdd,
-      headerLeft: () => (
-        <Pressable onPress={() => router.back()}>
-          <View className="flex-row items-center">
-            <SymbolView name="chevron.backward" />
-            <Text className="text-lg font-semibold">Back</Text>
-          </View>
-        </Pressable>
-      ),
+      // headerLeft: () => (
+      //   <Pressable onPress={() => router.back()} className="ml-[-8]">
+      //     <View className="flex-row items-center">
+      //       <SymbolView name="chevron.backward" />
+      //       <Text className="text-lg ">Back</Text>
+      //     </View>
+      //   </Pressable>
+      // ),
     };
     navigation.setOptions(options);
-  }, [movieId, existsInSaved, movieTitle, isLoading, movieDetails]);
+  }, [movieId, existsInSaved, movieTitle, isLoading, colorScheme]);
 
   const backgroundStartColor = "#000000";
   const backgroundEndColor = "#FFFFFF";
@@ -186,16 +160,18 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
         />
       )}
       <ScrollView style={{ marginTop: headerHeight + 5, flexGrow: 1 }}>
-        {/* <View className="flex-1 flex-col"> */}
-        {/* <Pressable onPress={() => router.push("/home/1184918/917496")}>
-          <Text>Link to 1184918/917496</Text>
-        </Pressable> */}
+        {/* IMAGE and DESC */}
         <View>
           <MDImageDescRow
             movieDetails={finalMovieDetails as MovieDetails}
             existsInSaved={existsInSaved}
           />
         </View>
+        {/* MOVIE RATINGS */}
+        <View className="pt-1 my-1">
+          <MDRatings movieDetails={movieDetails} omdbData={omdbData} />
+        </View>
+        {/* MOVIE DETAILS */}
         <View className="pt-1 my-1">
           <MDDetails
             movieDetails={finalMovieDetails as MovieDetails}
@@ -208,9 +184,9 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
             <MDWatchProviders movieId={finalMovieDetails?.id} />
           </HiddenContainerWatchProviders>
         </View>
-        {/* Other movie recomendations */}
+        {/* RECOMMENDATIONS */}
         <View className="flex-1 my-1">
-          <HiddenContainerAnimated title="Recommended" style={{ height: 75 }} height={200}>
+          <HiddenContainerAnimated title="Recommended" height={imageHeight + 30}>
             <MDMovieRecommendations movieId={finalMovieDetails?.id} />
           </HiddenContainerAnimated>
         </View>

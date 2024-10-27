@@ -11,19 +11,99 @@ import { useQuery } from "@tanstack/react-query";
 import { add } from "lodash";
 import { useEffect, useState } from "react";
 import { tagSavedMovies } from "./store.utils";
+import axios from "axios";
 
 //~ --------------------------------------------------------------------------------
 //~ useMovieDetails - Data from the movie/show details page
 //~ --------------------------------------------------------------------------------
-export type MovieDetails = movieDetails_typedef["data"];
-export const useMovieDetailData = (movieId: number) => {
-  // console.log("StoredMovie", storedMovie.existsInSaved, storedMovie.id);
-  const fetchAdditionalMovieData = async (id: number) => {
-    const response = await movieGetDetails(id);
-    // console.log("RESPONSE", response);
-    return response.data as MovieDetails;
-  };
+export type OMDBData = {
+  rated?: string;
+  imdbRating?: string;
+  imdbVotes?: string;
+  rottenTomatoesScore?: string;
+  rottenTomatoesRating?: string;
+  omdbPosterURL?: string;
+  boxOffice?: string;
+  omdbRunTime?: string;
+  metascore?: string;
+};
+export type MovieDetails = movieDetails_typedef["data"] & OMDBData;
+type OMDBMovie = {
+  Title: string;
+  Year: string;
+  Rated: string;
+  Released: string;
+  Runtime: string;
+  Genre: string; // ex: "Action, Comedy"
+  Director: string;
+  Writer: string; // ex: "Etan Cohen, Macon Blair"
+  Actors: string; // ex: "Josh Brolin, Peter Dinklage, Taylour Paige"
+  Plot: string;
+  Language: string;
+  Country: string;
+  Awards: string;
+  Poster: string;
+  // Source - value
+  // "Rotten Tomatoes" - "94%"
+  // "Internet Movie Database" = "8.4/10"
+  // "Metacritic" - "84/100"
+  Ratings: Array<{
+    Source: string;
+    Value: string;
+  }>;
+  Metascore: string;
+  imdbRating: string; // "5.1"
+  imdbVotes: string; // number of votes making up rating
+  imdbID: string;
+  Type: string; // movie, series, episode
+  DVD: string;
+  BoxOffice: string; // "$23,278,931"
+  Production: string;
+  Website: string;
+  Response: string;
+};
 
+const getOMDBData = async (imdbId: string) => {
+  if (!imdbId) return undefined;
+  try {
+    const response = await axios.get(`https://www.omdbapi.com/?i=${imdbId}&apikey=c0247b61`);
+    const omdbData = response.data as OMDBMovie;
+
+    if (omdbData) {
+      const rottenValue = omdbData?.Ratings.find((el) => el.Source === "Rotten Tomatoes")?.Value;
+      const metacritic = omdbData?.Ratings.find((el) => el.Source === "Metacritic")?.Value;
+      let rottenRating = undefined;
+      if (rottenValue) {
+        rottenRating = parseInt(rottenValue?.slice(0, 1)) < 6 ? "Rotten" : "Fresh";
+      }
+      const omdbInfo = {
+        rated: omdbData?.Rated,
+        imdbRating: omdbData?.imdbRating,
+        imdbVotes: omdbData?.imdbVotes,
+        rottenTomatoesScore: rottenValue,
+        rottenTomatoesRating: rottenRating,
+        omdbPosterURL: omdbData?.Poster,
+        boxOffice: omdbData?.BoxOffice,
+        omdbRunTime: omdbData?.Runtime,
+        metascore: metacritic ? metacritic.slice(0, metacritic.indexOf("/")) : metacritic,
+      };
+      return omdbInfo;
+    }
+    return undefined;
+  } catch (error) {
+    console.error("Error fetching movie data:", error);
+    return undefined;
+  }
+};
+export const useOMDBData = (imdbID: string | undefined) => {
+  return useQuery({
+    queryKey: ["omdbdata", imdbID],
+    queryFn: () => getOMDBData(imdbID!),
+    enabled: !!imdbID, // Only run query if movieId exists
+  });
+};
+
+export const useMovieDetailData = (movieId: number) => {
   const {
     data: movieDetails,
     isLoading,
@@ -35,6 +115,10 @@ export const useMovieDetailData = (movieId: number) => {
     // initialData: storedMovie, // Initial data from Zustand
   });
 
+  const fetchAdditionalMovieData = async (id: number) => {
+    const response = await movieGetDetails(id);
+    return response.data as MovieDetails; // Return combined data
+  };
   return { movieDetails, isLoading, ...rest };
 };
 

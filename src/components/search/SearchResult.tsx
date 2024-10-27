@@ -8,22 +8,6 @@ import { useCustomTheme } from "@/utils/colorThemes";
 import { Link, router, usePathname, useSegments } from "expo-router";
 import useImageSize from "@/hooks/useImageSize";
 
-function getProcessedPath(pathname: string) {
-  const segments = pathname.split("/").filter(Boolean); // Split and filter empty segments
-  console.log("P/S", pathname, segments);
-  if (segments.length === 1) {
-    // If the path is "/home" or "/search"
-    return `/${segments[0]}/`;
-  }
-
-  // if (segments.length === 2 && !isNaN(Number(segments[1]))) {
-  // If the path is "/home/1234" or "/search/1234"
-  return `/${segments[0]}/${segments[1]}/`;
-  // }
-
-  // return pathname; // Return the original path if no conditions match
-}
-
 //~~  SearchResult Component
 type Props = {
   movie: MovieSearchResults;

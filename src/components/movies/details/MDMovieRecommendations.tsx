@@ -14,18 +14,20 @@ const MDMovieRecommendations = ({ movieId }: Props) => {
   const movieActions = useMovieStore((state) => state.actions);
   if (isLoading) return null;
   return (
-    <ScrollView horizontal>
+    <ScrollView horizontal style={{ paddingLeft: 10, marginTop: 5 }}>
       {data &&
         data.map((el) => {
           return (
-            <SearchResult
-              movie={el}
-              numColumns={3}
-              key={el.id}
-              spacing={{ bottomMargin: 1, extraHeight: 2 }}
-              onAddMovie={movieActions.addShow}
-              onRemoveMovie={movieActions.removeShow}
-            />
+            <View key={el.id} className="mr-2">
+              <SearchResult
+                movie={el}
+                numColumns={3}
+                key={el.id}
+                spacing={{ bottomMargin: 10, extraHeight: 20 }}
+                onAddMovie={movieActions.addShow}
+                onRemoveMovie={movieActions.removeShow}
+              />
+            </View>
           );
         })}
     </ScrollView>
