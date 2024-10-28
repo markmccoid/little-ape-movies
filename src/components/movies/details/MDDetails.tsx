@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import React from "react";
-import { MovieDetails } from "@/store/dataHooks";
+import { MovieDetails, OMDBData } from "@/store/dataHooks";
 import { addDelimitersToArray, formatAsUSDCurrency, formatTime } from "@/utils/utils";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import MDBackground from "./MDBackground";
@@ -9,9 +9,10 @@ import MDBackground from "./MDBackground";
 type Props = {
   existsInSaved: boolean;
   movieDetails: MovieDetails;
+  omdbData: OMDBData | undefined;
 };
 
-const MDDetails = ({ movieDetails }: Props) => {
+const MDDetails = ({ movieDetails, omdbData }: Props) => {
   return (
     <Animated.View className="relative">
       <MDBackground />
@@ -23,11 +24,14 @@ const MDDetails = ({ movieDetails }: Props) => {
             <Text style={styles.textLabel}>Released:</Text>
             <Text style={styles.textDesc}>{movieDetails?.releaseDate?.formatted}</Text>
           </View>
-          <View className="flex-row">
-            <Text style={styles.textLabel}>Length:</Text>
-            <Text style={styles.textDesc}>
-              {movieDetails?.runtime && formatTime(movieDetails.runtime).verbose}
-            </Text>
+          <View className="flex-row justify-between">
+            <View className="flex-row">
+              <Text style={styles.textLabel}>Length:</Text>
+              <Text style={styles.textDesc}>
+                {movieDetails?.runtime && formatTime(movieDetails.runtime).verbose}
+              </Text>
+            </View>
+            <Text className="font-semibold ml-1">({omdbData?.rated})</Text>
           </View>
           {movieDetails?.budget !== 0 && (
             <View className="flex-row">

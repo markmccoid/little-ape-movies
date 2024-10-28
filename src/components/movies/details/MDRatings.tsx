@@ -19,12 +19,22 @@ const MDRatings = ({ movieDetails, omdbData }: Props) => {
       <MDBackground />
       <View className="flex-row items-center py-2 px-3 justify-between flex-1">
         {/* Need to not show if there is NO rating */}
-        <RottenTomatoes
-          rating={omdbData?.rottenTomatoesRating}
-          score={omdbData?.rottenTomatoesScore}
-        />
-        <IMDBRating rating={omdbData?.imdbRating} votes={omdbData?.imdbVotes} />
-        <Metascore metascore={omdbData?.metascore} />
+        <View style={{ flex: 1 }}>
+          <RottenTomatoes
+            rating={omdbData?.rottenTomatoesRating}
+            score={omdbData?.rottenTomatoesScore}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <IMDBRating
+            rating={omdbData?.imdbRating}
+            votes={omdbData?.imdbVotes}
+            imdbId={movieDetails?.imdbId}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Metascore metascore={omdbData?.metascore} imdbId={movieDetails?.imdbId} />
+        </View>
       </View>
     </View>
   );

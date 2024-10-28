@@ -28,6 +28,8 @@ import MDMovieRecommendations from "./MDMovieRecommendations";
 import { SymbolView } from "expo-symbols";
 import useImageSize from "@/hooks/useImageSize";
 import MDRatings from "./MDRatings";
+import MDMovieVideos from "./MDMovieVideos";
+import MDMovieCast from "./cast/MDMovieCast";
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   //!! We need have local state so that we only update component AFTER
@@ -81,23 +83,26 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
       onPress={async () => {
         const yesDelete = await showConfirmationPrompt("Delete Movie", "Delete Movie");
         if (yesDelete) {
-          movieActions.removeShow(storedMovie?.id);
+          if (storedMovie?.id) {
+            movieActions.removeShow(storedMovie?.id);
+          }
           // If we are deep in a stack go back to starting point
           router.dismissAll();
         }
       }}
     >
-      <DeleteIcon />
+      <SymbolView name="trash" tintColor={colors.deleteRed} />
     </TouchableOpacity>
   );
   const HeaderRightAdd = () => (
     <TouchableOpacity
-      className="pr-2 mr-[-10] pl-1"
+      className="pr-2 mr-[-10] pl-1 pt-1"
       activeOpacity={0.5}
       onPress={() => handleAddMovie()}
       disabled={movieAdding}
     >
-      <AddIcon color={colors.text} />
+      {/* <AddIcon color={colors.text} /> */}
+      <SymbolView name="plus.app" tintColor={colors.text} size={30} />
     </TouchableOpacity>
   );
   //~~ --------------------------------
@@ -175,6 +180,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
         <View className="pt-1 my-1">
           <MDDetails
             movieDetails={finalMovieDetails as MovieDetails}
+            omdbData={omdbData}
             existsInSaved={existsInSaved}
           />
         </View>
@@ -188,6 +194,18 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
         <View className="flex-1 my-1">
           <HiddenContainerAnimated title="Recommended" height={imageHeight + 30}>
             <MDMovieRecommendations movieId={finalMovieDetails?.id} />
+          </HiddenContainerAnimated>
+        </View>
+        {/* VIDEOS */}
+        <View className="flex-1 my-1">
+          <HiddenContainerAnimated title="Videos" height={145}>
+            <MDMovieVideos movieId={finalMovieDetails?.id} />
+          </HiddenContainerAnimated>
+        </View>
+        {/* CAST */}
+        <View className="flex-1 my-1">
+          <HiddenContainerAnimated title="Cast" height={145} startOpen>
+            <MDMovieCast movieId={finalMovieDetails?.id} />
           </HiddenContainerAnimated>
         </View>
       </ScrollView>

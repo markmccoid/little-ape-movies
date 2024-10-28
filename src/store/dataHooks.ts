@@ -1,4 +1,3 @@
-import { WatchProvider } from "./../../node_modules/@markmccoid/tmdb_api/types/APICurated/API_TV.d";
 import useMovieStore from "./store.shows";
 import {
   movieGetDetails,
@@ -6,15 +5,16 @@ import {
   movieGetWatchProviders,
   ProviderInfo,
   movieGetRecommendations,
+  movieGetVideos,
 } from "@markmccoid/tmdb_api";
 import { useQuery } from "@tanstack/react-query";
-import { add } from "lodash";
+import { reverse, sortBy } from "lodash";
 import { useEffect, useState } from "react";
 import { tagSavedMovies } from "./store.utils";
 import axios from "axios";
 
 //~ --------------------------------------------------------------------------------
-//~ useMovieDetails - Data from the movie/show details page
+//~ useOMDBData HELPERS
 //~ --------------------------------------------------------------------------------
 export type OMDBData = {
   rated?: string;
@@ -95,6 +95,10 @@ const getOMDBData = async (imdbId: string) => {
     return undefined;
   }
 };
+
+//~~ --------------------------------------------------------------------------------
+//~ useOMDBData - Movie data from the OMDB API
+//~~ --------------------------------------------------------------------------------
 export const useOMDBData = (imdbID: string | undefined) => {
   return useQuery({
     queryKey: ["omdbdata", imdbID],
@@ -103,6 +107,9 @@ export const useOMDBData = (imdbID: string | undefined) => {
   });
 };
 
+//~~ --------------------------------------------------------------------------------
+//~ useMovieDetailData - Base movie detail data
+//~~ --------------------------------------------------------------------------------
 export const useMovieDetailData = (movieId: number) => {
   const {
     data: movieDetails,
@@ -181,5 +188,24 @@ export const useMovieRecommendations = (movieId: number) => {
     ...movie,
     existsInSaved: useMovieStore.getState().shows.some((savedMovie) => savedMovie.id === movie.id),
   }));
+  return { data: finalData, isLoading, ...rest };
+};
+
+//~~ --------------------------------------------------------------------------------
+//~ Get Movie Videos
+//~~ --------------------------------------------------------------------------------
+export const useMovieVideos = (movieId: number) => {
+  const { data, isLoading, ...rest } = useQuery({
+    queryKey: ["movievideos", movieId],
+    queryFn: async () => {
+      const resp = await movieGetVideos(movieId);
+      console.log("Resp", resp.data);
+      return resp.data;
+    },
+    staleTime: 300000,
+  });
+
+  // Want trailers to show up first, so sort and then reverse
+  const finalData = reverse(sortBy(data, ["type"]));
   return { data: finalData, isLoading, ...rest };
 };

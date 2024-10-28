@@ -1,23 +1,36 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
+import { useCustomTheme } from "@/utils/colorThemes";
+import { useRatingsTier } from "@/store/store.settings";
+import * as Linking from "expo-linking";
 
 type Props = {
   rating: string | undefined;
   votes: string | undefined;
+  imdbId: string | undefined;
 };
-const IMDBRating = ({ rating, votes }: Props) => {
-  if (!rating) return null;
-
-  const imdbColor = "#ECC233";
-  const notGoodColor = "#AC831Faa";
-  const goodColor = "#579C31aa";
-  const bgColor = parseInt(rating) < 6 ? notGoodColor : goodColor;
+const IMDBRating = ({ rating, votes, imdbId }: Props) => {
+  const { finalRating, ratingColor } = useRatingsTier(rating, "imdb");
+  const { colors } = useCustomTheme();
+  const imdbColor = colors.imdbYellow;
+  const imdbRatingURL = `https://www.imdb.com/title/${imdbId}/ratings/`;
   return (
-    <View
-      className="border p-1 rounded-md"
-      style={{ backgroundColor: bgColor, borderColor: imdbColor }}
-    >
-      <Text>{rating}</Text>
+    <View className="flex-row justify-center">
+      <TouchableOpacity
+        onPress={async () => {
+          Linking.openURL(imdbRatingURL).catch((err) =>
+            console.log("Error opening WatchProvider", err)
+          );
+        }}
+        style={{ paddingTop: 5 }}
+      >
+        <View
+          className="p-1 items-center border-hairline rounded-md"
+          style={{ backgroundColor: ratingColor, borderColor: imdbColor }}
+        >
+          <Text className="text-base">{finalRating}</Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };

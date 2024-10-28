@@ -35,6 +35,9 @@ export const RemoveCircleIcon = ({ size = 25, color, style }: Props) => {
   return <Ionicons name="remove-circle-outline" size={size} color={color} style={style} />;
 };
 
+export const YouTubePlayIcon = ({ size = 25, color, style }: Props) => {
+  return <FontAwesome name="youtube-play" color={color} size={size} style={style} />;
+};
 export const ImageIcon = ({ size = 25, color, style }: Props) => {
   return <Entypo name="image" size={size} color={color} style={style} />;
 };

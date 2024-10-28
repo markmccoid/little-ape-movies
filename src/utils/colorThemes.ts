@@ -10,6 +10,7 @@ type CustomTheme = Theme & {
     cardInverted: string;
     colorSelected: string;
     deleteRed: string;
+    imdbYellow: string;
   };
 };
 
@@ -38,6 +39,7 @@ export const CustomLightTheme: CustomTheme = {
     colorSelected: "#90ee90",
     notification: "rgb(255, 59, 48)",
     deleteRed: "#c70000",
+    imdbYellow: "#ECC233",
   },
 };
 
@@ -59,5 +61,6 @@ export const CustomDarkTheme: CustomTheme = {
     colorSelected: "#2f6b2f",
     notification: "rgb(255, 59, 48)",
     deleteRed: "#c70000",
+    imdbYellow: "#ECC233",
   },
 };

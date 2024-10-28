@@ -5,6 +5,10 @@ import { eventBus } from "./eventBus";
 
 interface SettingsStore {
   searchColumns: 2 | 3;
+  ratingsTiers: {
+    tierLimit: number;
+    tierColor: string;
+  }[];
   actions: {
     toggleSearchColumns: () => void;
   };
@@ -12,6 +16,16 @@ interface SettingsStore {
 
 const settingsInitialState = {
   searchColumns: 3 as 2 | 3, // Default value, adjust as needed
+  ratingsTiers: [
+    {
+      tierLimit: 60,
+      tierColor: "#AC831F",
+    },
+    {
+      tierLimit: 100,
+      tierColor: "#579C31",
+    },
+  ],
 };
 
 const useSettingsStore = create<SettingsStore>()(
@@ -36,4 +50,37 @@ const useSettingsStore = create<SettingsStore>()(
   )
 );
 
+export const useRatingsTier = (rating: string | undefined, type: "imdb" | "rt" | "metascore") => {
+  if (rating === "N/A" || !rating) return { finalRating: "N/A", ratingColor: "#ccc" };
+  let intRating = 0;
+  let finalRating = "";
+  switch (type) {
+    case "metascore":
+      intRating = parseInt(rating);
+      finalRating = rating;
+      break;
+    case "imdb":
+      intRating = parseInt(rating) * 10;
+      finalRating = `${rating}/10`;
+      break;
+    case "rt":
+      intRating = parseInt(rating.replace(/\s?%/, ""));
+      finalRating = rating;
+      break;
+    default:
+      return { finalRating: "N/A", ratingColor: "#ccc" };
+  }
+
+  let ratingsColors = useSettingsStore.getState().ratingsTiers;
+  // Sort the array by tierLimit in ascending order
+  ratingsColors.sort((a, b) => a.tierLimit - b.tierLimit);
+
+  // Find the first tier where the number is less than the tierLimit
+  for (let i = 0; i < ratingsColors.length; i++) {
+    if (intRating < ratingsColors[i].tierLimit) {
+      return { finalRating, ratingColor: ratingsColors[i].tierColor };
+    }
+  }
+  return { finalRating: "N/A", ratingColor: "#ccc" };
+};
 export default useSettingsStore;

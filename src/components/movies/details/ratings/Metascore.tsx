@@ -1,21 +1,33 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
+import { useRatingsTier } from "@/store/store.settings";
+import * as Linking from "expo-linking";
 
 type Props = {
   metascore: string | undefined;
+  imdbId: string | undefined;
 };
-const Metascore = ({ metascore }: Props) => {
-  if (!metascore) return null;
+const Metascore = ({ metascore, imdbId }: Props) => {
+  const { finalRating, ratingColor } = useRatingsTier(metascore, "metascore");
+  const metascoreURL = `https://www.imdb.com/title/${imdbId}/criticreviews`;
 
-  const notGoodColor = "#AC831Faa";
-  const goodColor = "#579C31aa";
-  const isGood = parseInt(metascore) > 60;
   return (
-    <View
-      className="p-1 items-center border-hairline rounded-md"
-      style={{ backgroundColor: isGood ? goodColor : notGoodColor }}
-    >
-      <Text>{metascore}</Text>
+    <View className="flex-row justify-center">
+      <TouchableOpacity
+        onPress={async () => {
+          Linking.openURL(metascoreURL).catch((err) =>
+            console.log("Error opening WatchProvider", err)
+          );
+        }}
+        style={{ paddingTop: 5 }}
+      >
+        <View
+          className="p-1 items-center border-hairline rounded-md"
+          style={{ backgroundColor: ratingColor }}
+        >
+          <Text className="text-base">{finalRating}</Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };

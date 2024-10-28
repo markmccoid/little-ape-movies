@@ -1,5 +1,6 @@
 import { View, Text, Image } from "react-native";
 import React from "react";
+import { useRatingsTier } from "@/store/store.settings";
 
 type Props = {
   rating: string | undefined;
@@ -7,8 +8,9 @@ type Props = {
 };
 const RottenTomatoes = ({ rating, score }: Props) => {
   if (!rating) return null;
+
   return (
-    <View className="flex-row items-center">
+    <View className="flex-row items-center py-1">
       {rating === "Fresh" ? (
         <Image
           source={require("../../../../../assets/images/fresh2.png")}
@@ -26,7 +28,7 @@ const RottenTomatoes = ({ rating, score }: Props) => {
           }}
         />
       )}
-      <Text className="ml-[2] font-semibold">{score}</Text>
+      <Text className="ml-[2]  text-base pt-1">{score}</Text>
     </View>
   );
 };

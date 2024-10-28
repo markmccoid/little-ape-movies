@@ -41,6 +41,7 @@ module.exports = {
         buttontext: "var(--color-button-text)",
         selected: "var(--color-selected)",
         overlay: "var(--color-overlay)",
+        imdbyellow: "var(--color-imdb-yellow)",
       },
     },
   },

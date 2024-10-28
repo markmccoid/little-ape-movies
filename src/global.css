@@ -18,6 +18,7 @@
   --color-button-text: #040316;  
   --color-selected: #90ee90;
   --color-overlay: rgba(0, 0, 0, .05);
+  --color-imdb-yellow: "#ECC233";
 }
 
 @media (prefers-color-scheme: dark) {
@@ -37,5 +38,6 @@
     --color-button-text: #040316;
     --color-selected: #2f6b2f;
     --color-overlay: rgba(0, 0, 0, .05);
+    --color-imdb-yellow: "#ECC233";
   }
 }
