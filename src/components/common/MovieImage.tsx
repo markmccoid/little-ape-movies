@@ -33,8 +33,6 @@ const MovieImage = ({
           className={`border rounded-lg rounded-b-none`}
           source={require("../../../assets/images/DefaultImage.png")}
           style={{ width: imageWidth, height: imageHeight, opacity: 0.7, ...imageStyle }}
-          // contentFit={resizeMode}
-          // placeholder={{ blurhash }}
         />
         <Text
           className="absolute text-text text-center font-semibold text-white"
@@ -49,14 +47,10 @@ const MovieImage = ({
   return (
     <Image
       className="border-hairline border-border"
-      // source={posterURL}
       source={{ uri: posterURL }}
-      // contentFit="contain"
-      // placeholder={{ blurhash }}
       style={{
         width: imageWidth,
         height: imageHeight,
-        // resizeMode,
         overflow: "hidden",
         ...imageStyle,
       }}

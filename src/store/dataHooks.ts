@@ -6,6 +6,7 @@ import {
   ProviderInfo,
   movieGetRecommendations,
   movieGetVideos,
+  movieGetCredits,
 } from "@markmccoid/tmdb_api";
 import { useQuery } from "@tanstack/react-query";
 import { reverse, sortBy } from "lodash";
@@ -180,7 +181,7 @@ export const useMovieRecommendations = (movieId: number) => {
       const resp = await movieGetRecommendations(movieId);
       return resp.data.results as movieRecommendationsResults[];
     },
-    staleTime: 300000,
+    staleTime: 600000,
   });
 
   // Tag the data
@@ -199,13 +200,27 @@ export const useMovieVideos = (movieId: number) => {
     queryKey: ["movievideos", movieId],
     queryFn: async () => {
       const resp = await movieGetVideos(movieId);
-      console.log("Resp", resp.data);
       return resp.data;
     },
-    staleTime: 300000,
+    staleTime: 600000,
   });
 
   // Want trailers to show up first, so sort and then reverse
   const finalData = reverse(sortBy(data, ["type"]));
   return { data: finalData, isLoading, ...rest };
+};
+//~~ --------------------------------------------------------------------------------
+//~ Get Movie Cast
+//~~ --------------------------------------------------------------------------------
+export const useMovieCast = (movieId: number | undefined) => {
+  const { data, isLoading, ...rest } = useQuery({
+    queryKey: ["moviecast", movieId],
+    queryFn: async () => {
+      const resp = await movieGetCredits(movieId);
+      return resp.data.cast;
+    },
+    staleTime: 600000,
+  });
+
+  return { data, isLoading, ...rest };
 };

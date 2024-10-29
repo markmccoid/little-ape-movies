@@ -204,7 +204,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
         </View>
         {/* CAST */}
         <View className="flex-1 my-1">
-          <HiddenContainerAnimated title="Cast" height={145} startOpen>
+          <HiddenContainerAnimated title="Cast" startOpen={true}>
             <MDMovieCast movieId={finalMovieDetails?.id} />
           </HiddenContainerAnimated>
         </View>

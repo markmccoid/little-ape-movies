@@ -14,7 +14,7 @@ import { AnimatePresence, MotiView } from "moti";
 type Props = {
   children: ReactNode;
   title: string;
-  height: number;
+  height?: number;
   style?: ViewStyle;
   startOpen?: boolean;
 };
@@ -32,6 +32,7 @@ const HiddenContainerAnimated: React.FC<Props> = ({
   React.useEffect(() => {
     setIsMounted(true);
   }, []);
+
   return (
     <View
       style={{
@@ -72,19 +73,41 @@ const HiddenContainerAnimated: React.FC<Props> = ({
         </View>
       </Pressable>
 
-      <MotiView
-        from={{ height: !isMounted || viewContents ? 0 : height }}
-        animate={{ height: !isMounted || viewContents ? height : 0 }}
-        transition={{ type: "timing", duration: 500 }}
-      >
-        <AnimatePresence>
-          {viewContents && (
-            <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} key={1}>
-              {children}
-            </MotiView>
-          )}
-        </AnimatePresence>
-      </MotiView>
+      {height ? (
+        <MotiView
+          from={{ height: !isMounted || viewContents ? 0 : height }}
+          animate={{ height: !isMounted || viewContents ? height : 0 }}
+          transition={{ type: "timing", duration: 500 }}
+        >
+          <AnimatePresence>
+            {viewContents && (
+              <MotiView
+                from={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                key={1}
+              >
+                {children}
+              </MotiView>
+            )}
+          </AnimatePresence>
+        </MotiView>
+      ) : (
+        <MotiView transition={{ type: "timing", duration: 500 }}>
+          <AnimatePresence>
+            {viewContents && (
+              <MotiView
+                from={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                key={1}
+              >
+                {children}
+              </MotiView>
+            )}
+          </AnimatePresence>
+        </MotiView>
+      )}
     </View>
   );
 };

@@ -5,6 +5,7 @@ import MDBackground from "./MDBackground";
 import RottenTomatoes from "./ratings/RottenTomatoes";
 import IMDBRating from "./ratings/IMDBRating";
 import Metascore from "./ratings/Metascore";
+import UserRating from "../../common/UserRating";
 
 type Props = {
   movieDetails: MovieDetails | undefined;
@@ -14,7 +15,7 @@ const MDRatings = ({ movieDetails, omdbData }: Props) => {
   return (
     <View className="flex-row items-center">
       <View className="w-1/2">
-        <Text>RATING</Text>
+        <UserRating />
       </View>
       <MDBackground />
       <View className="flex-row items-center py-2 px-3 justify-between flex-1">
