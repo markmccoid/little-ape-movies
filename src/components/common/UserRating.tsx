@@ -22,9 +22,10 @@ type Props = {
   rating: number | undefined;
 };
 const UserRating = ({ updateRating, rating = 0 }: Props) => {
-  console.log("R", rating);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
+  const rightEdgeOffset = useSharedValue(0);
+  const leftEdgeOffset = useSharedValue(0);
   const absX = useSharedValue(0);
   const textScale = useSharedValue(0);
   const isLongPressActive = useSharedValue(false);
@@ -36,18 +37,22 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
     .onChange((event) => {
       "worklet";
       if (isLongPressActive.value) {
-        // translateX.value = event.translationX;
-        translateX.value = Math.max(-10, Math.min(333, event.translationX));
+        // const leftEdgeOffset = event.absoluteX + (40 - event.x) + event.translationX;
+        // translateX.value = Math.max(-10, Math.min(distToREdge, event.translationX));
         let absoluteX = event.absoluteX;
-        if (translateX.value === -10 || translateX.value === 333) {
+        //!! 60 is width of button + left padding (need to put in Vars instead.)
+        if (rightEdgeOffset.value + event.translationX <= 0 || 60 + event.translationX >= width) {
           absoluteX = absX.value;
         } else {
           absX.value = event.absoluteX;
+          translateX.value = event.translationX;
         }
         textScale.value = absoluteX / positionFactor - Math.floor(absoluteX / positionFactor);
         // console.log("W", width - 60, event.translationX, event.absoluteX);
         // console.log("M", Math.max(0, Math.min(maxTranslateX, event.translationX)));
-        console.log("PAN AB", event.absoluteX);
+        // absoluteX - x = width of screen then you hit the right edge
+
+        // console.log("PAN AB", event.absoluteX, event.translationX);
         let calcCurrRating =
           Math.floor(absoluteX / positionFactor) >= 10
             ? 10
@@ -71,7 +76,10 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
     .minDuration(300)
     .onStart((e) => {
       "worklet";
-      console.log("LP AB", e.x, e.absoluteX, width - 55 - 35 / 2);
+      //absoluteX - x = amount left/negative before you hit edge
+      // console.log("LP LEdgeOffset", e.absoluteX, e.x);
+      rightEdgeOffset.value = e.absoluteX - e.x;
+      leftEdgeOffset.value = e.absoluteX;
       translateY.value = withSpring(-35);
       isLongPressActive.value = true;
       Haptics.ImpactFeedbackStyle.Medium;
@@ -97,7 +105,7 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
       transform: [
         { translateX: translateX.value },
         { translateY: translateY.value },
-        { scale: isLongPressActive.value ? withSpring(1.4) : withSpring(1) },
+        // { scale: isLongPressActive.value ? withSpring(1.4) : withSpring(1) },
       ],
     };
   });

@@ -17,7 +17,6 @@ const MDRatings = ({ movieDetails, omdbData, storedMovie }: Props) => {
   const updateShow = useMovieActions().updateShow;
 
   const updateRating = (rating: number) => {
-    console.log("MDRating", movieDetails?.id);
     if (!movieDetails?.id) return;
 
     updateShow(movieDetails?.id, { rating });

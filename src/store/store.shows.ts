@@ -81,7 +81,7 @@ const useMovieStore = create<MovieStore>()(
           set((state) => ({
             shows: state.shows.map((m) => (m.id === id ? { ...m, ...updatedShow } : m)),
           }));
-          console.log("UPDATE Show", updatedShow);
+          // console.log("UPDATE Show", updatedShow);
         },
         removeShow: (id) => {
           set((state) => ({
