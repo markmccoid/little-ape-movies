@@ -6,16 +6,26 @@ import RottenTomatoes from "./ratings/RottenTomatoes";
 import IMDBRating from "./ratings/IMDBRating";
 import Metascore from "./ratings/Metascore";
 import UserRating from "../../common/UserRating";
+import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
 
 type Props = {
   movieDetails: MovieDetails | undefined;
   omdbData: OMDBData | undefined;
+  storedMovie: ShowItemType | undefined;
 };
-const MDRatings = ({ movieDetails, omdbData }: Props) => {
+const MDRatings = ({ movieDetails, omdbData, storedMovie }: Props) => {
+  const updateShow = useMovieActions().updateShow;
+
+  const updateRating = (rating: number) => {
+    console.log("MDRating", movieDetails?.id);
+    if (!movieDetails?.id) return;
+
+    updateShow(movieDetails?.id, { rating });
+  };
   return (
     <View className="flex-row items-center">
       <View className="w-1/2">
-        <UserRating />
+        <UserRating updateRating={updateRating} rating={storedMovie?.rating} />
       </View>
       <MDBackground />
       <View className="flex-row items-center py-2 px-3 justify-between flex-1">

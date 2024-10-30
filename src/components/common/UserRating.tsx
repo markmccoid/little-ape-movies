@@ -1,136 +1,127 @@
-import { last } from "lodash";
-import React from "react";
-import { Dimensions } from "react-native";
-import { StyleSheet, Text, View, Animated } from "react-native";
-import { State, LongPressGestureHandler } from "react-native-gesture-handler";
+import { View, Text, Dimensions } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
+import Animated, {
+  Extrapolation,
+  interpolate,
+  interpolateColor,
+  runOnJS,
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 
 const { width, height } = Dimensions.get("window");
-const positionFactor = Math.floor((width - 50) / 10);
+const positionFactor = Math.floor((width - 40) / 10);
 
-const LongTouchUserRating = ({
-  userRating = 0,
-  updateUserRating = (userRating) => console.log("UR", userRating),
-}) => {
-  const forceVal = React.useRef(new Animated.Value(0)).current;
-  const xPos = React.useRef(new Animated.Value(0)).current;
-  // Used to set User Rating Text higher when gesture active
-  // Turned on in _onGestureEvent and off in the "EndXPosAnim" callback.
-  const [gestureActive, setGestureActive] = React.useState(false);
-  const [currRating, setCurrRating] = React.useState(0);
+type Props = {
+  updateRating: (rating: number) => void;
+  rating: number | undefined;
+};
+const UserRating = ({ updateRating, rating = 0 }: Props) => {
+  console.log("R", rating);
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+  const absX = useSharedValue(0);
+  const textScale = useSharedValue(0);
+  const isLongPressActive = useSharedValue(false);
+  const [currRating, setCurrRating] = React.useState(rating);
 
-  //Animation on gesture START/activation
-  const gestureStartAnim = () =>
-    Animated.spring(forceVal, {
-      toValue: 1,
-      bounciness: 15,
-      speed: 10,
-      useNativeDriver: true,
-    }).start();
-  //Animation on gesture END
-  const gestureEndAnim = () =>
-    Animated.timing(forceVal, {
-      toValue: 0,
-      duration: 400,
-      useNativeDriver: true,
-    }).start(() => setGestureActive(false));
-  //Animation on Gesture End for translateX
-  const EndXPosAnim = () =>
-    Animated.spring(xPos, {
-      toValue: 0,
-      damping: 10,
-      useNativeDriver: true,
-    }).start();
+  const colorTrans = useSharedValue(0);
+  const maxTranslateX = width - 60;
+  const pan = Gesture.Pan()
+    .onChange((event) => {
+      "worklet";
+      if (isLongPressActive.value) {
+        // translateX.value = event.translationX;
+        translateX.value = Math.max(-10, Math.min(333, event.translationX));
+        let absoluteX = event.absoluteX;
+        if (translateX.value === -10 || translateX.value === 333) {
+          absoluteX = absX.value;
+        } else {
+          absX.value = event.absoluteX;
+        }
+        textScale.value = absoluteX / positionFactor - Math.floor(absoluteX / positionFactor);
+        // console.log("W", width - 60, event.translationX, event.absoluteX);
+        // console.log("M", Math.max(0, Math.min(maxTranslateX, event.translationX)));
+        console.log("PAN AB", event.absoluteX);
+        let calcCurrRating =
+          Math.floor(absoluteX / positionFactor) >= 10
+            ? 10
+            : Math.floor(absoluteX / positionFactor);
+        if (currRating !== calcCurrRating) {
+          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+        }
+        runOnJS(setCurrRating)(calcCurrRating);
+      }
+    })
+    .onEnd(() => {
+      "worklet";
+      translateX.value = withSpring(0);
+      translateY.value = withSpring(0);
+      textScale.value = withSpring(0);
+      isLongPressActive.value = false;
+      runOnJS(updateRating)(currRating);
+    });
 
-  const _onGestureEvent = (event) => {
-    let { absoluteY, y, absoluteX, x, oldState, state } = event.nativeEvent;
-    setGestureActive(true);
-    xPos.setValue(absoluteX - 66);
-    let calcCurrRating =
-      Math.floor(absoluteX / positionFactor) >= 10 ? 10 : Math.floor(absoluteX / positionFactor);
-    if (currRating !== calcCurrRating) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    setCurrRating(calcCurrRating);
-  };
+  const longPress = Gesture.LongPress()
+    .minDuration(300)
+    .onStart((e) => {
+      "worklet";
+      console.log("LP AB", e.x, e.absoluteX, width - 55 - 35 / 2);
+      translateY.value = withSpring(-35);
+      isLongPressActive.value = true;
+      Haptics.ImpactFeedbackStyle.Medium;
+    })
+    .onEnd(() => {
+      "worklet";
+      translateX.value = withSpring(0);
+      translateY.value = withSpring(0);
+      isLongPressActive.value = false;
+      textScale.value = withSpring(0);
+    });
 
-  const _onHandlerStateChange = (event) => {
-    // console.log(State.ACTIVE, State.UNDETERMINED, State.BEGAN, State.END);
-    // Event is over
-    let { oldState, state } = event.nativeEvent;
+  const gesture = Gesture.Simultaneous(longPress, pan);
 
-    // When long gesture is actived do this
-    if (state === State.ACTIVE) {
-      gestureStartAnim();
-      // Haptics.selectionAsync();
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    }
-
-    // When long gesture ends, do this
-    if (state === State.END) {
-      gestureEndAnim();
-      EndXPosAnim();
-      updateUserRating(currRating);
-    }
-  };
-
-  React.useEffect(() => {
-    setCurrRating(userRating);
-  }, [userRating]);
-
+  const rStyle = useAnimatedStyle(() => {
+    colorTrans.value = withTiming(isLongPressActive.value ? 0 : 1);
+    return {
+      backgroundColor: interpolateColor(
+        colorTrans.value, // Input value (0 or 1)
+        [0, 1], // Input range
+        ["#eab308", "yellow"] // Output colors
+      ),
+      transform: [
+        { translateX: translateX.value },
+        { translateY: translateY.value },
+        { scale: isLongPressActive.value ? withSpring(1.4) : withSpring(1) },
+      ],
+    };
+  });
+  const textStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { scale: interpolate(textScale.value, [0, 1, 0], [1, 1.5, 1], Extrapolation.CLAMP) },
+      ],
+    };
+  });
   return (
-    <View className="z-10">
-      <LongPressGestureHandler
-        minDurationMs={500}
-        maxDist={width}
-        onGestureEvent={_onGestureEvent}
-        onHandlerStateChange={_onHandlerStateChange}
-      >
-        <View style={{ position: "absolute", bottom: -25, paddingBottom: 30 }}>
-          <Animated.View
-            style={[
-              styles.box,
-              gestureActive ? { justifyContent: "flex-start" } : { justifyContent: "center" },
-              {
-                transform: [
-                  { translateX: xPos },
-                  {
-                    translateY: forceVal.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -35],
-                      extrapolate: "clamp",
-                    }),
-                  },
-                  { scale: Animated.add(1, forceVal) },
-                ],
-              },
-            ]}
-          >
-            <Text style={styles.userRating}>{currRating}</Text>
-          </Animated.View>
-        </View>
-      </LongPressGestureHandler>
+    <View className="ml-5 z-10">
+      <GestureDetector gesture={gesture}>
+        <Animated.View
+          style={[rStyle, { width: 40, height: 30 }]}
+          className="rounded-xl bg-yellow-500 flex-row justify-center items-center border border-border"
+        >
+          <Animated.Text style={textStyle} className="text-xl font-bold">
+            {currRating}
+          </Animated.Text>
+        </Animated.View>
+      </GestureDetector>
     </View>
   );
 };
 
-export default LongTouchUserRating;
-
-const styles = StyleSheet.create({
-  box: {
-    width: 60,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 5,
-    backgroundColor: "yellow",
-    zIndex: 200,
-    borderColor: "#777",
-    borderWidth: 1,
-  },
-  userRating: {
-    fontSize: 18,
-    fontWeight: "800",
-  },
-});
+export default UserRating;
