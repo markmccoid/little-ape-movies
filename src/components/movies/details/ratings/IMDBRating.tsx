@@ -26,9 +26,9 @@ const IMDBRating = ({ rating, votes, imdbId }: Props) => {
       >
         <View
           className="p-1 items-center border-hairline rounded-md"
-          style={{ backgroundColor: ratingColor, borderColor: imdbColor }}
+          style={{ backgroundColor: `${ratingColor}aa`, borderColor: imdbColor }}
         >
-          <Text className="text-base">{finalRating}</Text>
+          <Text className="text-base font-semibold">{finalRating}</Text>
         </View>
       </TouchableOpacity>
     </View>

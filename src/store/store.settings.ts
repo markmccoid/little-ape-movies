@@ -51,7 +51,7 @@ const useSettingsStore = create<SettingsStore>()(
 );
 
 export const useRatingsTier = (rating: string | undefined, type: "imdb" | "rt" | "metascore") => {
-  if (rating === "N/A" || !rating) return { finalRating: "N/A", ratingColor: "#ccc" };
+  if (rating === "N/A" || !rating) return { finalRating: "N/A", ratingColor: "#aaaaaa" };
   let intRating = 0;
   let finalRating = "";
   switch (type) {
@@ -68,7 +68,7 @@ export const useRatingsTier = (rating: string | undefined, type: "imdb" | "rt" |
       finalRating = rating;
       break;
     default:
-      return { finalRating: "N/A", ratingColor: "#ccc" };
+      return { finalRating: "N/A", ratingColor: "#aaaaaa" };
   }
 
   let ratingsColors = useSettingsStore.getState().ratingsTiers;

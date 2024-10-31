@@ -28,7 +28,7 @@ const RottenTomatoes = ({ rating, score }: Props) => {
           }}
         />
       )}
-      <Text className="ml-[2]  text-base pt-1">{score}</Text>
+      <Text className="ml-[2] text-base pt-1 font-semibold">{score}</Text>
     </View>
   );
 };

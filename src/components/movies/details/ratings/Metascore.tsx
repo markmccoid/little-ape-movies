@@ -22,10 +22,10 @@ const Metascore = ({ metascore, imdbId }: Props) => {
         style={{ paddingTop: 5 }}
       >
         <View
-          className="p-1 items-center border-hairline rounded-md"
-          style={{ backgroundColor: ratingColor }}
+          className="p-1 items-center border-hairline rounded-md w-full"
+          style={{ backgroundColor: `${ratingColor}aa` }}
         >
-          <Text className="text-base">{finalRating}</Text>
+          <Text className="text-base font-semibold">{finalRating}</Text>
         </View>
       </TouchableOpacity>
     </View>

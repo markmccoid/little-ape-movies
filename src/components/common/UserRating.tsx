@@ -15,7 +15,11 @@ import Animated, {
 } from "react-native-reanimated";
 
 const { width, height } = Dimensions.get("window");
-const positionFactor = Math.floor((width - 40) / 10);
+const BUTTON_WIDTH = 40;
+const LEFT_MARGIN = 20;
+
+const positionFactor = Math.floor((width - (BUTTON_WIDTH + LEFT_MARGIN)) / 10);
+// const positionFactor = Math.floor((width - 60) / 10);
 
 type Props = {
   updateRating: (rating: number) => void;
@@ -25,38 +29,35 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const rightEdgeOffset = useSharedValue(0);
-  const leftEdgeOffset = useSharedValue(0);
   const absX = useSharedValue(0);
   const textScale = useSharedValue(0);
   const isLongPressActive = useSharedValue(false);
   const [currRating, setCurrRating] = React.useState(rating);
 
   const colorTrans = useSharedValue(0);
-  const maxTranslateX = width - 60;
   const pan = Gesture.Pan()
     .onChange((event) => {
       "worklet";
       if (isLongPressActive.value) {
-        // const leftEdgeOffset = event.absoluteX + (40 - event.x) + event.translationX;
-        // translateX.value = Math.max(-10, Math.min(distToREdge, event.translationX));
-        let absoluteX = event.absoluteX;
-        //!! 60 is width of button + left padding (need to put in Vars instead.)
-        if (rightEdgeOffset.value + event.translationX <= 0 || 60 + event.translationX >= width) {
-          absoluteX = absX.value;
-        } else {
-          absX.value = event.absoluteX;
+        //Check to see if we are off the left or right edge.
+        // This is checking the we are on the screen and if both are true
+        // then we can save the event.translationX to our translateX share value
+        // that is actually moving the rating view.
+        if (
+          rightEdgeOffset.value + event.translationX > 0 &&
+          BUTTON_WIDTH + LEFT_MARGIN + event.translationX < width
+        ) {
           translateX.value = event.translationX;
         }
-        textScale.value = absoluteX / positionFactor - Math.floor(absoluteX / positionFactor);
-        // console.log("W", width - 60, event.translationX, event.absoluteX);
-        // console.log("M", Math.max(0, Math.min(maxTranslateX, event.translationX)));
-        // absoluteX - x = width of screen then you hit the right edge
 
-        // console.log("PAN AB", event.absoluteX, event.translationX);
-        let calcCurrRating =
-          Math.floor(absoluteX / positionFactor) >= 10
-            ? 10
-            : Math.floor(absoluteX / positionFactor);
+        // Now we determine what rating number to show based on the position of the view.
+        // some tweaking done, hopefully works on most devices.
+        const posAbsoluteX = event.absoluteX - 12;
+        const newPosition = Math.floor(posAbsoluteX / positionFactor);
+        let calcCurrRating = newPosition >= 10 ? 10 : newPosition <= 0 ? 0 : newPosition;
+        console.log("TS", posAbsoluteX / positionFactor, Math.floor(posAbsoluteX / positionFactor));
+        textScale.value =
+          newPosition >= 10 || newPosition <= 0 ? 0 : posAbsoluteX / positionFactor - newPosition;
         if (currRating !== calcCurrRating) {
           runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
         }
@@ -74,13 +75,12 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
 
   const longPress = Gesture.LongPress()
     .minDuration(300)
-    .onStart((e) => {
+    .onStart((event) => {
       "worklet";
       //absoluteX - x = amount left/negative before you hit edge
       // console.log("LP LEdgeOffset", e.absoluteX, e.x);
-      rightEdgeOffset.value = e.absoluteX - e.x;
-      leftEdgeOffset.value = e.absoluteX;
-      translateY.value = withSpring(-35);
+      rightEdgeOffset.value = event.absoluteX - event.x;
+      translateY.value = withSpring(-45);
       isLongPressActive.value = true;
       Haptics.ImpactFeedbackStyle.Medium;
     })
@@ -105,22 +105,29 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
       transform: [
         { translateX: translateX.value },
         { translateY: translateY.value },
-        // { scale: isLongPressActive.value ? withSpring(1.4) : withSpring(1) },
+        { scale: isLongPressActive.value ? withSpring(1.5) : withSpring(1) },
       ],
     };
   });
   const textStyle = useAnimatedStyle(() => {
     return {
       transform: [
-        { scale: interpolate(textScale.value, [0, 1, 0], [1, 1.5, 1], Extrapolation.CLAMP) },
+        {
+          scale: interpolate(
+            textScale.value,
+            [0, 0.25, 0.5, 0.75, 1],
+            [1, 1.4, 1.5, 1.2, 1],
+            Extrapolation.CLAMP
+          ),
+        },
       ],
     };
   });
   return (
-    <View className="ml-5 z-10">
+    <View className="z-10" style={{ marginLeft: LEFT_MARGIN }}>
       <GestureDetector gesture={gesture}>
         <Animated.View
-          style={[rStyle, { width: 40, height: 30 }]}
+          style={[rStyle, { width: BUTTON_WIDTH, height: 30 }]}
           className="rounded-xl bg-yellow-500 flex-row justify-center items-center border border-border"
         >
           <Animated.Text style={textStyle} className="text-xl font-bold">
