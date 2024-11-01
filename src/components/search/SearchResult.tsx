@@ -5,7 +5,7 @@ import { MovieSearchResults, useSearchStore } from "@/store/store.search";
 import { MovieStore } from "@/store/store.shows";
 import { AddCircleIcon, AddIcon, CheckCircleIcon } from "../common/Icons";
 import { useCustomTheme } from "@/utils/colorThemes";
-import { Link, router, usePathname, useSegments } from "expo-router";
+import { Link, router, useFocusEffect, usePathname, useSegments } from "expo-router";
 import useImageSize from "@/hooks/useImageSize";
 
 //~~  SearchResult Component
@@ -27,15 +27,26 @@ const SearchResult = ({ movie, spacing, numColumns = 3, onAddMovie, onRemoveMovi
     () => (pathName.includes("/search") ? "/search/" : "/home/"),
     [pathName]
   );
-  // console.log("SearchResult.tsx", pathName, segments, target, movie.id);
+
   const [isLocallyAdded, setIsLocallyAdded] = useState(movie.existsInSaved);
   const { imageHeight, imageWidth } = useImageSize(numColumns);
 
-  // console.log("SearchResult -LinkPath", linkPath, pathName, `${linkPath}${movie.id}`);
   const { colors } = useCustomTheme();
   useEffect(() => {
     setIsLocallyAdded(movie.existsInSaved);
   }, [movie.existsInSaved]);
+
+  //! --------------
+  // using this so that double taps don't go to route twice
+  // state didn't work, but refs need to be set back to false outside of
+  // function they are set in since synchronous
+  const pickedRef = React.useRef(false);
+  useFocusEffect(
+    React.useCallback(() => {
+      pickedRef.current = false;
+    }, [])
+  );
+  //! --------------
 
   const handleAddRemoveMovie = () => {
     setIsLocallyAdded((prev) => !prev);
@@ -62,7 +73,19 @@ const SearchResult = ({ movie, spacing, numColumns = 3, onAddMovie, onRemoveMovi
       }}
     >
       {/* <Link href={`${linkPath}${movie.id}`} style={{ zIndex: 0 }} push> */}
-      <Pressable onPress={() => router.push(`${linkPath}${movie.id}`)} style={{ zIndex: 0 }}>
+      <Pressable
+        onPress={() => {
+          // if not already routed, push route and set ref
+          // ref will be reset in useEffect
+          if (!pickedRef.current) {
+            router.push(`${linkPath}${movie.id}`);
+            pickedRef.current = true;
+          } else {
+            pickedRef.current = false;
+          }
+        }}
+        style={{ zIndex: 0 }}
+      >
         <View>
           <MovieImage
             imageWidth={imageWidth}

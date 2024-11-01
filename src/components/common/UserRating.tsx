@@ -8,18 +8,16 @@ import Animated, {
   interpolateColor,
   runOnJS,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
 
 const { width, height } = Dimensions.get("window");
-const BUTTON_WIDTH = 40;
+const BUTTON_WIDTH = 50;
 const LEFT_MARGIN = 20;
 
-const positionFactor = Math.floor((width - (BUTTON_WIDTH + LEFT_MARGIN)) / 10);
-// const positionFactor = Math.floor((width - 60) / 10);
+const positionFactor = Math.floor((width - BUTTON_WIDTH / 2) / 10);
 
 type Props = {
   updateRating: (rating: number) => void;
@@ -29,7 +27,8 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const rightEdgeOffset = useSharedValue(0);
-  const absX = useSharedValue(0);
+  // Supposed to offset Absoultex so that it is considered center of button
+  const buttonOffsetx = useSharedValue(0);
   const textScale = useSharedValue(0);
   const isLongPressActive = useSharedValue(false);
   const [currRating, setCurrRating] = React.useState(rating);
@@ -43,19 +42,20 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
         // This is checking the we are on the screen and if both are true
         // then we can save the event.translationX to our translateX share value
         // that is actually moving the rating view.
-        if (
-          rightEdgeOffset.value + event.translationX > 0 &&
-          BUTTON_WIDTH + LEFT_MARGIN + event.translationX < width
-        ) {
-          translateX.value = event.translationX;
-        }
+        // if (
+        //   rightEdgeOffset.value + event.translationX > 0 &&
+        //   BUTTON_WIDTH + LEFT_MARGIN + event.translationX < width
+        // ) {
+        //   translateX.value = event.translationX;
+        // }
+        translateX.value = event.translationX;
 
         // Now we determine what rating number to show based on the position of the view.
         // some tweaking done, hopefully works on most devices.
-        const posAbsoluteX = event.absoluteX - 12;
+        const posAbsoluteX = event.absoluteX + buttonOffsetx.value;
         const newPosition = Math.floor(posAbsoluteX / positionFactor);
         let calcCurrRating = newPosition >= 10 ? 10 : newPosition <= 0 ? 0 : newPosition;
-        console.log("TS", posAbsoluteX / positionFactor, Math.floor(posAbsoluteX / positionFactor));
+
         textScale.value =
           newPosition >= 10 || newPosition <= 0 ? 0 : posAbsoluteX / positionFactor - newPosition;
         if (currRating !== calcCurrRating) {
@@ -80,7 +80,8 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
       //absoluteX - x = amount left/negative before you hit edge
       // console.log("LP LEdgeOffset", e.absoluteX, e.x);
       rightEdgeOffset.value = event.absoluteX - event.x;
-      translateY.value = withSpring(-45);
+      translateY.value = withSpring(-55);
+      buttonOffsetx.value = BUTTON_WIDTH / 2 - event.x;
       isLongPressActive.value = true;
       Haptics.ImpactFeedbackStyle.Medium;
     })
@@ -113,12 +114,7 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
     return {
       transform: [
         {
-          scale: interpolate(
-            textScale.value,
-            [0, 0.25, 0.5, 0.75, 1],
-            [1, 1.4, 1.5, 1.2, 1],
-            Extrapolation.CLAMP
-          ),
+          scale: interpolate(textScale.value, [0, 0.5, 1], [1, 1.5, 1], Extrapolation.CLAMP),
         },
       ],
     };
@@ -127,8 +123,8 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
     <View className="z-10" style={{ marginLeft: LEFT_MARGIN }}>
       <GestureDetector gesture={gesture}>
         <Animated.View
-          style={[rStyle, { width: BUTTON_WIDTH, height: 30 }]}
-          className="rounded-xl bg-yellow-500 flex-row justify-center items-center border border-border"
+          style={[rStyle, { width: BUTTON_WIDTH, borderRadius: 30 }]}
+          className=" bg-yellow-500 flex-row justify-center items-center border border-border"
         >
           <Animated.Text style={textStyle} className="text-xl font-bold">
             {currRating}

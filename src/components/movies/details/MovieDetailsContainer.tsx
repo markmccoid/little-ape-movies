@@ -92,7 +92,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
         }
       }}
     >
-      <SymbolView name="trash" tintColor={colors.deleteRed} />
+      <SymbolView name="trash" tintColor={colors.deleteRed} size={30} />
     </TouchableOpacity>
   );
   const HeaderRightAdd = () => (

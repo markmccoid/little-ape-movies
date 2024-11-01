@@ -2,6 +2,7 @@ import { View, Dimensions, Image, Text, Pressable } from "react-native";
 import React, { useState } from "react";
 import { CastType, getPersonDetails, movieCredits_typedef } from "@markmccoid/tmdb_api";
 import * as Linking from "expo-linking";
+import { getProfileImage, getProfileImageIndex } from "@/utils/utils";
 
 const { width, height } = Dimensions.get("window");
 // Images 300 x 450
@@ -9,11 +10,11 @@ const { width, height } = Dimensions.get("window");
 // Pull code from LAAB to use hash to pull same one same name each time
 const sideMargin = 10; // Margin on each side of the screen
 const gapBetweenImages = 10; // Gap between each image
-const borderWidth = 0;
+const borderWidth = 2; // Both sides, so 1 borderwidth should be 2 here
 const numberOfImages = 3; // Number of images to tile across
 
 // Calculate total margins and gaps
-const totalSideMargins = sideMargin * 2;
+const totalSideMargins = sideMargin * 2 + borderWidth * numberOfImages;
 const totalGaps = gapBetweenImages * (numberOfImages - 1);
 
 // Calculate available width for images
@@ -36,11 +37,11 @@ type Props = {
   castInfo: movieCredits_typedef["data"]["cast"][number];
 };
 const CastMember = ({ castInfo }: Props) => {
-  const [personIMDBId, setPersonIMDBId] = useState("");
-
+  // const castPicURL =  getProfileImage(castInfo.name)
+  const isDefaultImage = !castInfo?.profileURL;
   const castPicURL = castInfo?.profileURL
     ? { uri: castInfo.profileURL }
-    : require("../../../../../assets/images/cast001.jpeg");
+    : getProfileImage(castInfo.name);
 
   return (
     <View className="px-[5] my-[4]">
@@ -57,6 +58,8 @@ const CastMember = ({ castInfo }: Props) => {
           className="bg-white"
           style={{
             borderRadius: 30,
+            borderColor: "red",
+            borderWidth: isDefaultImage ? 1 : 0,
             shadowColor: "#000000",
             shadowOffset: {
               width: 0,

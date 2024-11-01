@@ -32,6 +32,7 @@ export interface MovieStore {
   actions: {
     addShow: (show: movieSearchByTitle_Results) => void;
     updateShow: (id: number, updatedShow: Partial<ShowItemType>) => void;
+    updateShowTags: (id: number, tagId: string, action: "add" | "remove") => void;
     removeShow: (id: number) => void;
     getShowById: (id: number) => ShowItemType | undefined;
     clearStore: () => void;
@@ -82,6 +83,21 @@ const useMovieStore = create<MovieStore>()(
             shows: state.shows.map((m) => (m.id === id ? { ...m, ...updatedShow } : m)),
           }));
           // console.log("UPDATE Show", updatedShow);
+        },
+        updateShowTags: (id, tagId, action) => {
+          const currShow = get().shows.find((show) => show.id === id);
+          if (!currShow) return;
+
+          const showTags = currShow?.tags || [];
+          let newShowTags = [];
+          if (action === "remove") {
+            newShowTags = showTags.filter((tag) => tag !== tagId);
+          } else {
+            newShowTags = [...showTags, tagId];
+          }
+          console.log("NEWTAGS", newShowTags);
+          currShow.tags = newShowTags;
+          set((state) => ({ shows: [...state.shows, currShow] }));
         },
         removeShow: (id) => {
           set((state) => ({

@@ -1,6 +1,6 @@
-import { View, Text, Image, Dimensions } from "react-native";
-import React from "react";
-import { Link, useNavigation } from "expo-router";
+import { View, Text, Image, Dimensions, Pressable } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { Link, useFocusEffect, useNavigation, useRouter } from "expo-router";
 import { ShowItemType } from "@/store/store.shows";
 import { getMovieItemSizing } from "./movieItemHelpers";
 import MovieImage from "@/components/common/MovieImage";
@@ -18,6 +18,19 @@ type Props = {
 const MovieItem = ({ movie }: Props) => {
   const { imageHeight, imageWidth, verticalMargin, extraHeight, horizontalMargin, gap } =
     getMovieItemSizing();
+  const router = useRouter();
+  //! --------------
+  // using this so that double taps don't go to route twice
+  // state didn't work, but refs need to be set back to false outside of
+  // function they are set in since synchronous
+  const pickedRef = React.useRef(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      pickedRef.current = false;
+    }, [])
+  );
+  //! --------------
 
   return (
     <View
@@ -41,12 +54,20 @@ const MovieItem = ({ movie }: Props) => {
       >
         <MovieItemActionBar movie={movie} />
       </View>
-      <Link href={`/(auth)/(drawer)/(tabs)/home/${movie.id}`} push>
-        {/* <Image
-          source={{ uri: movie.posterURL }}
-          style={{ width: imageWidth, height: imageHeight, resizeMode: "contain" }}
-          className="rounded-t-lg"
-        /> */}
+      {/* <Link href={`/(auth)/(drawer)/(tabs)/home/${movie.id}`} push disabled> */}
+
+      <Pressable
+        onPress={() => {
+          // if not already routed, push route and set ref
+          // ref will be reset in useEffect
+          if (!pickedRef.current) {
+            router.push(`/(auth)/(drawer)/(tabs)/home/${movie.id}`);
+            pickedRef.current = true;
+          } else {
+            pickedRef.current = false;
+          }
+        }}
+      >
         <MovieImage
           posterURL={movie?.posterURL}
           imageWidth={imageWidth}
@@ -60,7 +81,8 @@ const MovieItem = ({ movie }: Props) => {
             overflow: "hidden",
           }}
         />
-      </Link>
+      </Pressable>
+      {/* </Link> */}
     </View>
   );
 };
