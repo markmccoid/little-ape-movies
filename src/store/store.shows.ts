@@ -3,7 +3,8 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { StorageAdapter } from "./dataAccess/storageAdapter";
 import { movieSearchByTitle_Results, ProviderInfo } from "@markmccoid/tmdb_api";
 import { eventBus } from "./eventBus";
-import { getImageColors, ImageColors } from "@/utils/color.utils";
+import { ImageColors } from "@/utils/color.utils";
+import { unionBy } from "lodash";
 
 type ShowStreamingProviders = {
   dateAddedEpoch: number;
@@ -23,31 +24,42 @@ export type ShowItemType = {
   tags: string[];
   existsInSaved: boolean;
   streaming: ShowStreamingProviders;
+  watched?: number; // Epoch date number
+  favorited?: number; // Epoch date number
   // Add other movie properties
+};
+
+type TagArray = {
+  position: number;
+  tagName: string;
 };
 
 export interface MovieStore {
   shows: ShowItemType[];
-  tagArray: string[];
+  tagArray: TagArray[];
+  streamingProviders: ProviderInfo[];
   actions: {
     addShow: (show: movieSearchByTitle_Results) => void;
     updateShow: (id: number, updatedShow: Partial<ShowItemType>) => void;
     updateShowTags: (id: number, tagId: string, action: "add" | "remove") => void;
+    updateStreamingProviders: (newProviders: ProviderInfo[] | undefined) => void;
     removeShow: (id: number) => void;
     getShowById: (id: number) => ShowItemType | undefined;
     clearStore: () => void;
   };
 }
-console.log("Movie Store Loaded");
+
 const movieInitialState = {
   shows: [],
-  tagArray: ["Watched", "Favorite"],
+  tagArray: [{ position: 1, tagName: "Sample1" }],
+  streamingProviders: [],
 };
 const useMovieStore = create<MovieStore>()(
   persist(
     (set, get) => ({
       ...movieInitialState,
       actions: {
+        //~ addShow
         addShow: (show) => {
           const showExists = doesShowExist(
             get().shows.map((el) => el.id),
@@ -78,12 +90,14 @@ const useMovieStore = create<MovieStore>()(
           eventBus.publish("TAG_SEARCH_RESULTS");
           eventBus.publish("GET_SHOW_COLORS", newShow.id, newShow?.posterURL);
         },
+        //~ updateShow
         updateShow: (id, updatedShow) => {
           set((state) => ({
             shows: state.shows.map((m) => (m.id === id ? { ...m, ...updatedShow } : m)),
           }));
           // console.log("UPDATE Show", updatedShow);
         },
+        //~ updateShowTags
         updateShowTags: (id, tagId, action) => {
           const currShow = get().shows.find((show) => show.id === id);
           if (!currShow) return;
@@ -99,24 +113,40 @@ const useMovieStore = create<MovieStore>()(
           currShow.tags = newShowTags;
           set((state) => ({ shows: [...state.shows, currShow] }));
         },
+        //~ removeShow
         removeShow: (id) => {
           set((state) => ({
             shows: state.shows.filter((m) => m.id !== id),
           }));
           eventBus.publish("TAG_SEARCH_RESULTS");
         },
+        //~ getShowById
         getShowById: (id) => {
           const show = get().shows.find((el) => el.id === id);
 
           return show;
         },
+        //~ updateStreamingProviders
+        updateStreamingProviders: (newProviders) => {
+          if (!newProviders) return;
+          // merge new providers
+          const currProviders = get().streamingProviders;
+          const mergedProviders = unionBy(currProviders, newProviders, "providerId");
+
+          set({ streamingProviders: mergedProviders });
+        },
+        //~ clearStore
         clearStore: () => set({ shows: [] }),
       },
     }),
     {
       name: "movie-storage",
       storage: createJSONStorage(() => StorageAdapter),
-      partialize: (state) => ({ shows: state.shows }),
+      partialize: (state) => ({
+        shows: state.shows,
+        tagsArray: state.tagArray,
+        streamingProviders: state.streamingProviders,
+      }),
       onRehydrateStorage: (state) => {
         // console.log("Rehydrating", state.shows.length);
       },
@@ -125,7 +155,15 @@ const useMovieStore = create<MovieStore>()(
 );
 
 export const useMovieActions = () => {
-  return useMovieStore((state) => state.actions);
+  const updateShow = useMovieStore((state) => state.actions.updateShow);
+  // probably want to toggle
+  const toggleWatched = (movieId: number) => {
+    const isWatched = useMovieStore.getState().actions.getShowById(movieId)?.watched;
+    updateShow(movieId, { watched: isWatched ? undefined : Date.now() });
+  };
+  const actions = { ...useMovieStore((state) => state.actions), toggleWatched };
+  // return useMovieStore((state) => state.actions);
+  return actions;
 };
 
 //-- UTILS

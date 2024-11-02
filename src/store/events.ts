@@ -26,6 +26,10 @@ const createUpdateShowProviders = (queryClient: QueryClient) => async (showId: n
   } catch (e) {
     console.log("Error in WatchProvider Event");
   }
+
+  // Store the streaming provider as a lookup array on the store.  No dupes will be created
+  useMovieStore.getState().actions.updateStreamingProviders(wproviders?.stream);
+  // Update the movie record with the streaming providers
   useMovieStore.getState().actions.updateShow(showId, {
     streaming: {
       dateAddedEpoch: Date.now(),

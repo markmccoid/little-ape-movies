@@ -105,14 +105,16 @@ const WatchProviderSection = ({ item, index, scrollOffset, watchProviders }: Pro
             item.providers?.map((el) => {
               return (
                 <View key={el.providerId} style={{ marginHorizontal: ICON_MARGIN }}>
-                  <Image
-                    source={{ uri: el.logoURL }}
-                    style={{
-                      width: PROVIDER_ICON_SIZE,
-                      height: PROVIDER_ICON_SIZE,
-                      borderRadius: 8,
-                    }}
-                  />
+                  {el?.logoURL && (
+                    <Image
+                      source={{ uri: el.logoURL }}
+                      style={{
+                        width: PROVIDER_ICON_SIZE,
+                        height: PROVIDER_ICON_SIZE,
+                        borderRadius: 8,
+                      }}
+                    />
+                  )}
                 </View>
               );
             })}

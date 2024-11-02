@@ -13,7 +13,7 @@ const MDMovieCast = ({ movieId }: Props) => {
   if (!movieId || isLoading) return null;
 
   return (
-    <ScrollView style={{ height: (height / 3) * 2 }}>
+    <ScrollView style={{ height: (height / 3) * 2, paddingTop: 10 }}>
       <View className="flex-row flex-wrap mx-[5]">
         {data &&
           data.map((el) => {

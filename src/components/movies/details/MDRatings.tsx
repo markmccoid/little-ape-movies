@@ -23,7 +23,7 @@ const MDRatings = ({ movieDetails, omdbData, storedMovie }: Props) => {
   };
   return (
     <View className="flex-row items-center">
-      <View className="w-1/2">
+      <View className="w-1/3">
         <UserRating updateRating={updateRating} rating={storedMovie?.rating} />
       </View>
       <MDBackground />

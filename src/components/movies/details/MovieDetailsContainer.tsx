@@ -31,6 +31,7 @@ import MDRatings from "./MDRatings";
 import MDMovieVideos from "./MDMovieVideos";
 import MDMovieCast from "./cast/MDMovieCast";
 import { store } from "expo-router/build/global-state/router-store";
+import { eventBus } from "@/store/eventBus";
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   //!! We need have local state so that we only update component AFTER
@@ -136,6 +137,13 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
       setMovieTitle(storedMovie?.title || movieDetails?.title || "");
     }
   }, [isFocused, isLoading]);
+
+  //~ Update streaming providers
+  useEffect(() => {
+    if (existsInSaved) {
+      eventBus.publish("UPDATE_SHOW_PROVIDERS", storedMovie?.id);
+    }
+  }, [existsInSaved]);
   return (
     <View className="flex-1">
       {existsInSaved && finalMovieDetails?.posterURL ? (
@@ -166,11 +174,11 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
           />
         </View>
         {/* MOVIE RATINGS */}
-        <View className="pt-1 my-1">
+        <View className="mt-[4] mb-[2]">
           <MDRatings movieDetails={movieDetails} omdbData={omdbData} storedMovie={storedMovie} />
         </View>
         {/* MOVIE DETAILS */}
-        <View className="pt-1 my-1">
+        <View className="my-[2]">
           <MDDetails
             movieDetails={finalMovieDetails as MovieDetails}
             omdbData={omdbData}
@@ -178,25 +186,25 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
           />
         </View>
         {/* WHERE TO WATCH */}
-        <View className="my-1">
+        <View className="my-[2]">
           <HiddenContainerWatchProviders title="Where to Watch" movieId={movieId} height={85}>
             <MDWatchProviders movieId={finalMovieDetails?.id} />
           </HiddenContainerWatchProviders>
         </View>
         {/* RECOMMENDATIONS */}
-        <View className="flex-1 my-1">
+        <View className="flex-1 my-[2]">
           <HiddenContainerAnimated title="Recommended" height={imageHeight + 30}>
             <MDMovieRecommendations movieId={finalMovieDetails?.id} />
           </HiddenContainerAnimated>
         </View>
         {/* VIDEOS */}
-        <View className="flex-1 my-1">
+        <View className="flex-1 my-[2]">
           <HiddenContainerAnimated title="Videos" height={145}>
             <MDMovieVideos movieId={finalMovieDetails?.id} />
           </HiddenContainerAnimated>
         </View>
         {/* CAST */}
-        <View className="flex-1 my-1">
+        <View className="flex-1 my-[2]">
           <HiddenContainerAnimated title="Cast" startOpen={true}>
             <MDMovieCast movieId={finalMovieDetails?.id} />
           </HiddenContainerAnimated>

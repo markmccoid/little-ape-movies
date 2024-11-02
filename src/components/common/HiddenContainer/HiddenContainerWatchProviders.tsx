@@ -88,10 +88,12 @@ const HiddenContainerWatchProviders: React.FC<Props> = ({
               {streamProviders?.providers &&
                 streamProviders?.providers.map((el) => (
                   <View key={el.providerId} style={{ marginHorizontal: 3 }}>
-                    <Image
-                      source={{ uri: el.logoURL }}
-                      style={{ width: 25, height: 25, borderRadius: 4 }}
-                    />
+                    {el?.logoURL && (
+                      <Image
+                        source={{ uri: el.logoURL }}
+                        style={{ width: 25, height: 25, borderRadius: 4 }}
+                      />
+                    )}
                   </View>
                 ))}
             </ScrollView>
