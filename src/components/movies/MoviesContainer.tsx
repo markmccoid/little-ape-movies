@@ -8,7 +8,7 @@ import Animated, {
   useSharedValue,
   useAnimatedScrollHandler,
 } from "react-native-reanimated";
-import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
+import useMovieStore, { ShowItemType, useMovieActions, useMovies } from "@/store/store.shows";
 import MovieItem from "./movieitem/MovieItem";
 import MovieAnimatedView from "./movieitem/MovieAnimatedView";
 import useImageSize from "@/hooks/useImageSize";
@@ -24,7 +24,8 @@ const MoviesContainer = () => {
   // get the itemHeight for building our getItemLayout
   // If you want to change the layout, ONLY do it in th egetMovieItemSizing function
   const { horizontalMargin, itemHeight } = getMovieItemSizing();
-  const movies = useMovieStore((state) => state.shows);
+  // const movies = useMovieStore((state) => state.shows);
+  const movies = useMovies();
   const scrollY = useSharedValue(0);
   const flatListRef = React.useRef<FlatList>(null);
 

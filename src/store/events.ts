@@ -10,7 +10,6 @@ import { getImageColors } from "@/utils/color.utils";
 //~~ -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 const utilFetchMovieWatchProviders = async (showId: number) => {
   const tempData = await movieGetWatchProviders(showId.toString());
-  console.log("in UtilFetchWP");
   return tempData.data.results.US as WatchProvidersType;
 };
 //

@@ -4,7 +4,8 @@ import { StorageAdapter } from "./dataAccess/storageAdapter";
 import { movieSearchByTitle_Results, ProviderInfo } from "@markmccoid/tmdb_api";
 import { eventBus } from "./eventBus";
 import { ImageColors } from "@/utils/color.utils";
-import { unionBy } from "lodash";
+import { reverse, sortBy, unionBy } from "lodash";
+import useSettingsStore from "./store.settings";
 
 type ShowStreamingProviders = {
   dateAddedEpoch: number;
@@ -154,16 +155,52 @@ const useMovieStore = create<MovieStore>()(
   )
 );
 
+//~~ ------------------------------------------------------------
+//~~ useMovieActions
+//~~  actions defined on useMovieStore as well as custom actions
+//~~ ------------------------------------------------------------
 export const useMovieActions = () => {
   const updateShow = useMovieStore((state) => state.actions.updateShow);
-  // probably want to toggle
+  //~ toggleWatched
   const toggleWatched = (movieId: number) => {
     const isWatched = useMovieStore.getState().actions.getShowById(movieId)?.watched;
     updateShow(movieId, { watched: isWatched ? undefined : Date.now() });
   };
-  const actions = { ...useMovieStore((state) => state.actions), toggleWatched };
+  //~ toggleFavorited
+  const toggleFavorited = (movieId: number) => {
+    const isFavorited = useMovieStore.getState().actions.getShowById(movieId)?.favorited;
+    updateShow(movieId, { watched: isFavorited ? undefined : Date.now() });
+  };
+  const actions = { ...useMovieStore((state) => state.actions), toggleWatched, toggleFavorited };
   // return useMovieStore((state) => state.actions);
   return actions;
+};
+
+//~~ ------------------------------------------------------------
+//~~ useMovies
+//~~  Returns the movies to show on the main screen based on the settings
+//~~ ------------------------------------------------------------
+export const useMovies = () => {
+  const { filterIsFavorited, filterIsWatched, tags } = useSettingsStore(
+    (state) => state.filterCriteria
+  );
+  const movies = useMovieStore((state) => state.shows);
+
+  let filteredMovies: ShowItemType[] = [];
+  for (const movie of movies) {
+    if (filterIsWatched) {
+      if (movie?.watched) {
+        filteredMovies.push(movie);
+      }
+    } else {
+      filteredMovies.push(movie);
+    }
+  }
+  console.log(filteredMovies.map((el) => el.id));
+
+  // sort
+  filteredMovies = reverse(sortBy(filteredMovies, "dateAddedEpoch"));
+  return filteredMovies;
 };
 
 //-- UTILS
@@ -171,11 +208,4 @@ const doesShowExist = (allShows: number[], showToCheck: number) => {
   return allShows.includes(showToCheck);
 };
 
-// //-- Subscribe
-// eventBus.subscribe("GET_SHOW_COLORS", async (movieId: number, posterURL) => {
-//   // console.log("EVENT BUS", movieId, posterURL)
-//   const imageColors = await getImageColors(posterURL);
-//   // console.log("IMAGE COL gotten");
-//   useMovieStore.getState().actions.updateShow(movieId, { posterColors: imageColors });
-// });
 export default useMovieStore;

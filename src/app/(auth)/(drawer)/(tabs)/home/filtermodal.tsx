@@ -1,12 +1,9 @@
 import { View, Text } from "react-native";
-import React from "react";
+import React, { useLayoutEffect } from "react";
+import FilterContainer from "@/components/movies/filter/FilterContainer";
 
-const Stack2 = () => {
-  return (
-    <View className="flex-1">
-      <Text>Stack2</Text>
-    </View>
-  );
+const FilterModal = () => {
+  return <FilterContainer />;
 };
 
-export default Stack2;
+export default FilterModal;

@@ -15,7 +15,7 @@ type Props = {
 };
 const MDRatings = ({ movieDetails, omdbData, storedMovie }: Props) => {
   const updateShow = useMovieActions().updateShow;
-
+  const existsInSaved = storedMovie?.existsInSaved;
   const updateRating = (rating: number) => {
     if (!movieDetails?.id) return;
 
@@ -23,9 +23,11 @@ const MDRatings = ({ movieDetails, omdbData, storedMovie }: Props) => {
   };
   return (
     <View className="flex-row items-center">
-      <View className="w-1/3">
-        <UserRating updateRating={updateRating} rating={storedMovie?.rating} />
-      </View>
+      {existsInSaved && (
+        <View className="w-1/3">
+          <UserRating updateRating={updateRating} rating={storedMovie?.rating} />
+        </View>
+      )}
       <MDBackground />
       <View className="flex-row items-center py-2 px-3 justify-between flex-1">
         {/* Need to not show if there is NO rating */}

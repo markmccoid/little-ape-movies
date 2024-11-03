@@ -9,8 +9,15 @@ interface SettingsStore {
     tierLimit: number;
     tierColor: string;
   }[];
+  filterCriteria: {
+    filterIsWatched?: boolean;
+    filterIsFavorited?: boolean;
+    tags?: string[];
+  };
   actions: {
     toggleSearchColumns: () => void;
+    toggleIsWatched: () => void;
+    toggleIsFavorited: () => void;
   };
 }
 
@@ -26,6 +33,7 @@ const settingsInitialState = {
       tierColor: "#579C31",
     },
   ],
+  filterCriteria: {},
 };
 
 const useSettingsStore = create<SettingsStore>()(
@@ -36,6 +44,25 @@ const useSettingsStore = create<SettingsStore>()(
         toggleSearchColumns: () => {
           set({ searchColumns: get().searchColumns === 3 ? 2 : 3 });
           eventBus.publish("TAG_SEARCH_RESULTS");
+        },
+        // ~ - - - - - - - - - - - - -
+        // ~ Filter Criteria Actions
+        // ~ - - - - - - - - - - - - -
+        toggleIsWatched: () => {
+          set((state) => ({
+            filterCriteria: {
+              ...state.filterCriteria,
+              filterIsWatched: !state.filterCriteria?.filterIsWatched,
+            },
+          }));
+        },
+        toggleIsFavorited: () => {
+          set((state) => ({
+            filterCriteria: {
+              ...state.filterCriteria,
+              filterIsFavorited: !state.filterCriteria?.filterIsFavorited,
+            },
+          }));
         },
       },
     }),
@@ -50,6 +77,14 @@ const useSettingsStore = create<SettingsStore>()(
   )
 );
 
+export const useSettingsActions = () => {
+  return useSettingsStore((state) => state.actions);
+};
+
+//~ -----------------------------------------------------------------------------------------------
+//~ useRatingsTier - determines the color for the each of the ratings
+//~   In future, can allow users to update the color based on a scale of 0-10
+//~ -----------------------------------------------------------------------------------------------
 export const useRatingsTier = (rating: string | undefined, type: "imdb" | "rt" | "metascore") => {
   if (rating === "N/A" || !rating) return { finalRating: "N/A", ratingColor: "#aaaaaa" };
   let intRating = 0;

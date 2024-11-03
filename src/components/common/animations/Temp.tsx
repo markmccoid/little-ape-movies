@@ -28,15 +28,15 @@ export default function App() {
   const initialMode = useRef<boolean>(true);
   const mactions = useMovieActions();
 
-  const shows = useMovieStore((state) => state.shows);
-  const sampleId = shows[0].id;
-  const sampleTitle = shows[0].title;
-  const sampleTags = shows[0].tags;
-  console.log(sampleId, sampleTitle, sampleTags);
+  // const shows = useMovieStore((state) => state.shows);
+  // const sampleId = shows[0].id;
+  // const sampleTitle = shows[0].title;
+  // const sampleTags = shows[0].tags;
+  // console.log(sampleId, sampleTitle, sampleTags);
   useEffect(() => {
     initialMode.current = false;
   }, []);
-
+  console.log("Tag tab");
   // new Array(5).fill(0).map((_, index) => ({ id: index }))
   const [items, setItems] = useState<Item[]>(
     new Array(5).fill(0).map((_, index) => ({ id: index }))
