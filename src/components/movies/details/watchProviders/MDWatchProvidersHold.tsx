@@ -19,7 +19,7 @@ interface WatchProviderSection {
 const MDWatchProviders = ({ movieId }: Props) => {
   const { watchProviders, isLoading } = useMovieWatchProviders(movieId);
   const scrollOffset = useSharedValue(0);
-  console.log(scrollOffset.value);
+
   if (isLoading) return null;
   if (!watchProviders) {
     return (

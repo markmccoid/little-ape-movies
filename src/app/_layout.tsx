@@ -1,4 +1,5 @@
 import "../global.css";
+import { PortalHost } from "@rn-primitives/portal";
 
 import { useRootNavigationState, useSegments } from "expo-router";
 import { View, Text, SafeAreaView, ActivityIndicator } from "react-native";
@@ -115,14 +116,17 @@ export default function RootLayout() {
   const colorScheme = useColorScheme() || "light";
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ThemeProvider value={colorScheme === "dark" ? CustomDarkTheme : CustomLightTheme}>
-          {/* <View style={themes[colorScheme]} className="flex-1"> */}
-          <InitialLayout />
-          {/* </View> */}
-        </ThemeProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <ThemeProvider value={colorScheme === "dark" ? CustomDarkTheme : CustomLightTheme}>
+            {/* <View style={themes[colorScheme]} className="flex-1"> */}
+            <InitialLayout />
+            {/* </View> */}
+          </ThemeProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+      <PortalHost />
+    </>
   );
 }

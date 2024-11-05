@@ -2,7 +2,9 @@ import { DefaultTheme, DarkTheme, Theme, useTheme } from "@react-navigation/nati
 
 type CustomTheme = Theme & {
   colors: Theme["colors"] & {
+    primaryForeground: string;
     secondary: string;
+    secondaryForeground: string;
     button: string;
     buttontext: string;
     textInverted: string;
@@ -24,8 +26,10 @@ export const CustomLightTheme: CustomTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: "#192D3C",
-    secondary: "#9EB5BD",
+    primary: "#7c3aed",
+    primaryForeground: "#f5f7fa",
+    secondary: "#c5b8d1",
+    secondaryForeground: "#111827",
     background: "#ebebf0",
     card: "#fbfbfe",
     cardInverted: "#010104",
@@ -47,8 +51,10 @@ export const CustomDarkTheme: CustomTheme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
-    primary: "#9EB5BD",
-    secondary: "#192D3C",
+    primary: "#7c3aed",
+    primaryForeground: "#f5f7fa",
+    secondary: "#c5b8d1",
+    secondaryForeground: "#111827",
     background: "#0f0f14",
     card: "#010104",
     cardInverted: "#fbfbfe",

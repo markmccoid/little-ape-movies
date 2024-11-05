@@ -12,6 +12,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { useCustomTheme } from "@/utils/colorThemes";
 
 const { width, height } = Dimensions.get("window");
 const BUTTON_WIDTH = 50;
@@ -24,6 +25,7 @@ type Props = {
   rating: number | undefined;
 };
 const UserRating = ({ updateRating, rating = 0 }: Props) => {
+  const { colors } = useCustomTheme();
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const isPanActive = useSharedValue(false);
@@ -73,7 +75,7 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
       backgroundColor: interpolateColor(
         colorTrans.value, // Input value (0 or 1)
         [0, 1], // Input range
-        ["#eab308", "yellow"] // Output colors
+        [colors.secondary, colors.primary] // Output colors
       ),
       transform: [
         { translateX: translateX.value },
@@ -84,6 +86,11 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
   });
   const textStyle = useAnimatedStyle(() => {
     return {
+      color: interpolateColor(
+        colorTrans.value, // Input value (0 or 1)
+        [0, 1], // Input range
+        ["black", "white"] // Output colors
+      ),
       transform: [
         {
           scale: interpolate(textScale.value, [0, 0.5, 1], [1, 1.5, 1], Extrapolation.CLAMP),
@@ -96,7 +103,7 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
       <GestureDetector gesture={gesture}>
         <Animated.View
           style={[rStyle, { width: BUTTON_WIDTH, borderRadius: 30 }]}
-          className=" bg-yellow-500 flex-row justify-center items-center border border-border"
+          className="bg-primary flex-row justify-center items-center border border-border"
         >
           <Animated.Text style={textStyle} className="text-3xl font-bold">
             {currRating}

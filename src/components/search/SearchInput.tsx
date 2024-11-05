@@ -46,7 +46,7 @@ const SearchInput = forwardRef(
       <View className="relative">
         <TextInput
           ref={inputRef}
-          className="w-full px-3 py-2 text-text bg-textinput rounded-2xl"
+          className="w-full px-3 py-2 bg-muted text-muted-foreground rounded-2xl"
           value={inputValue}
           onChangeText={handleInputChange}
           style={{ fontSize: 18 }}

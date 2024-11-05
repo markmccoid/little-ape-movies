@@ -196,7 +196,6 @@ export const useMovies = () => {
       filteredMovies.push(movie);
     }
   }
-  console.log(filteredMovies.map((el) => el.id));
 
   // sort
   filteredMovies = reverse(sortBy(filteredMovies, "dateAddedEpoch"));

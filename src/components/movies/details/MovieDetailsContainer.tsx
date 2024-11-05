@@ -170,6 +170,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
         <View>
           <MDImageDescRow
             movieDetails={finalMovieDetails as MovieDetails}
+            storedMovie={storedMovie}
             existsInSaved={existsInSaved}
           />
         </View>

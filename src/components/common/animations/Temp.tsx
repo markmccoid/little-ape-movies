@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated, {
   FadeIn,
   FadeOut,
@@ -10,6 +10,8 @@ import Animated, {
 import TagCloud, { TagItem } from "../TagCloud/TagCloud";
 import { TagIcon } from "../Icons";
 import useMovieStore, { useMovieActions } from "@/store/store.shows";
+import { Button } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
 
 const LIST_ITEM_COLOR = "#1798DE";
 
@@ -64,7 +66,17 @@ export default function App() {
     mactions.updateShowTags(sampleId, tagId, "remove");
   };
   return (
-    <View className=" border">
+    <View className="flex-col border">
+      <View className="flex-row dark:bg-primary">
+        <Button
+          size="sm"
+          onPress={() => console.log("button from rn primatives")}
+          // variant="destructive"
+          variant="default"
+        >
+          <Text>HERE</Text>
+        </Button>
+      </View>
       <View className=" h-[200] border">
         <TagCloud>
           <TagItem

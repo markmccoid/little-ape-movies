@@ -1,4 +1,4 @@
-import { View, Text, Dimensions, StyleSheet, TouchableOpacity, Pressable } from "react-native";
+import { View, TouchableOpacity, Pressable } from "react-native";
 import React, { useState, useEffect, useMemo } from "react";
 import MovieImage from "../common/MovieImage";
 import { MovieSearchResults, useSearchStore } from "@/store/store.search";
@@ -7,7 +7,7 @@ import { AddCircleIcon, AddIcon, CheckCircleIcon } from "../common/Icons";
 import { useCustomTheme } from "@/utils/colorThemes";
 import { Link, router, useFocusEffect, usePathname, useSegments } from "expo-router";
 import useImageSize from "@/hooks/useImageSize";
-
+import { Text } from "@/components/ui/text";
 //~~  SearchResult Component
 type Props = {
   movie: MovieSearchResults;
@@ -59,7 +59,7 @@ const SearchResult = ({ movie, spacing, numColumns = 3, onAddMovie, onRemoveMovi
 
   return (
     <View
-      className={`border-hairline border-border `}
+      className={`border-hairline `}
       style={{
         width: imageWidth,
         height: imageHeight + spacing.extraHeight,
@@ -105,16 +105,16 @@ const SearchResult = ({ movie, spacing, numColumns = 3, onAddMovie, onRemoveMovi
       <TouchableOpacity className="flex-1" activeOpacity={0.9} onPress={handleAddRemoveMovie}>
         <View
           style={[{ alignItems: "center", justifyContent: "center", marginTop: -5, height: 20 }]}
-          className={`flex-1 border-t-hairline border-t-border rounded-b-lg  ${
+          className={`flex-1 border-t-hairline  rounded-b-lg  ${
             isLocallyAdded ? "bg-selected" : "bg-card"
           }`}
         >
-          <Text numberOfLines={1} className="px-1 text-text">
+          <Text numberOfLines={1} className={`px-1 ${isLocallyAdded && "text-text"}`}>
             {movie.title}
           </Text>
         </View>
         <View
-          className={`absolute rounded-t-md border-hairline border-border ${
+          className={`absolute rounded-t-md border-hairline  ${
             isLocallyAdded ? "bg-selected" : "bg-card"
           }`}
           style={{
@@ -126,7 +126,7 @@ const SearchResult = ({ movie, spacing, numColumns = 3, onAddMovie, onRemoveMovi
         >
           <View className="flex-1 items-center justify-center">
             {isLocallyAdded ? (
-              <CheckCircleIcon color={colors.text} size={18} />
+              <CheckCircleIcon color={"black"} size={18} />
             ) : (
               <AddIcon color={colors.text} size={15} />
             )}

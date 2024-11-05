@@ -4,7 +4,6 @@ import {
   TextInput,
   InputAccessoryView,
   Text,
-  Button,
   KeyboardAvoidingView,
   StyleSheet,
 } from "react-native";
@@ -24,6 +23,12 @@ import useSettingsStore from "@/store/store.settings";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import SearchInput from "@/components/search/SearchInput";
 import SearchInputAccessoryView from "@/components/search/SearchInputAccessoryView";
+
+import { GripHorizontal } from "@/lib/icons/GripHorizontals";
+
+import { Button } from "@/components/ui/button";
+import { GripHorizontalIcon } from "@/components/common/Icons";
+import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle";
 
 const SearchPage = () => {
   const { colors } = useCustomTheme();
@@ -67,7 +72,10 @@ const SearchPage = () => {
     <View className="flex-1">
       <View className="bg-card border-b-hairline border-border" style={{ paddingTop: top }}>
         <View className="flex-row w-full items-center" style={{ marginTop: 10 }}>
-          <View className="mr-2 mb-2 flex-1" style={{ marginLeft: 18 }}>
+          <View className="items-center mb-2 ml-[16] mr-[-5]">
+            <NestedStackDrawerToggle />
+          </View>
+          <View className="mr-2 mb-2 flex-1" style={{ marginLeft: 0 }}>
             <SearchInput
               onChange={debouncedSetSearchText}
               setIsFocused={setIsFocused}
@@ -77,13 +85,14 @@ const SearchPage = () => {
           {/* Toggle from 3 to 2 or 2 to 3 columns being shown */}
           <Pressable
             onPress={settingsActions.toggleSearchColumns}
-            className="flex-row items-center h-full pr-4 pl-2"
+            className="flex-row items-center pr-4 pl-2 h-full mb-2"
           >
             <MotiView
-              from={{ transform: [{ rotateZ: searchColumns === 2 ? "180deg" : "0deg" }] }}
-              animate={{ transform: [{ rotateZ: searchColumns === 2 ? "0deg" : "180deg" }] }}
+              from={{ transform: [{ rotateZ: searchColumns === 2 ? "0deg" : "90deg" }] }}
+              animate={{ transform: [{ rotateZ: searchColumns === 2 ? "90deg" : "0deg" }] }}
             >
-              <SymbolView
+              <GripHorizontalIcon color={colors.primary} />
+              {/* <SymbolView
                 name="arrow.left.and.right.text.vertical"
                 // name="rectangle.expand.vertical"
                 style={{
@@ -92,7 +101,7 @@ const SearchPage = () => {
                 }}
                 colors={searchColumns === 2 ? [colors.primary, "green"] : ["green", colors.primary]}
                 type="palette"
-              />
+              /> */}
             </MotiView>
           </Pressable>
         </View>

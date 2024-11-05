@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { Image } from "expo-image";
 import React from "react";
 import { MovieDetails, OMDBData } from "@/store/dataHooks";
 import { addDelimitersToArray, formatAsUSDCurrency, formatTime } from "@/utils/utils";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import MDBackground from "./MDBackground";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
   existsInSaved: boolean;
@@ -19,19 +20,38 @@ const MDDetails = ({ movieDetails, omdbData }: Props) => {
 
       <View className="flex-row pl-3 pr-2 py-2">
         {/* Left Side Info */}
-        <View className="flex-col">
+        <View className="flex-col w-[50%]">
           <View className="flex-row">
             <Text style={styles.textLabel}>Released:</Text>
-            <Text style={styles.textDesc}>{movieDetails?.releaseDate?.formatted}</Text>
+            {movieDetails?.id ? (
+              <Text style={styles.textDesc}>{movieDetails?.releaseDate?.formatted}</Text>
+            ) : (
+              <View className="flex-1 justify-center">
+                <Skeleton className=" h-3" />
+              </View>
+            )}
           </View>
-          <View className="flex-row justify-between">
-            <View className="flex-row">
+          <View className="flex-row flex-1">
+            <View className="flex-row flex-1">
               <Text style={styles.textLabel}>Length:</Text>
-              <Text style={styles.textDesc}>
-                {movieDetails?.runtime && formatTime(movieDetails.runtime).verbose}
-              </Text>
+              {movieDetails?.id ? (
+                <Text style={styles.textDesc}>
+                  {movieDetails?.runtime && formatTime(movieDetails.runtime).verbose}
+                </Text>
+              ) : (
+                <View className="flex-1 justify-center">
+                  <Skeleton className=" h-3" />
+                </View>
+              )}
             </View>
-            <Text className="font-semibold ml-1">({omdbData?.rated})</Text>
+
+            {omdbData ? (
+              <Text className="font-semibold ml-1">({omdbData?.rated})</Text>
+            ) : (
+              <View className="flex-1 max-w-[35] justify-center">
+                <Skeleton className=" h-3" />
+              </View>
+            )}
           </View>
           {movieDetails?.budget !== 0 && (
             <View className="flex-row">

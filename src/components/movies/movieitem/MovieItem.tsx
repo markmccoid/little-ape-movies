@@ -5,6 +5,7 @@ import { ShowItemType } from "@/store/store.shows";
 import { getMovieItemSizing } from "./movieItemHelpers";
 import MovieImage from "@/components/common/MovieImage";
 import MovieItemActionBar from "./MovieItemActionBar";
+import { useCustomTheme } from "@/utils/colorThemes";
 
 // const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 // const availableWidth = screenWidth - 20; // Subtract left and right margins
@@ -19,6 +20,7 @@ const MovieItem = ({ movie }: Props) => {
   const { imageHeight, imageWidth, verticalMargin, extraHeight, horizontalMargin, gap } =
     getMovieItemSizing();
   const router = useRouter();
+  const { colors } = useCustomTheme();
   //! --------------
   // using this so that double taps don't go to route twice
   // state didn't work, but refs need to be set back to false outside of
@@ -34,55 +36,68 @@ const MovieItem = ({ movie }: Props) => {
 
   return (
     <View
-      className="rounded-lg relative"
       style={{
-        marginVertical: verticalMargin,
-        marginRight: gap,
-        height: imageHeight + extraHeight,
-        shadowColor: "#000",
+        shadowColor: colors.text,
         shadowOffset: {
           width: 1,
           height: 1,
         },
         shadowOpacity: 0.53,
-        shadowRadius: 2.62,
+        shadowRadius: 3,
       }}
     >
       <View
-        className="absolute p-1 bottom-0 w-full z-0 bg-red-500 rounded-b-lg"
-        style={{ height: extraHeight + verticalMargin }}
-      >
-        <MovieItemActionBar movie={movie} />
-      </View>
-      {/* <Link href={`/(auth)/(drawer)/(tabs)/home/${movie.id}`} push disabled> */}
-
-      <Pressable
-        onPress={() => {
-          // if not already routed, push route and set ref
-          // ref will be reset in useEffect
-          if (!pickedRef.current) {
-            router.push(`/(auth)/(drawer)/(tabs)/home/${movie.id}`);
-            pickedRef.current = true;
-          } else {
-            pickedRef.current = false;
-          }
+        className="relative border-hairline border-border"
+        style={{
+          borderRadius: 10,
+          overflow: "hidden",
+          marginVertical: verticalMargin,
+          marginRight: gap,
+          height: imageHeight + extraHeight,
         }}
       >
-        <MovieImage
-          posterURL={movie?.posterURL}
-          imageWidth={imageWidth}
-          imageHeight={imageHeight}
-          title={movie?.title}
-          resizeMode="contain"
-          imageStyle={{
-            borderRadius: 10,
-            borderBottomLeftRadius: 0,
-            borderBottomRightRadius: 0,
-            overflow: "hidden",
+        <View
+          className="absolute p-1 bottom-0 w-full z-0 bg-red-500 "
+          style={{
+            height: extraHeight + verticalMargin,
+            borderBottomEndRadius: 10,
+            borderBottomStartRadius: 10,
           }}
-        />
-      </Pressable>
-      {/* </Link> */}
+        >
+          <MovieItemActionBar movie={movie} />
+        </View>
+        {/* <Link href={`/(auth)/(drawer)/(tabs)/home/${movie.id}`} push disabled> */}
+
+        <Pressable
+          onPress={() => {
+            // if not already routed, push route and set ref
+            // ref will be reset in useEffect
+            if (!pickedRef.current) {
+              router.push(`/(auth)/(drawer)/(tabs)/home/${movie.id}`);
+              pickedRef.current = true;
+            } else {
+              pickedRef.current = false;
+            }
+          }}
+        >
+          <MovieImage
+            posterURL={movie?.posterURL}
+            imageWidth={imageWidth}
+            imageHeight={imageHeight}
+            title={movie?.title}
+            resizeMode="contain"
+            imageStyle={
+              {
+                // borderRadius: 10,
+                // borderBottomLeftRadius: 0,
+                // borderBottomRightRadius: 0,
+                // overflow: "hidden",
+              }
+            }
+          />
+        </Pressable>
+        {/* </Link> */}
+      </View>
     </View>
   );
 };

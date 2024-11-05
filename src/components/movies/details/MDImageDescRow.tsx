@@ -1,22 +1,20 @@
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import React from "react";
-import Animated, {
-  FadeIn,
-  FadeInRight,
-  FadeOut,
-  ReduceMotion,
-  SequencedTransition,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import MotiDetailImage from "./MotiDetailImage";
 import { MovieDetails } from "@/store/dataHooks";
 import useDetailImageSize from "@/hooks/useDetailImageSize";
+import { ShowItemType } from "@/store/store.shows";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
   existsInSaved: boolean;
   movieDetails: MovieDetails;
+  storedMovie: ShowItemType | undefined;
 };
 
-const MDImageDescRow = ({ existsInSaved, movieDetails }: Props) => {
+const MDImageDescRow = ({ existsInSaved, movieDetails, storedMovie }: Props) => {
+  const posterURL = storedMovie?.posterURL || movieDetails?.posterURL;
   return (
     <View
       style={{
@@ -49,7 +47,7 @@ const MDImageDescRow = ({ existsInSaved, movieDetails }: Props) => {
           // exiting={FadeOut.duration(300)}
           // entering={FadeIn.duration(300)}
         >
-          <MotiDetailImage existsInSaved={existsInSaved} posterURL={movieDetails?.posterURL} />
+          <MotiDetailImage existsInSaved={existsInSaved} posterURL={posterURL} />
         </View>
         <View
           className="flex-1"
@@ -58,7 +56,13 @@ const MDImageDescRow = ({ existsInSaved, movieDetails }: Props) => {
           // exiting={FadeOut.duration(300)}
           // entering={FadeIn.duration(300)}
         >
-          <Overview overview={movieDetails?.overview} />
+          {movieDetails?.id ? (
+            <Overview overview={movieDetails?.overview} />
+          ) : (
+            <View className="flex-1 justify-center items-center">
+              <ActivityIndicator size="large" />
+            </View>
+          )}
         </View>
       </View>
     </View>
