@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, Pressable } from "react-native";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import MovieImage from "../common/MovieImage";
 import { MovieSearchResults, useSearchStore } from "@/store/store.search";
 import { MovieStore } from "@/store/store.shows";
@@ -13,16 +13,22 @@ type Props = {
   movie: MovieSearchResults;
   numColumns: 2 | 3;
   spacing: { bottomMargin: number; extraHeight: number };
+  isMovieLoading: boolean;
+  setIsMovieLoading: (arg: boolean) => void;
   onAddMovie: MovieStore["actions"]["addShow"];
   onRemoveMovie: MovieStore["actions"]["removeShow"];
 };
-const SearchResult = ({ movie, spacing, numColumns = 3, onAddMovie, onRemoveMovie }: Props) => {
+const SearchResult = ({
+  movie,
+  spacing,
+  numColumns = 3,
+  isMovieLoading,
+  setIsMovieLoading,
+  onAddMovie,
+  onRemoveMovie,
+}: Props) => {
   const pathName = usePathname();
-  const segments = useSegments();
-  const target = useSearchStore((state) => state.detailTarget);
-  // const linkPath = "/(auth)/(drawer)/_detailshowid/"; // getProcessedPath(pathName);
 
-  // const linkPath = useMemo(() => (pathName === "/search" ? "./search/" : "../"), [pathName]);
   const linkPath = useMemo(
     () => (pathName.includes("/search") ? "/search/" : "/home/"),
     [pathName]
@@ -40,16 +46,17 @@ const SearchResult = ({ movie, spacing, numColumns = 3, onAddMovie, onRemoveMovi
   // using this so that double taps don't go to route twice
   // state didn't work, but refs need to be set back to false outside of
   // function they are set in since synchronous
-  const pickedRef = React.useRef(false);
-  useFocusEffect(
-    React.useCallback(() => {
-      pickedRef.current = false;
-    }, [])
-  );
+  // const pickedRef = React.useRef(false);
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     pickedRef.current = false;
+  //   }, [])
+  // );
   //! --------------
 
-  const handleAddRemoveMovie = () => {
+  const handleAddRemoveMovie = async () => {
     setIsLocallyAdded((prev) => !prev);
+    await new Promise((resolve) => setTimeout(() => resolve("done"), 0));
     if (isLocallyAdded) {
       onRemoveMovie(movie.id);
     } else {
@@ -57,6 +64,25 @@ const SearchResult = ({ movie, spacing, numColumns = 3, onAddMovie, onRemoveMovi
     }
   };
 
+  //~
+
+  const handlePressToMovie = async () => {
+    // Prevent further presses if a movie is already loading
+    if (isMovieLoading) return;
+
+    // Set loading state to true
+    setIsMovieLoading(true);
+
+    try {
+      // delay so
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      // Navigate to the movie's detail page
+      router.push(`${linkPath}${movie.id}`);
+    } catch (error) {
+      // Reset loading state after navigation completes
+      console.log("Error navigating to movie detail (SearchResult.tsx)");
+    }
+  };
   return (
     <View
       className={`border-hairline `}
@@ -73,19 +99,7 @@ const SearchResult = ({ movie, spacing, numColumns = 3, onAddMovie, onRemoveMovi
       }}
     >
       {/* <Link href={`${linkPath}${movie.id}`} style={{ zIndex: 0 }} push> */}
-      <Pressable
-        onPress={() => {
-          // if not already routed, push route and set ref
-          // ref will be reset in useEffect
-          if (!pickedRef.current) {
-            router.push(`${linkPath}${movie.id}`);
-            pickedRef.current = true;
-          } else {
-            pickedRef.current = false;
-          }
-        }}
-        style={{ zIndex: 0 }}
-      >
+      <Pressable onPress={handlePressToMovie} style={{ zIndex: 0 }}>
         <View>
           <MovieImage
             imageWidth={imageWidth}

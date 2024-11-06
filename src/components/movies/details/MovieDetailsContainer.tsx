@@ -5,7 +5,7 @@ import {
   Image,
   ScrollView,
   useColorScheme,
-  SafeAreaView,
+  ActivityIndicator,
   Pressable,
 } from "react-native";
 import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
@@ -32,6 +32,8 @@ import MDMovieVideos from "./MDMovieVideos";
 import MDMovieCast from "./cast/MDMovieCast";
 import { store } from "expo-router/build/global-state/router-store";
 import { eventBus } from "@/store/eventBus";
+import MDDeleteButton from "./MDButtonDelete";
+import MDButtonAdd from "./MDButtonAdd";
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   //!! We need have local state so that we only update component AFTER
@@ -59,8 +61,6 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   //-- HEADER RIGHT ----------
   const handleAddMovie = useCallback(() => {
     if (!movieDetails) return;
-    setMovieAdding(true);
-
     const movieToAdd = {
       id: movieDetails.id,
       title: movieDetails.title,
@@ -73,40 +73,20 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
     } as movieSearchByTitle_Results;
 
     movieActions.addShow(movieToAdd);
-    setMovieAdding(false);
   }, [finalMovieDetails]);
 
   //~~ --------------------------------
   //~~ Setup Header Right Components
   const HeaderRight = () => (
-    <TouchableOpacity
-      className="pr-2 mr-[-10] pl-1"
-      activeOpacity={0.5}
-      onPress={async () => {
-        const yesDelete = await showConfirmationPrompt("Delete Movie", "Delete Movie");
-        if (yesDelete) {
-          if (storedMovie?.id) {
-            movieActions.removeShow(storedMovie?.id);
-          }
-          // If we are deep in a stack go back to starting point
-          router.dismissAll();
-        }
-      }}
-    >
-      <SymbolView name="trash" tintColor={colors.deleteRed} size={30} />
-    </TouchableOpacity>
+    <MDDeleteButton movieId={storedMovie?.id} removeShow={movieActions.removeShow} />
   );
-  const HeaderRightAdd = () => (
-    <TouchableOpacity
-      className="pr-2 mr-[-10] pl-1 pt-1"
-      activeOpacity={0.5}
-      onPress={() => handleAddMovie()}
-      disabled={movieAdding}
-    >
-      {/* <AddIcon color={colors.text} /> */}
-      <SymbolView name="plus.app" tintColor={colors.text} size={30} />
-    </TouchableOpacity>
-  );
+  const HeaderRightAdd = () => {
+    return (
+      <>
+        <MDButtonAdd addShow={handleAddMovie} />
+      </>
+    );
+  };
   //~~ --------------------------------
 
   // Sets the title and Header icons
@@ -165,7 +145,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
           style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, opacity: 0.5 }}
         />
       )}
-      <ScrollView style={{ marginTop: headerHeight + 5, flexGrow: 1 }}>
+      <ScrollView style={{ paddingTop: 5, flexGrow: 1 }}>
         {/* IMAGE and DESC */}
         <View>
           <MDImageDescRow

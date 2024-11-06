@@ -13,6 +13,7 @@ import MovieItem from "./movieitem/MovieItem";
 import MovieAnimatedView from "./movieitem/MovieAnimatedView";
 import useImageSize from "@/hooks/useImageSize";
 import { getMovieItemSizing } from "./movieitem/movieItemHelpers";
+import { useFocusEffect, usePathname } from "expo-router";
 
 // const { width } = Dimensions.get("window");
 // const POSTER_WIDTH = width / 2.2;
@@ -24,6 +25,7 @@ const MoviesContainer = () => {
   // get the itemHeight for building our getItemLayout
   // If you want to change the layout, ONLY do it in th egetMovieItemSizing function
   const { horizontalMargin, itemHeight } = getMovieItemSizing();
+  const [isMovieLoading, setIsMovieLoading] = useState(false);
   // const movies = useMovieStore((state) => state.shows);
   const movies = useMovies();
   const scrollY = useSharedValue(0);
@@ -46,14 +48,29 @@ const MoviesContainer = () => {
   //     flatListRef.current.scrollToIndex({ index: 15, animated: true });
   //   }
   // }, [flatListRef?.current]);
+  //! - - - -- - - -- - - -- - - -- - - -
+  //! This useFocusEffect is used in conjunction with the isMovieLoading state
+  //!  that is passed to MovieItem.
+  //!  When a MovieItem is pressed, it sets the state and all other items won't allow a press
+  //!  useFocusEffect resets the state.  This seems to be an issue with how slowly the navigation transitions.
+  //! - - - -- - - -- - - -- - - -- - - -
+  useFocusEffect(
+    useCallback(() => {
+      setIsMovieLoading(false);
+    }, [])
+  );
 
   const renderItem = useCallback(
     ({ item, index }: { item: ShowItemType; index: number }) => (
       <MovieAnimatedView index={index} scrollY={scrollY}>
-        <MovieItem movie={item} />
+        <MovieItem
+          movie={item}
+          isMovieLoading={isMovieLoading}
+          setIsMovieLoading={setIsMovieLoading}
+        />
       </MovieAnimatedView>
     ),
-    []
+    [isMovieLoading]
   );
 
   return (
@@ -61,6 +78,7 @@ const MoviesContainer = () => {
       data={movies}
       ref={flatListRef}
       renderItem={renderItem}
+      extraData={isMovieLoading}
       // keyExtractor={(item, index) => index.toString()}
       keyExtractor={(item) => item.id.toString()}
       numColumns={2}

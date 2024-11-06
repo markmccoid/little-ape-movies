@@ -8,6 +8,7 @@ import { SymbolView } from "expo-symbols";
 import useSettingsStore from "@/store/store.settings";
 import { MotiView } from "moti";
 import useImageSize from "@/hooks/useImageSize";
+import { useFocusEffect } from "expo-router";
 
 type Props = {
   movies: MovieSearchResults[];
@@ -26,11 +27,25 @@ const SearchContainer = ({ movies, fetchNextPage }: Props) => {
   const movieActions = useMovieStore((state) => state.actions);
   const fetchNextPageFunc = fetchNextPage ? fetchNextPage : () => {};
   const flatListRef = useRef<FlatList>(null);
+  const [isMovieLoading, setIsMovieLoading] = useState(false);
+  //! - - - -- - - -- - - -- - - -- - - -
+  //! This useFocusEffect is used in conjunction with the isMovieLoading state
+  //!  that is passed to MovieItem.
+  //!  When a MovieItem is pressed, it sets the state and all other items won't allow a press
+  //!  useFocusEffect resets the state.  This seems to be an issue with how slowly the navigation transitions.
+  //! - - - -- - - -- - - -- - - -- - - -
+  useFocusEffect(
+    useCallback(() => {
+      setIsMovieLoading(false);
+    }, [])
+  );
 
   const renderItem = ({ item, index }: { item: MovieSearchResults; index: number }) => {
     return (
       <SearchResult
         movie={item}
+        isMovieLoading={isMovieLoading}
+        setIsMovieLoading={setIsMovieLoading}
         onAddMovie={movieActions.addShow}
         onRemoveMovie={movieActions.removeShow}
         numColumns={numColumns}

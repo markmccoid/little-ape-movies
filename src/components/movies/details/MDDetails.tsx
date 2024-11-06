@@ -66,7 +66,9 @@ const MDDetails = ({ movieDetails, omdbData }: Props) => {
         <View className="flex-1 ml-4 flex-col">
           <Text style={styles.textLabel}>Genres:</Text>
           <View className="flex-row gap-2">
-            <Text style={styles.textDesc}>{addDelimitersToArray(movieDetails?.genres, ", ")}</Text>
+            <Text numberOfLines={2} style={styles.textDesc}>
+              {addDelimitersToArray(movieDetails?.genres, ", ")}
+            </Text>
           </View>
         </View>
       </View>

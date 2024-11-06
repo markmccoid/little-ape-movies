@@ -1,4 +1,4 @@
-import { View, Text, Image, Dimensions, Pressable } from "react-native";
+import { View, Text, Image, Dimensions, Pressable, InteractionManager } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useFocusEffect, useNavigation, useRouter } from "expo-router";
 import { ShowItemType } from "@/store/store.shows";
@@ -15,8 +15,10 @@ import { useCustomTheme } from "@/utils/colorThemes";
 // const imageHeight = imageWidth * 1.5;
 type Props = {
   movie: ShowItemType;
+  isMovieLoading: boolean;
+  setIsMovieLoading: (arg: boolean) => void;
 };
-const MovieItem = ({ movie }: Props) => {
+const MovieItem = ({ movie, isMovieLoading, setIsMovieLoading }: Props) => {
   const { imageHeight, imageWidth, verticalMargin, extraHeight, horizontalMargin, gap } =
     getMovieItemSizing();
   const router = useRouter();
@@ -25,14 +27,29 @@ const MovieItem = ({ movie }: Props) => {
   // using this so that double taps don't go to route twice
   // state didn't work, but refs need to be set back to false outside of
   // function they are set in since synchronous
-  const pickedRef = React.useRef(false);
+  // const pickedRef = React.useRef(false);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      pickedRef.current = false;
-    }, [])
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     pickedRef.current = false;
+  //   }, [])
+  // );
   //! --------------
+
+  const handlePress = async () => {
+    // Prevent further presses if a movie is already loading
+    if (isMovieLoading) return;
+    // Set loading state to true
+    setIsMovieLoading(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1));
+      // Navigate to the movie's detail page
+      router.push(`/(auth)/(drawer)/(tabs)/home/${movie.id}`);
+    } catch (error) {
+      // Reset loading state after navigation completes
+      console.log("Error navigating to movie detail (MovieItem.tsx)");
+    }
+  };
 
   return (
     <View
@@ -69,16 +86,23 @@ const MovieItem = ({ movie }: Props) => {
         {/* <Link href={`/(auth)/(drawer)/(tabs)/home/${movie.id}`} push disabled> */}
 
         <Pressable
-          onPress={() => {
-            // if not already routed, push route and set ref
-            // ref will be reset in useEffect
-            if (!pickedRef.current) {
-              router.push(`/(auth)/(drawer)/(tabs)/home/${movie.id}`);
-              pickedRef.current = true;
-            } else {
-              pickedRef.current = false;
-            }
-          }}
+          onPress={handlePress}
+          disabled={isMovieLoading}
+          // onPress={async () => {
+          //   // if not already routed, push route and set ref
+          //   // ref will be reset in useEffect
+          //   // if (!pickedRef.current) {
+          //   console.log("MovieID-Loading?", movie.id, isMovieLoading);
+          //   if (isMovieLoading) return;
+          //   setIsMovieLoading(true);
+          //   await new Promise((resolve) => setTimeout(() => resolve("done"), 1));
+          //   router.push(`/(auth)/(drawer)/(tabs)/home/${movie.id}`);
+          //   pickedRef.current = true;
+          //   setIsMovieLoading(false);
+          //   // } else {
+          //   //   pickedRef.current = false;
+          //   // }
+          // }}
         >
           <MovieImage
             posterURL={movie?.posterURL}
