@@ -12,7 +12,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { useCustomTheme } from "@/utils/colorThemes";
+import { useCustomTheme } from "@/lib/colorThemes";
 
 const { width, height } = Dimensions.get("window");
 const BUTTON_WIDTH = 50;

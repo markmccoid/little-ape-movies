@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TouchableOpacity, View, Text, ActivityIndicator } from "react-native";
-import { useCustomTheme } from "@/utils/colorThemes";
+import { useCustomTheme } from "@/lib/colorThemes";
 import { SymbolView } from "expo-symbols";
 type Props = {
   addShow: () => void;

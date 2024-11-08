@@ -22,7 +22,7 @@ import MDImageDescRow from "./MDImageDescRow";
 import MDWatchProviders from "./watchProviders/MDWatchProviders";
 import MDDetails from "./MDDetails";
 import HiddenContainerAnimated from "@/components/common/HiddenContainer/HiddenContainerAnimated";
-import { useCustomTheme } from "@/utils/colorThemes";
+import { useCustomTheme } from "@/lib/colorThemes";
 import HiddenContainerWatchProviders from "@/components/common/HiddenContainer/HiddenContainerWatchProviders";
 import MDMovieRecommendations from "./MDMovieRecommendations";
 import { SymbolView } from "expo-symbols";

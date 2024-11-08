@@ -30,14 +30,16 @@ export type ShowItemType = {
   // Add other movie properties
 };
 
-type TagArray = {
-  position: number;
-  tagName: string;
+export type Tag = {
+  id: string;
+  name: string;
+  dateAdded: number;
 };
 
 export interface MovieStore {
   shows: ShowItemType[];
-  tagArray: TagArray[];
+  tagArray: Tag[];
+  // Updated with on the providers stored on shows, updated via "UPDATE_SHOW_PROVIDERS" event bus call.
   streamingProviders: ProviderInfo[];
   actions: {
     addShow: (show: movieSearchByTitle_Results) => void;
@@ -46,13 +48,17 @@ export interface MovieStore {
     updateStreamingProviders: (newProviders: ProviderInfo[] | undefined) => void;
     removeShow: (id: number) => void;
     getShowById: (id: number) => ShowItemType | undefined;
+    tagAdd: (tag: string) => void;
+    tagRemove: (tagId: string) => void;
+    tagEdit: (tagId: string, newTagName: string) => void;
+    tagUpdateOrder: (tags: Tag[]) => void;
     clearStore: () => void;
   };
 }
 
 const movieInitialState = {
   shows: [],
-  tagArray: [{ position: 1, tagName: "Sample1" }],
+  tagArray: [],
   streamingProviders: [],
 };
 const useMovieStore = create<MovieStore>()(
@@ -136,6 +142,46 @@ const useMovieStore = create<MovieStore>()(
 
           set({ streamingProviders: mergedProviders });
         },
+        //~ tagAdd
+        tagAdd: (tag) => {
+          if (!tag || tag === "") return;
+          const currTags = get().tagArray;
+          // Make sure it doesn't exist
+          const exists = currTags
+            .map((currTag) => currTag.name.toLowerCase())
+            .includes(tag.toLowerCase());
+          if (exists) {
+            throw new Error("duplicate");
+          }
+          // create new id
+          const id = Date.now().toString(36);
+          const newTags = [...currTags, { id, name: tag, dateAdded: Date.now() }];
+          set({ tagArray: newTags });
+        },
+        //~ tagRemove
+        tagRemove: (tagId) => {
+          const currTags = get().tagArray;
+          const newTags = currTags.filter((currTag) => currTag.id !== tagId);
+          set({ tagArray: newTags });
+        },
+        //~ tagEdit
+        tagEdit: (tagId, newTagName) => {
+          if (!newTagName || newTagName === "") return;
+          const currTags = [...get().tagArray];
+          for (let currTag of currTags) {
+            if (currTag.id === tagId) {
+              currTag.name = newTagName;
+              break;
+            }
+          }
+
+          set({ tagArray: currTags });
+          console.log("EDIT TAGS", get().tagArray);
+        },
+        //~ tagUpdateOrder
+        tagUpdateOrder: (tags: Tag[]) => {
+          set({ tagArray: tags });
+        },
         //~ clearStore
         clearStore: () => set({ shows: [] }),
       },
@@ -145,7 +191,7 @@ const useMovieStore = create<MovieStore>()(
       storage: createJSONStorage(() => StorageAdapter),
       partialize: (state) => ({
         shows: state.shows,
-        tagsArray: state.tagArray,
+        tagArray: state.tagArray,
         streamingProviders: state.streamingProviders,
       }),
       onRehydrateStorage: (state) => {

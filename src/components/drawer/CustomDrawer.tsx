@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+import { View, StyleSheet, SafeAreaView } from "react-native";
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
@@ -10,10 +10,10 @@ import { useAuth } from "@/providers/AuthProvider";
 import { SymbolView } from "expo-symbols";
 import { Link, useNavigation, usePathname, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useCustomTheme } from "@/utils/colorThemes";
+import { useCustomTheme } from "@/lib/colorThemes";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { CheckSquareIcon, FilterIcon } from "../common/Icons";
-
+import { Text } from "@/components/ui/text";
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const { currentUser, onLogout } = useAuth();
   const insets = useSafeAreaInsets();
@@ -27,8 +27,12 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         className="p-[20] flex-row items-center gap-4 border-b border-border"
         style={{ marginTop: insets.top }}
       >
-        <SymbolView name="person.fill" type="palette" colors={[colors.primary, colors.primary]} />
-        <Text className="text-3xl text-text font-bold">{currentUser}</Text>
+        <SymbolView
+          name="person.fill"
+          type="palette"
+          colors={[colors.secondaryForeground, colors.secondaryForeground]}
+        />
+        <Text className="text-3xl font-bold">{currentUser}</Text>
       </View>
       {/* HOME and SETTINGS Links */}
       <View className="bg-card">
@@ -44,7 +48,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
               type="palette"
               colors={[colors.text, colors.text]}
             />
-            <Text className="text-lg text-text">Home</Text>
+            <Text className="text-lg ">Home</Text>
             {/* {pathname === "/home" && <CheckSquareIcon />} */}
           </View>
         </Link>
@@ -60,7 +64,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
               type="palette"
               colors={[colors.text, colors.text]}
             />
-            <Text className="text-lg text-text">Settings</Text>
+            <Text className="text-lg ">Settings</Text>
           </View>
         </Link>
       </View>
@@ -72,7 +76,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       >
         <View className={`p-[10] pl-[20] bg-card flex-row items-center gap-3 w-full rounded-lg`}>
           <FilterIcon size={18} color={colors.text} />
-          <Text className="text-lg text-text">Saved Filters</Text>
+          <Text className="text-lg ">Saved Filters</Text>
         </View>
       </DrawerContentScrollView>
       <View style={{ height: insets.bottom + 50 }}>
@@ -85,7 +89,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
               type="palette"
               colors={[colors.text, colors.text]}
             />
-            <Text className="text-text text-lg font-semibold">Sign Out</Text>
+            <Text className=" text-lg font-semibold">Sign Out</Text>
           </View>
         </TouchableOpacity>
       </View>

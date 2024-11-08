@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import React from "react";
 import { Stack } from "expo-router";
 
-import { useCustomTheme } from "@/utils/colorThemes";
+import { useCustomTheme } from "@/lib/colorThemes";
 const SignInLayout = () => {
   const { colors } = useCustomTheme();
   return (

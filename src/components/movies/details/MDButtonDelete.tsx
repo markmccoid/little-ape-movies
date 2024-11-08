@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TouchableOpacity, View, Text } from "react-native";
 import showConfirmationPrompt from "@/components/common/showConfirmationPrompt";
-import { useCustomTheme } from "@/utils/colorThemes";
+import { useCustomTheme } from "@/lib/colorThemes";
 import { SymbolView } from "expo-symbols";
 import { useRouter } from "expo-router";
 type Props = {

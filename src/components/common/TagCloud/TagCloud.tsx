@@ -2,7 +2,7 @@ import React from "react";
 // import PropTypes from "prop-types";
 import { View, Text, LayoutAnimation, TouchableOpacity } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { useCustomTheme } from "@/utils/colorThemes";
+import { useCustomTheme } from "@/lib/colorThemes";
 // import { TagContainer, Tag, TagIcon, TagText } from "./TagCloudStyles";
 type Props = {
   tagId: string;

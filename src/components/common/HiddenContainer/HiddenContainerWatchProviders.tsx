@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Image, Pressable, ViewStyle, ScrollView } from 
 import { ExpandDownIcon, CollapseUpIcon } from "@/components/common/Icons";
 import { AnimatePresence, MotiView } from "moti";
 import { useMovieWatchProviders } from "@/store/dataHooks";
-import { useCustomTheme } from "@/utils/colorThemes";
+import { useCustomTheme } from "@/lib/colorThemes";
 
 /**
  * Component will take a component as a child and toggle displaying or hiding

@@ -2,11 +2,6 @@ import {
   StyleSheet,
   Image,
   View,
-  TextInput,
-  Button,
-  Text,
-  KeyboardAvoidingView,
-  Platform,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
@@ -21,10 +16,10 @@ import { useTheme } from "@react-navigation/native";
 // import { defaultStyles } from '@/constants/Styles';
 import { LinearGradient } from "expo-linear-gradient";
 import { useAuth } from "@/providers/AuthProvider";
-import { addNewUser, removeItem } from "@/store/dataAccess/localStorage-users";
-import { useCustomTheme } from "@/utils/colorThemes";
+import { useCustomTheme } from "@/lib/colorThemes";
 import { DeleteIcon } from "../common/Icons";
 import { SymbolView } from "expo-symbols";
+import { Text } from "@/components/ui/text";
 
 const handleNewUserPrompt = (registerUser: (user: string) => void) => {
   Alert.prompt(
@@ -119,11 +114,11 @@ const SignIn = () => {
                       className="flex-1 px-3 py-2 mr-2"
                       onPress={() => handleLogin(user)}
                     >
-                      <Text className="text-text">{user}</Text>
+                      <Text className="">{user}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => onRemoveUser(user)}>
                       <View className="border-l bg-card-inverted p-2">
-                        <DeleteIcon size={15} color={colors.textInverted} />
+                        <DeleteIcon size={15} color={colors.deleteRed} />
                       </View>
                     </TouchableOpacity>
                   </View>

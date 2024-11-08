@@ -4,7 +4,7 @@ import MovieImage from "../common/MovieImage";
 import { MovieSearchResults, useSearchStore } from "@/store/store.search";
 import { MovieStore } from "@/store/store.shows";
 import { AddCircleIcon, AddIcon, CheckCircleIcon } from "../common/Icons";
-import { useCustomTheme } from "@/utils/colorThemes";
+import { useCustomTheme } from "@/lib/colorThemes";
 import { Link, router, useFocusEffect, usePathname, useSegments } from "expo-router";
 import useImageSize from "@/hooks/useImageSize";
 import { Text } from "@/components/ui/text";

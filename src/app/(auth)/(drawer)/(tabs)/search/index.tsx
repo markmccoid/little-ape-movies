@@ -17,7 +17,7 @@ import PersonSearchContainer from "@/components/search/personSearch/PersonSearch
 import MovieSearchContainer from "@/components/search/movieTitleSearch/MovieSearchContainer";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MotiText, MotiView } from "moti";
-import { useCustomTheme } from "@/utils/colorThemes";
+import { useCustomTheme } from "@/lib/colorThemes";
 import { SymbolView } from "expo-symbols";
 import useSettingsStore from "@/store/store.settings";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";

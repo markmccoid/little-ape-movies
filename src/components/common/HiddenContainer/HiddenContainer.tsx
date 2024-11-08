@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import { CollapseUpIcon, EraserIcon, ExpandDownIcon } from "@/components/common/Icons";
-import { useCustomTheme } from "@/utils/colorThemes";
+import { useCustomTheme } from "@/lib/colorThemes";
 
 /**
  * Component will take a component as a child and toggle displaying or hiding

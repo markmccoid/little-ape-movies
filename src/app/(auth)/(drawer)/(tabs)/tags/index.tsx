@@ -1,10 +1,13 @@
-import { View, Text } from "react-native";
-import React from "react";
+import { View, Text, Pressable } from "react-native";
+import React, { useReducer, useState } from "react";
 import { Link, Stack } from "expo-router";
 import { useTheme } from "@react-navigation/native";
 import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle";
-import Temp from "@/components/common/animations/Temp";
-const Page3 = () => {
+import TagContainer from "@/components/tags/TagContainer";
+import { PlusCircle } from "@/lib/icons/PlusCircle";
+import TagTest from "@/components/tags/TagTest";
+
+const TagRoute = () => {
   const { colors } = useTheme();
 
   return (
@@ -16,9 +19,10 @@ const Page3 = () => {
         }}
       />
 
-      <Temp />
+      {/* <TagTest /> */}
+      <TagContainer />
     </View>
   );
 };
 
-export default Page3;
+export default TagRoute;

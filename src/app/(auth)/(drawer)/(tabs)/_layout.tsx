@@ -1,6 +1,8 @@
 import React from "react";
 import { Tabs } from "expo-router";
-import { AddIcon, MovieIcon, TagIcon } from "@/components/common/Icons";
+import { SearchIcon, AddIcon, MovieIcon, TagIcon } from "@/components/common/Icons";
+import { Search } from "lucide-react-native";
+
 export const unstable_settings = {
   // Ensure any route can link back to `/`
   initialRouteName: "home",
@@ -15,7 +17,7 @@ const Layout = () => {
       <Tabs.Screen
         name="search"
         options={{
-          tabBarIcon: ({ color }) => <AddIcon size={25} color={color} />,
+          tabBarIcon: ({ color }) => <SearchIcon size={25} color={color} />,
         }}
       />
       <Tabs.Screen

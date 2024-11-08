@@ -5,7 +5,7 @@ import { FilterIcon } from "@/components/common/Icons";
 import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle";
 import MoviesContainer from "@/components/movies/MoviesContainer";
 import { getCurrentUser } from "@/store/dataAccess/localStorage-users";
-import { useCustomTheme } from "@/utils/colorThemes";
+import { useCustomTheme } from "@/lib/colorThemes";
 import { useSearchStore } from "@/store/store.search";
 
 const Page = () => {

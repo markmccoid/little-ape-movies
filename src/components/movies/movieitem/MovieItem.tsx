@@ -5,7 +5,7 @@ import { ShowItemType } from "@/store/store.shows";
 import { getMovieItemSizing } from "./movieItemHelpers";
 import MovieImage from "@/components/common/MovieImage";
 import MovieItemActionBar from "./MovieItemActionBar";
-import { useCustomTheme } from "@/utils/colorThemes";
+import { useCustomTheme } from "@/lib/colorThemes";
 
 // const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 // const availableWidth = screenWidth - 20; // Subtract left and right margins
@@ -23,20 +23,9 @@ const MovieItem = ({ movie, isMovieLoading, setIsMovieLoading }: Props) => {
     getMovieItemSizing();
   const router = useRouter();
   const { colors } = useCustomTheme();
-  //! --------------
-  // using this so that double taps don't go to route twice
-  // state didn't work, but refs need to be set back to false outside of
-  // function they are set in since synchronous
-  // const pickedRef = React.useRef(false);
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     pickedRef.current = false;
-  //   }, [])
-  // );
-  //! --------------
-
-  const handlePress = async () => {
+  //~ --- handleMovieSelect ---
+  const handleMovieSelect = async () => {
     // Prevent further presses if a movie is already loading
     if (isMovieLoading) return;
     // Set loading state to true
@@ -86,7 +75,7 @@ const MovieItem = ({ movie, isMovieLoading, setIsMovieLoading }: Props) => {
         {/* <Link href={`/(auth)/(drawer)/(tabs)/home/${movie.id}`} push disabled> */}
 
         <Pressable
-          onPress={handlePress}
+          onPress={handleMovieSelect}
           disabled={isMovieLoading}
           // onPress={async () => {
           //   // if not already routed, push route and set ref

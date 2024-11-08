@@ -13,7 +13,7 @@ import * as SplashScreen from "expo-splash-screen";
 
 import { useColorScheme } from "react-native";
 import { ThemeProvider } from "@react-navigation/native";
-import { CustomLightTheme, CustomDarkTheme } from "../utils/colorThemes";
+import { CustomLightTheme, CustomDarkTheme } from "../lib/colorThemes";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { initTMDB } from "@markmccoid/tmdb_api";
