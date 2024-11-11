@@ -34,6 +34,7 @@ export type Tag = {
   id: string;
   name: string;
   dateAdded: number;
+  pos: number;
 };
 
 export interface MovieStore {
@@ -66,6 +67,7 @@ const useMovieStore = create<MovieStore>()(
     (set, get) => ({
       ...movieInitialState,
       actions: {
+        //~ ---------------------------------
         //~ addShow
         addShow: (show) => {
           const showExists = doesShowExist(
@@ -97,6 +99,7 @@ const useMovieStore = create<MovieStore>()(
           eventBus.publish("TAG_SEARCH_RESULTS");
           eventBus.publish("GET_SHOW_COLORS", newShow.id, newShow?.posterURL);
         },
+        //~ ---------------------------------
         //~ updateShow
         updateShow: (id, updatedShow) => {
           set((state) => ({
@@ -104,9 +107,11 @@ const useMovieStore = create<MovieStore>()(
           }));
           // console.log("UPDATE Show", updatedShow);
         },
+        //~ ---------------------------------
         //~ updateShowTags
         updateShowTags: (id, tagId, action) => {
-          const currShow = get().shows.find((show) => show.id === id);
+          const allShows = [...get().shows];
+          const currShow = allShows.find((show) => show.id === id);
           if (!currShow) return;
 
           const showTags = currShow?.tags || [];
@@ -116,10 +121,10 @@ const useMovieStore = create<MovieStore>()(
           } else {
             newShowTags = [...showTags, tagId];
           }
-          console.log("NEWTAGS", newShowTags);
           currShow.tags = newShowTags;
-          set((state) => ({ shows: [...state.shows, currShow] }));
+          set({ shows: allShows });
         },
+        //~ ---------------------------------
         //~ removeShow
         removeShow: (id) => {
           set((state) => ({
@@ -127,12 +132,14 @@ const useMovieStore = create<MovieStore>()(
           }));
           eventBus.publish("TAG_SEARCH_RESULTS");
         },
+        //~ ---------------------------------
         //~ getShowById
         getShowById: (id) => {
           const show = get().shows.find((el) => el.id === id);
 
           return show;
         },
+        //~ ---------------------------------
         //~ updateStreamingProviders
         updateStreamingProviders: (newProviders) => {
           if (!newProviders) return;
@@ -142,6 +149,7 @@ const useMovieStore = create<MovieStore>()(
 
           set({ streamingProviders: mergedProviders });
         },
+        //~ ---------------------------------
         //~ tagAdd
         tagAdd: (tag) => {
           if (!tag || tag === "") return;
@@ -155,15 +163,21 @@ const useMovieStore = create<MovieStore>()(
           }
           // create new id
           const id = Date.now().toString(36);
-          const newTags = [...currTags, { id, name: tag, dateAdded: Date.now() }];
+          const newTags = [
+            ...currTags,
+            { id, name: tag, dateAdded: Date.now(), pos: currTags.length },
+          ];
+          console.log("NEW Tags", newTags);
           set({ tagArray: newTags });
         },
+        //~ ---------------------------------
         //~ tagRemove
         tagRemove: (tagId) => {
           const currTags = get().tagArray;
           const newTags = currTags.filter((currTag) => currTag.id !== tagId);
           set({ tagArray: newTags });
         },
+        //~ ---------------------------------
         //~ tagEdit
         tagEdit: (tagId, newTagName) => {
           if (!newTagName || newTagName === "") return;
@@ -178,10 +192,12 @@ const useMovieStore = create<MovieStore>()(
           set({ tagArray: currTags });
           console.log("EDIT TAGS", get().tagArray);
         },
+        //~ ---------------------------------
         //~ tagUpdateOrder
         tagUpdateOrder: (tags: Tag[]) => {
           set({ tagArray: tags });
         },
+        //~ ---------------------------------
         //~ clearStore
         clearStore: () => set({ shows: [] }),
       },
@@ -227,20 +243,55 @@ export const useMovieActions = () => {
 //~~  Returns the movies to show on the main screen based on the settings
 //~~ ------------------------------------------------------------
 export const useMovies = () => {
-  const { filterIsFavorited, filterIsWatched, tags } = useSettingsStore(
-    (state) => state.filterCriteria
-  );
+  const { filterIsFavorited, filterIsWatched, includeTags, excludeTags, includeGenres } =
+    useSettingsStore((state) => state.filterCriteria);
   const movies = useMovieStore((state) => state.shows);
 
   let filteredMovies: ShowItemType[] = [];
+  // Loop through each saved movie and see if it meets criteria to be shown
   for (const movie of movies) {
+    // if looking for watched movies, exclude if not watched, otherwise we don't case
     if (filterIsWatched) {
-      if (movie?.watched) {
-        filteredMovies.push(movie);
+      if (!movie?.watched) {
+        continue;
       }
-    } else {
-      filteredMovies.push(movie);
     }
+    // favorited?
+    if (filterIsFavorited) {
+      if (!movie?.favorited) {
+        continue;
+      }
+    }
+
+    // Include Tags
+    if (Array.isArray(includeTags) && includeTags?.length > 0) {
+      // EVERY includeTag is present in the movie's tags
+      if (!includeTags.every((tag) => movie.tags.includes(tag))) {
+        continue;
+      }
+    }
+    // Exclude Tags
+    if (Array.isArray(excludeTags) && excludeTags?.length > 0) {
+      console.log(
+        "ExcludeTag",
+        excludeTags,
+        movie.tags,
+        !excludeTags.some((tag) => movie.tags.includes(tag))
+      );
+      // EVERY excludeTag is present in the movie's tags
+      if (excludeTags.some((tag) => movie.tags.includes(tag))) {
+        continue;
+      }
+    }
+
+    // Genres
+    if (Array.isArray(includeGenres) && includeGenres?.length > 0) {
+      if (!includeGenres.every((genre) => movie.genres.includes(genre))) {
+        continue;
+      }
+    }
+    // if we make it here, then add the movie to our filtered list
+    filteredMovies.push(movie);
   }
 
   // sort
@@ -253,4 +304,13 @@ const doesShowExist = (allShows: number[], showToCheck: number) => {
   return allShows.includes(showToCheck);
 };
 
+export const updateTagState = (tags: Tag[], appliedTagIds: string[]) => {
+  // Create a Set for fast lookups of applied tags
+  const appliedTagSet = new Set(appliedTagIds);
+
+  return tags.map((tag) => ({
+    ...tag,
+    applied: appliedTagSet.has(tag.id),
+  }));
+};
 export default useMovieStore;

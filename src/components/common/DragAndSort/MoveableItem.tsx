@@ -10,8 +10,9 @@ import Animated, {
   useAnimatedReaction,
   scrollTo,
   SharedValue,
+  AnimatedRef,
 } from "react-native-reanimated";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { Gesture, GestureDetector, State } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
 import { DragIndicatorProps, DragIndicatorConfig } from "./DefaultDragIndicator";
 import { Positions } from "./helperFunctions";
@@ -20,7 +21,7 @@ import { usePositions } from "./DragSortContext";
 interface Props {
   id: number | string;
   scrollY: SharedValue<number>;
-  scrollViewRef: React.RefObject<Animated.ScrollView>;
+  scrollViewRef: AnimatedRef<Animated.ScrollView>;
   numberOfItems: number;
   handlePosition: "left" | "right";
   containerHeight: number;
@@ -30,6 +31,8 @@ interface Props {
   dragIndicator: React.FC<DragIndicatorProps>;
   dragIndicatorConfig: Partial<DragIndicatorConfig>;
   updatePositions: (positions: Positions) => void;
+  positionState: Positions;
+  setPositionState: (state: Positions) => void;
   itemHeight: number;
   children: React.ReactElement<{ id: number | string }>;
 }
@@ -60,6 +63,8 @@ const MoveableItem = ({
   handlePosition,
   containerHeight,
   updatePositions,
+  positionState,
+  setPositionState,
   children,
   itemHeight,
   handle,
@@ -68,7 +73,7 @@ const MoveableItem = ({
   dragIndicatorConfig,
   enableHapticFeedback,
 }: Props) => {
-  const positions = usePositions();
+  // const positions = usePositions();
   const Handle = handle;
   const DragIndicator = dragIndicator;
 
@@ -85,15 +90,16 @@ const MoveableItem = ({
   const ctxStartingY = useSharedValue(0);
 
   React.useEffect(() => {
-    if (positions.value[id] !== undefined) {
-      setMovingPos(positions.value[id] + 1);
-      translateY.value = withSpring(positions.value[id] * itemHeight);
+    if (positionState[id] !== undefined) {
+      setMovingPos(positionState[id] + 1);
+      translateY.value = withSpring(positionState[id] * itemHeight);
+      console.log("POS", positionState[id] * itemHeight, id, translateY.value, itemHeight);
     }
-  }, []);
-
+  }, [positionState[id]]);
   useAnimatedReaction(
-    () => positions.value[id],
+    () => positionState[id],
     (newPosition, previousPosition) => {
+      // console.log("in reaction", newPosition, previousPosition, moving, initialRender.value);
       if (newPosition === undefined) return;
 
       if (newPosition !== previousPosition) {
@@ -101,6 +107,7 @@ const MoveableItem = ({
           runOnJS(setMovingPos)(newPosition + 1);
         }
         if (!moving && !initialRender.value) {
+          // console.log("New Y Reaction", newPosition);
           translateY.value = withSpring(newPosition * itemHeight);
           runOnJS(setMovingPos)(newPosition + 1);
         } else {
@@ -136,8 +143,8 @@ const MoveableItem = ({
       const newPosition = clamp(Math.floor(translateY.value / itemHeight + 0.5), 0, numberOfItems);
 
       //* Check to see if we need to set a new position and do it if so
-      if (newPosition !== positions.value[id]) {
-        positions.value = objectMove(positions.value, positions.value[id], newPosition);
+      if (newPosition !== positionState[id]) {
+        runOnJS(setPositionState)(objectMove(positionState, positionState[id], newPosition));
         if (Platform.OS === "ios" && enableHapticFeedback) {
           runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
         }
@@ -174,12 +181,21 @@ const MoveableItem = ({
 
       // translateY.value = positionY;
     })
-    .onEnd(() => {
+    .onEnd((event) => {
       runOnJS(setIsActive)(false);
       runOnJS(setMoving)(false);
       scale.value = { x: 1, y: 1 };
-      translateY.value = withSpring(positions.value[id] * itemHeight);
-      runOnJS(updatePositions)(positions.value);
+      translateY.value = withSpring(positionState[id] * itemHeight);
+      runOnJS(updatePositions)(positionState);
+    })
+    .onFinalize((e) => {
+      // If on finalize we are in the failed state, assum onEnd didn't run and cleanup
+      if (e.state === State.FAILED) {
+        runOnJS(setIsActive)(false);
+        runOnJS(setMoving)(false);
+        scale.value = { x: 1, y: 1 };
+        translateY.value = withSpring(positionState[id] * itemHeight);
+      }
     });
 
   const animatedStyle = useAnimatedStyle(() => ({

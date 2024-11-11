@@ -34,6 +34,7 @@ import { store } from "expo-router/build/global-state/router-store";
 import { eventBus } from "@/store/eventBus";
 import MDDeleteButton from "./MDButtonDelete";
 import MDButtonAdd from "./MDButtonAdd";
+import MDTags from "./tagMovies/MDTags";
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   //!! We need have local state so that we only update component AFTER
@@ -106,8 +107,8 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
     };
     navigation.setOptions(options);
   }, [movieId, existsInSaved, movieTitle, isLoading, colorScheme]);
-  const backgroundStartColor = "#000000";
-  const backgroundEndColor = "#FFFFFF";
+  const backgroundStartColor = storedMovie?.posterColors?.primary?.color || "#000000";
+  const backgroundEndColor = storedMovie?.posterColors?.darkestColor || "#FFFFFF";
 
   // Once we are focused and not loading, update the local state
   // Local state will be used to update the component
@@ -126,6 +127,12 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   }, [existsInSaved]);
   return (
     <View className="flex-1">
+      {existsInSaved && (
+        <LinearGradient
+          colors={[backgroundStartColor, backgroundEndColor]}
+          style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, opacity: 0.5 }}
+        />
+      )}
       {existsInSaved && finalMovieDetails?.posterURL ? (
         <Image
           source={{ uri: finalMovieDetails?.posterURL }}
@@ -163,6 +170,13 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
           <MDDetails
             movieDetails={finalMovieDetails as MovieDetails}
             omdbData={omdbData}
+            existsInSaved={existsInSaved}
+          />
+        </View>
+        <View className="my-[2]">
+          <MDTags
+            // movieDetails={finalMovieDetails as MovieDetails}
+            storedMovie={storedMovie}
             existsInSaved={existsInSaved}
           />
         </View>

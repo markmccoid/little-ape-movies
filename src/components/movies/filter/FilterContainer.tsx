@@ -6,6 +6,7 @@ import useSettingsStore, { useSettingsActions } from "@/store/store.settings";
 import { Text } from "@/components/ui/text";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import FilterTags from "./FilterTags";
 
 const FilterContainer = () => {
   const navigation = useNavigation();
@@ -55,6 +56,7 @@ const FilterContainer = () => {
           <Text className="ml-1">Favorited</Text>
         </View>
       </View>
+      <FilterTags />
     </View>
   );
 };

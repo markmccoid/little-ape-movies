@@ -18,7 +18,10 @@ type CustomTheme = Theme & {
     cardInverted: string;
     cardForeground: string;
     colorSelected: string;
+    destructive: string;
+    destructiveForeground: string;
     deleteRed: string;
+    includeGreen: string;
     imdbYellow: string;
   };
 };
@@ -31,24 +34,26 @@ export const CustomLightTheme: CustomTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: "#7c3aed",
-    primaryForeground: "#F9FAFB",
-    secondary: "#c5b8d1",
-    secondaryForeground: "#030712",
-    background: "#ebebf0",
-    card: "#fbfbfe",
-    cardForeground: "#030712",
+    primary: "#7b3df2", // Converted from HSL(262.1, 83.3%, 57.8%)
+    primaryForeground: "#f5f9fb", // Converted from HSL(210, 20%, 98%)
+    secondary: "#c3b1e6", // Converted from HSL(262, 47%, 75%)
+    secondaryForeground: "#1a2230", // Converted from HSL(220.9, 39.3%, 11%)
+    background: "#f0ebfa", // Converted from HSL(262, 50%, 95%)
+    card: "#ffffff", // Converted from HSL(0, 0%, 100%)
+    cardForeground: "#03061a", // Converted from HSL(224, 71.4%, 4.1%)
     cardInverted: "#010104",
     text: "#040316",
     textInput: "#dfdfdf",
     textInverted: "#eae9fc",
-    border: "#09080c", // Make border same as primary??
-    // border: "#262323",
+    border: "#160D26",
     button: "#9fb6db",
     buttontext: "#040316",
     colorSelected: "#90ee90",
     notification: "rgb(255, 59, 48)",
-    deleteRed: "#c70000",
+    destructive: "#F24545",
+    destructiveForeground: "#F6F9FB",
+    deleteRed: "#a61000",
+    includeGreen: "#6cb043",
     imdbYellow: "#ECC233",
   },
 };
@@ -57,23 +62,26 @@ export const CustomDarkTheme: CustomTheme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
-    primary: "#7c3aed",
-    primaryForeground: "#030712",
-    secondary: "#c5b8d1",
-    secondaryForeground: "#F9FAFB",
-    background: "#3D3649",
-    card: "#241E2F",
-    cardForeground: "#F9FAFB",
+    primary: "#7c5eb8", // Converted from HSL(263.4, 70%, 50.4%)
+    primaryForeground: "#03061a", // Converted from HSL(224, 71.4%, 4.1%)
+    secondary: "#7c5eb8", // Same as primary for dark theme (HSL conversion)
+    secondaryForeground: "#f5f9fb", // Converted from HSL(210, 20%, 98%)
+    background: "#3d3540", // Converted from HSL(262,15%,25%)
+    card: "#2d2438", // Converted from HSL(263,22%,15%)
+    cardForeground: "#f5f9fb", // Converted from HSL(210,20%,98%)
     cardInverted: "#fbfbfe",
     text: "#fbfbfe",
-    textInput: "#4d595d",
+    textInput: "#26282d", // Converted from HSL(215,27.9%,16.9%)
     textInverted: "#040316",
-    border: "#eae9fc",
+    border: "#747474", // Converted from HSL(240,1%,46%)
     button: "#9fb6db",
     buttontext: "#040316",
     colorSelected: "#2f6b2f",
     notification: "rgb(255, 59, 48)",
-    deleteRed: "#c70000",
+    destructive: "#872121",
+    destructiveForeground: "#F6F9FB",
+    deleteRed: "#992424", // Converted from HSL(0,62.8%,30.6%)
+    includeGreen: "#6cb043",
     imdbYellow: "#ECC233",
   },
 };

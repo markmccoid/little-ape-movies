@@ -12,12 +12,20 @@ interface SettingsStore {
   filterCriteria: {
     filterIsWatched?: boolean;
     filterIsFavorited?: boolean;
-    tags?: string[];
+    includeTags?: string[];
+    excludeTags?: string[];
+    includeGenres?: string[];
   };
   actions: {
     toggleSearchColumns: () => void;
     toggleIsWatched: () => void;
     toggleIsFavorited: () => void;
+    updateTagsFilter: (
+      tagType: "include" | "exclude",
+      tagId: string,
+      action: "add" | "remove"
+    ) => void;
+    updateexcludeTagsFilter: (tagId: string, action: "add" | "remove") => void;
   };
 }
 
@@ -64,6 +72,42 @@ const useSettingsStore = create<SettingsStore>()(
             },
           }));
         },
+        updateTagsFilter: (tagType, tagId, action) => {
+          // Set tag type
+          let tagTypeKey: keyof SettingsStore["filterCriteria"] = "includeTags";
+          let tagTypeInverseKey: keyof SettingsStore["filterCriteria"] = "excludeTags";
+          if (tagType === "exclude") {
+            tagTypeKey = "excludeTags";
+            tagTypeInverseKey = "includeTags";
+          }
+          /**Maybe a function that we pass in tag type and it removes for inverse
+           * Then another to add it existing
+           * both functions return a new list that we set at end of this function
+           */
+          let currTagsList = [...(get().filterCriteria?.[tagTypeKey] || [])];
+
+          let newTagsList: string[] = [];
+
+          //Make sure tagType's inverse doesn't include the tagId (whether adding or removing,
+          // this tag should NEVER exist in the other bucket (include/exclude))
+          let newInverseTags = [
+            ...(get().filterCriteria?.[tagTypeInverseKey] || []).filter((el) => el !== tagId),
+          ];
+
+          if (action === "add") {
+            newTagsList = Array.from(new Set([...currTagsList, tagId]));
+          } else if (action === "remove") {
+            newTagsList = currTagsList.filter((el) => el !== tagId);
+          }
+          set((state) => ({
+            filterCriteria: {
+              ...state.filterCriteria,
+              [tagTypeKey]: newTagsList,
+              [tagTypeInverseKey]: newInverseTags,
+            },
+          }));
+        },
+        updateexcludeTagsFilter: (tagId, action) => {},
       },
     }),
     {

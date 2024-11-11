@@ -17,13 +17,13 @@ export type Positions = {
  * @template T
  * @param {Positions} positions - provided by the DragDropEntry component in the updatePositions function
  * @param {T[]} baseArray - array that you want "resorted"
- * @param { positionField?: string; idField: string } - optional position field name,
+ * @param { positionField?: string; idField?: string } - optional position field name,
  *            idField is the name of the id field.  Not options, but defaults to "id" if not passed.
  */
 export function sortArray<T>(
   positions: Positions,
   baseArray: T[],
-  { positionField, idField = "id" }: { positionField?: string; idField: string }
+  { positionField, idField = "id" }: { positionField?: string; idField?: string }
 ) {
   if (Object.keys(positions).length < 1) {
     return [];
@@ -51,7 +51,7 @@ export function sortArray<T>(
     }
     return arrayItem;
   });
-  return finalList;
+  return finalList.filter((el): el is T => el !== undefined);
 }
 
 /**
@@ -66,9 +66,6 @@ export function sortArray<T>(
  * @param {T[]} baseArray
  * @param {string} positionField
  */
-export function updatePositionArrayField<T>(
-  baseArray: T[],
-  positionField: string
-): T[] {
+export function updatePositionArrayField<T>(baseArray: T[], positionField: string): T[] {
   return baseArray.map((item, idx) => ({ ...item, [positionField]: idx }));
 }

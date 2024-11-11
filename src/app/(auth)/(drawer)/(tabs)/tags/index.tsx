@@ -3,9 +3,9 @@ import React, { useReducer, useState } from "react";
 import { Link, Stack } from "expo-router";
 import { useTheme } from "@react-navigation/native";
 import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle";
-import TagContainer from "@/components/tags/TagContainer";
+import TagMaintContainer from "@/components/tagMaintenance/TagMaintContainer";
 import { PlusCircle } from "@/lib/icons/PlusCircle";
-import TagTest from "@/components/tags/TagTest";
+import TagTest from "@/components/tagMaintenance/TagTest";
 
 const TagRoute = () => {
   const { colors } = useTheme();
@@ -14,13 +14,14 @@ const TagRoute = () => {
     <View className="flex-1">
       <Stack.Screen
         options={{
+          title: "Tags",
           headerShown: true,
           headerLeft: () => <NestedStackDrawerToggle />,
         }}
       />
 
       {/* <TagTest /> */}
-      <TagContainer />
+      <TagMaintContainer />
     </View>
   );
 };

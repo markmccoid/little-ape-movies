@@ -55,6 +55,15 @@ const DragDropEntry = ({
   //*Scrollview animated ref
   const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
   // const positions = useSharedValue<Positions>({});
+  const [positionsState, setPositionState] = React.useState<Positions>(
+    Object.assign(
+      {},
+      ...React.Children.map(children, (child, idx) => ({
+        [`${child.props.id}`]: idx,
+      }))
+    )
+  );
+  //!!! Does this need to be a shared value???
   const positions = useSharedValue<Positions>(
     Object.assign(
       {},
@@ -70,13 +79,24 @@ const DragDropEntry = ({
   });
 
   const numberOfItems = React.useMemo(() => React.Children.count(children), [children]);
-
   React.useEffect(() => {
     positions.value = Object.assign(
       {},
       ...React.Children.map(children, (child, idx) => ({
         [`${child.props.id}`]: idx,
       }))
+    );
+    // console.log("IN UEFF", positions.value);
+  }, [children]);
+  //!! PositionState
+  React.useEffect(() => {
+    setPositionState(
+      Object.assign(
+        {},
+        ...React.Children.map(children, (child, idx) => ({
+          [`${child.props.id}`]: idx,
+        }))
+      )
     );
   }, [children]);
 
@@ -135,6 +155,8 @@ const DragDropEntry = ({
           enableDragIndicator={enableDragIndicator}
           dragIndicator={dragIndicator}
           dragIndicatorConfig={dragIndicatorConfig}
+          positionState={positionsState}
+          setPositionState={setPositionState}
         >
           {child}
         </MoveableItem>
@@ -144,22 +166,22 @@ const DragDropEntry = ({
   });
 
   return (
-    <PositionsProvider positions={positions}>
-      <Animated.ScrollView
-        ref={scrollViewRef}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        style={scrollStyles}
-        onLayout={(e) => {
-          setContainerHeight(e.nativeEvent.layout.height);
-        }}
-        contentContainerStyle={{
-          height: numberOfItems * itemHeight,
-        }}
-      >
-        {moveableItems}
-      </Animated.ScrollView>
-    </PositionsProvider>
+    // <PositionsProvider positions={positions}>
+    <Animated.ScrollView
+      ref={scrollViewRef}
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
+      style={scrollStyles}
+      onLayout={(e) => {
+        setContainerHeight(e.nativeEvent.layout.height);
+      }}
+      contentContainerStyle={{
+        height: numberOfItems * itemHeight,
+      }}
+    >
+      {moveableItems}
+    </Animated.ScrollView>
+    // </PositionsProvider>
   );
 };
 
