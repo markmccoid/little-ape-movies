@@ -9,7 +9,8 @@ type Events =
   | "TAG_SEARCH_RESULTS"
   | "CLEAR_SEARCH_STORES"
   | "GET_SHOW_COLORS"
-  | "UPDATE_SHOW_PROVIDERS";
+  | "UPDATE_SHOW_PROVIDERS"
+  | "GENERATE_GENRES_ARRAY";
 class EventBus {
   private listeners: { [event: string]: Listener[] } = {};
   // Subscribe is like "on"  This is where we setup what we are going to do

@@ -40,6 +40,7 @@ export type Tag = {
 export interface MovieStore {
   shows: ShowItemType[];
   tagArray: Tag[];
+  genreArray: string[];
   // Updated with on the providers stored on shows, updated via "UPDATE_SHOW_PROVIDERS" event bus call.
   streamingProviders: ProviderInfo[];
   actions: {
@@ -60,6 +61,7 @@ export interface MovieStore {
 const movieInitialState = {
   shows: [],
   tagArray: [],
+  genreArray: [],
   streamingProviders: [],
 };
 const useMovieStore = create<MovieStore>()(
@@ -98,6 +100,7 @@ const useMovieStore = create<MovieStore>()(
           eventBus.publish("UPDATE_SHOW_PROVIDERS", show.id);
           eventBus.publish("TAG_SEARCH_RESULTS");
           eventBus.publish("GET_SHOW_COLORS", newShow.id, newShow?.posterURL);
+          eventBus.publish("GENERATE_GENRES_ARRAY");
         },
         //~ ---------------------------------
         //~ updateShow
@@ -243,8 +246,14 @@ export const useMovieActions = () => {
 //~~  Returns the movies to show on the main screen based on the settings
 //~~ ------------------------------------------------------------
 export const useMovies = () => {
-  const { filterIsFavorited, filterIsWatched, includeTags, excludeTags, includeGenres } =
-    useSettingsStore((state) => state.filterCriteria);
+  const {
+    filterIsFavorited,
+    filterIsWatched,
+    includeTags,
+    excludeTags,
+    includeGenres,
+    excludeGenres,
+  } = useSettingsStore((state) => state.filterCriteria);
   const movies = useMovieStore((state) => state.shows);
 
   let filteredMovies: ShowItemType[] = [];
@@ -272,12 +281,6 @@ export const useMovies = () => {
     }
     // Exclude Tags
     if (Array.isArray(excludeTags) && excludeTags?.length > 0) {
-      console.log(
-        "ExcludeTag",
-        excludeTags,
-        movie.tags,
-        !excludeTags.some((tag) => movie.tags.includes(tag))
-      );
       // EVERY excludeTag is present in the movie's tags
       if (excludeTags.some((tag) => movie.tags.includes(tag))) {
         continue;
@@ -287,6 +290,13 @@ export const useMovies = () => {
     // Genres
     if (Array.isArray(includeGenres) && includeGenres?.length > 0) {
       if (!includeGenres.every((genre) => movie.genres.includes(genre))) {
+        continue;
+      }
+    }
+    // Exclude Genres
+    if (Array.isArray(excludeGenres) && excludeGenres?.length > 0) {
+      // EVERY excludeTag is present in the movie's tags
+      if (excludeGenres.some((genre) => movie.genres.includes(genre))) {
         continue;
       }
     }

@@ -1,7 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { eventBus } from "./eventBus";
 import { movieGetWatchProviders, WatchProvidersType } from "@markmccoid/tmdb_api";
-import useMovieStore from "./store.shows";
+import useMovieStore, { useMovies } from "./store.shows";
 import { getImageColors } from "@/utils/color.utils";
 
 //~~ -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -47,14 +47,26 @@ const createUpdateShowProviders = (queryClient: QueryClient) => async (showId: n
 export const setupEvents = (queryClient: QueryClient) => {
   //- Create updateShowProviders function (needs queryClient)
   const updateShowProviders = createUpdateShowProviders(queryClient);
+  //~~ ------------------------------
   //~~ Subscribe UPDATE_SHOW_PROVIDERS
   eventBus.subscribe("UPDATE_SHOW_PROVIDERS", updateShowProviders);
 
+  //~~ ------------------------------
   //~~ Subscribe GET_SHOW_COLORS
   eventBus.subscribe("GET_SHOW_COLORS", async (movieId: number, posterURL) => {
     // console.log("EVENT BUS", movieId, posterURL)
     const imageColors = await getImageColors(posterURL);
     // console.log("IMAGE COL gotten");
     useMovieStore.getState().actions.updateShow(movieId, { posterColors: imageColors });
+  });
+
+  //~~ ------------------------------
+  //~~ Subscribe GENERATE_GENRES_ARRAY
+  // Called on Add Show and on App intialize
+  eventBus.subscribe("GENERATE_GENRES_ARRAY", () => {
+    const genres = Array.from(
+      new Set(useMovieStore.getState().shows.flatMap((show) => show.genres))
+    );
+    useMovieStore.setState({ genreArray: genres });
   });
 };

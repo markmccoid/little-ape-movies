@@ -26,6 +26,8 @@ const MDMovieRecommendations = ({ movieId }: Props) => {
                 spacing={{ bottomMargin: 10, extraHeight: 20 }}
                 onAddMovie={movieActions.addShow}
                 onRemoveMovie={movieActions.removeShow}
+                isMovieLoading={false}
+                setIsMovieLoading={() => {}}
               />
             </View>
           );

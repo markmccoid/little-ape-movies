@@ -20,6 +20,7 @@ import { initTMDB } from "@markmccoid/tmdb_api";
 import { setupEvents } from "../store/events";
 
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
+import { eventBus } from "@/store/eventBus";
 
 // This is the default configuration
 configureReanimatedLogger({
@@ -67,6 +68,7 @@ const InitialLayout = () => {
 
       //Setup Event Bus Events
       setupEvents(queryClient);
+      eventBus.publish("GENERATE_GENRES_ARRAY");
       setInitialized(true);
     };
     mainInit();

@@ -15,6 +15,7 @@ interface SettingsStore {
     includeTags?: string[];
     excludeTags?: string[];
     includeGenres?: string[];
+    excludeGenres?: string[];
   };
   actions: {
     toggleSearchColumns: () => void;
@@ -25,7 +26,12 @@ interface SettingsStore {
       tagId: string,
       action: "add" | "remove"
     ) => void;
-    updateexcludeTagsFilter: (tagId: string, action: "add" | "remove") => void;
+    updateGenresFilter: (
+      genreType: "include" | "exclude",
+      genre: string,
+      action: "add" | "remove"
+    ) => void;
+    clearFilters: (filter: "Tags" | "Genres" | "all") => void;
   };
 }
 
@@ -72,6 +78,10 @@ const useSettingsStore = create<SettingsStore>()(
             },
           }));
         },
+        /**Function handles setting both the include and exclude tags
+         * It makes sure that if a tag is added to either include or exclude
+         * that is will NOT exist in the other (invervse)
+         */
         updateTagsFilter: (tagType, tagId, action) => {
           // Set tag type
           let tagTypeKey: keyof SettingsStore["filterCriteria"] = "includeTags";
@@ -80,10 +90,7 @@ const useSettingsStore = create<SettingsStore>()(
             tagTypeKey = "excludeTags";
             tagTypeInverseKey = "includeTags";
           }
-          /**Maybe a function that we pass in tag type and it removes for inverse
-           * Then another to add it existing
-           * both functions return a new list that we set at end of this function
-           */
+
           let currTagsList = [...(get().filterCriteria?.[tagTypeKey] || [])];
 
           let newTagsList: string[] = [];
@@ -107,7 +114,52 @@ const useSettingsStore = create<SettingsStore>()(
             },
           }));
         },
-        updateexcludeTagsFilter: (tagId, action) => {},
+        updateGenresFilter: (genreType, genre, action) => {
+          // Set tag type
+          let genreTypeKey: keyof SettingsStore["filterCriteria"] = "includeGenres";
+          let genreTypeInverseKey: keyof SettingsStore["filterCriteria"] = "excludeGenres";
+          if (genreType === "exclude") {
+            genreTypeKey = "excludeGenres";
+            genreTypeInverseKey = "includeGenres";
+          }
+
+          let currGenresList = [...(get().filterCriteria?.[genreTypeKey] || [])];
+
+          let newGenresList: string[] = [];
+
+          //Make sure genreType's inverse doesn't include the passed genre (whether adding or removing,
+          // this genre should NEVER exist in the other bucket (include/exclude))
+          let newInverseTags = [
+            ...(get().filterCriteria?.[genreTypeInverseKey] || []).filter((el) => el !== genre),
+          ];
+
+          if (action === "add") {
+            newGenresList = Array.from(new Set([...currGenresList, genre]));
+          } else if (action === "remove") {
+            newGenresList = currGenresList.filter((el) => el !== genre);
+          }
+          set((state) => ({
+            filterCriteria: {
+              ...state.filterCriteria,
+              [genreTypeKey]: newGenresList,
+              [genreTypeInverseKey]: newInverseTags,
+            },
+          }));
+          // console.log("GENRES", get().filterCriteria.includeGenres);
+        },
+        clearFilters: (filter) => {
+          if (filter === "all") {
+            set({
+              filterCriteria: {},
+            });
+            return;
+          }
+          const includeFilter = `include${filter}`;
+          const excludeFilter = `exclude${filter}`;
+          set((state) => ({
+            filterCriteria: { ...state.filterCriteria, [includeFilter]: [], [excludeFilter]: [] },
+          }));
+        },
       },
     }),
     {

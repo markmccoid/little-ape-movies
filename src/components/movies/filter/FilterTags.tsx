@@ -1,9 +1,8 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import React from "react";
-import useMovieStore, { Tag } from "@/store/store.shows";
-import TagCloud, { TagItem } from "@/components/common/TagCloud/TagCloud";
 import useSettingsStore, { useSettingsActions } from "@/store/store.settings";
 import useFilterTags from "./useFilterTags";
+import { Text } from "@/components/ui/text";
 import TagCloudEnhanced, {
   TagItem as TagItemEnhanced,
 } from "@/components/common/TagCloud/TagCloudEnhanced";
@@ -65,7 +64,6 @@ const FilterTags = () => {
   };
   return (
     <View>
-      <Text>FilterTags</Text>
       <TagCloudEnhanced>
         {mergedTags.map((tag) => (
           <TagItemEnhanced

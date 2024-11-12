@@ -72,7 +72,7 @@ const SearchResult = ({
 
     // Set loading state to true
     setIsMovieLoading(true);
-
+    console.log("MOVIE TO VIEW", `${linkPath}${movie.id}`);
     try {
       // delay so
       await new Promise((resolve) => setTimeout(resolve, 0));
