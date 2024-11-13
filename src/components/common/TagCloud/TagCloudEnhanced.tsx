@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useReducer, useState } from "react";
 import { View, Text, LayoutAnimation, TouchableOpacity, Pressable } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useCustomTheme } from "@/lib/colorThemes";
@@ -7,16 +7,58 @@ import { UnTagIcon } from "../Icons";
 type Props = {
   tagId: string;
   state: "off" | "include" | "exclude";
-  onToggleTag: (tagId: string) => void;
+  onToggleTag: (tagId: string) => Promise<void>;
   onLongPress?: (tagId: string) => void;
   tagName: string;
   size: string;
+  type: "boolean" | "threestate";
 };
-
-export const TagItem = ({ tagId, state, onToggleTag, onLongPress, tagName, size = "s" }: Props) => {
+const cycleState = (state: Props["state"], type: Props["type"]): Props["state"] => {
+  switch (state) {
+    case "include":
+      if (type === "boolean") {
+        return "off";
+      }
+      return "exclude";
+    case "exclude":
+      return "off";
+    case "off":
+      return "include";
+    default:
+      return "off";
+  }
+};
+export const TagItem = ({
+  tagId,
+  state,
+  onToggleTag,
+  onLongPress,
+  tagName,
+  size = "s",
+  type = "threestate",
+}: Props) => {
   const { colors } = useCustomTheme();
-  const bgColor = state === "include" ? "green" : state === "exclude" ? colors.deleteRed : "white";
-  const fgColor = state === "exclude" ? "white" : "black";
+  const [localState, setLocalState] = useState(state);
+  const bgColor =
+    localState === "include" ? "green" : localState === "exclude" ? colors.deleteRed : "white";
+  const fgColor = localState === "exclude" ? "white" : "black";
+
+  // Using localState so updates are optimistic
+  React.useEffect(() => {
+    setLocalState(state);
+  }, [state]);
+
+  const handleStateChange = async (tagId: string) => {
+    const prevState = localState;
+    setLocalState(cycleState(localState, type));
+    try {
+      await onToggleTag(tagId);
+    } catch (error) {
+      console.log("Error setting Genre Tag");
+      setLocalState(prevState);
+    }
+  };
+
   return (
     <TouchableOpacity
       onLongPress={onLongPress ? () => onLongPress(tagId) : undefined}
@@ -24,7 +66,8 @@ export const TagItem = ({ tagId, state, onToggleTag, onLongPress, tagName, size 
       className="border border-border py-[5] px-[7] m-[5] text-center"
       style={{ backgroundColor: bgColor, borderRadius: 10 }}
       key={tagId}
-      onPress={() => onToggleTag(tagId)}
+      onPress={() => handleStateChange(tagId)}
+      // onPress={() => onToggleTag(tagId)}
       //isSelected={isSelected} //used in styled components
     >
       <View className="flex-row items-center">
@@ -33,11 +76,11 @@ export const TagItem = ({ tagId, state, onToggleTag, onLongPress, tagName, size 
         ) : (
           <AntDesign
             style={{ paddingRight: 5 }}
-            name={state !== "off" ? "tag" : "tago"}
+            name={localState !== "off" ? "tag" : "tago"}
             size={size === "s" ? 15 : 20}
           />
         )}
-        <Text className="" style={{ fontSize: 12, color: fgColor }}>
+        <Text className="" style={{ color: fgColor }}>
           {tagName}
         </Text>
       </View>

@@ -25,7 +25,7 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
   //type DetailTags = (typeof movieTags)[number]
   // const [localTags, setLocalTags] = useState<DetailTags[]>(movieTags)
 
-  const handleToggleTag = (currState: "include" | "off") => (tagId: string) => {
+  const handleToggleTag = (currState: "include" | "off") => async (tagId: string) => {
     if (!storedMovie?.id) return;
     if (currState === "include") {
       actions.updateShowTags(storedMovie?.id, tagId, "remove");
@@ -45,6 +45,7 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
             tagId={el?.id}
             tagName={el?.name}
             key={el?.id}
+            type="boolean"
           />
         ))}
       </TagCloudEnhanced>

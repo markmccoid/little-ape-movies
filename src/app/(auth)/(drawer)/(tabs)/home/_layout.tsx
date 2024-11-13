@@ -13,7 +13,7 @@ const HomeLayout = () => {
         options={{ headerShown: true, headerTransparent: false, title: "" }}
       />
       {/* <Stack.Screen name="[showId]" options={{ headerTransparent: true, title: "" }} /> */}
-      <Stack.Screen name="filtermodal" options={{ presentation: "modal" }} />
+      <Stack.Screen name="filtermodal" options={{ presentation: "modal", headerShown: false }} />
     </Stack>
   );
 };

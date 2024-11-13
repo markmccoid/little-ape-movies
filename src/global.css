@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+
   --background: 262 50% 95%;
   --foreground: 224 71.4% 4.1%;
   --muted: 220 14.3% 95.9%;
@@ -23,9 +24,8 @@
   --destructive-foreground: 210 20% 98%;
   --ring: 262.1 83.3% 57.8%;
   --radius: 0.5rem;
-  --color-textinput: #dfdfdf;
-  --color-card: #fbfbfe;
-  --color-card-inverted: #010104;
+  /* CUSTOM Below */
+  
   --color-imdb-yellow: "#ECC233";
   --color-selected: "#90ee90";
 }
@@ -50,6 +50,9 @@
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 210 20% 98%;
   --ring: 263.4 70% 50.4%;
+  /* CUSTOM Below */
+  
+  --color-imdb-yellow: "#ECC233";
   --color-selected: "#90ee90";
 }
 

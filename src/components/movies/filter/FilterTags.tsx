@@ -36,7 +36,7 @@ const FilterTags = () => {
   // console.log("Merged", mergedTags);
   // Extract the type of the `state` property within each item of `mergedTags`
   type MergedTagState = (typeof mergedTags)[number]["state"];
-  const handleTagSelect = (tagState: MergedTagState) => (tagId: string) => {
+  const handleTagSelect = (tagState: MergedTagState) => async (tagId: string) => {
     // include -> exclude -> off
     if (tagState === "include") {
       actions.updateTagsFilter("exclude", tagId, "add");
@@ -74,6 +74,7 @@ const FilterTags = () => {
             state={tag.state}
             onToggleTag={handleTagSelect(tag.state)}
             onLongPress={handleLongPress(tag.state)}
+            type="threestate"
           />
         ))}
       </TagCloudEnhanced>

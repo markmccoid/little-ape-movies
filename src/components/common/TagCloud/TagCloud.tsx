@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 // import PropTypes from "prop-types";
 import { View, Text, LayoutAnimation, TouchableOpacity } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
@@ -12,6 +12,7 @@ type Props = {
   tagName: string;
   size: string;
 };
+
 export const TagItem = ({
   tagId,
   isSelected,
@@ -21,23 +22,36 @@ export const TagItem = ({
   size = "m",
 }: Props) => {
   const { colors } = useCustomTheme();
+  const [localState, setLocalState] = useState(isSelected);
+
+  useEffect(() => {
+    setLocalState(isSelected);
+  }, [isSelected]);
+
+  const handleSelect = (tagId: string) => {
+    if (isSelected) {
+      setLocalState(false);
+      onDeSelectTag(tagId);
+    } else {
+      setLocalState(true);
+      onSelectTag(tagId);
+    }
+  };
   return (
     <TouchableOpacity
       className="border border-border py-[5] px-[7] m-[5] text-center"
-      style={{ backgroundColor: isSelected ? "green" : "white", borderRadius: 10 }}
+      style={{ backgroundColor: localState ? "green" : "white", borderRadius: 10 }}
       key={tagId}
-      onPress={() => (isSelected ? onDeSelectTag(tagId) : onSelectTag(tagId))}
+      onPress={() => handleSelect(tagId)}
       //isSelected={isSelected} //used in styled components
     >
       <View className="flex-row items-center">
         <AntDesign
           style={{ paddingRight: 5 }}
-          name={isSelected ? "tag" : "tago"}
+          name={localState ? "tag" : "tago"}
           size={size === "s" ? 15 : 20}
         />
-        <Text className="" style={{ fontSize: 12 }}>
-          {tagName}
-        </Text>
+        <Text>{tagName}</Text>
       </View>
     </TouchableOpacity>
   );

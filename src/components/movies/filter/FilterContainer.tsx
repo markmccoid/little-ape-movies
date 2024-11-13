@@ -60,12 +60,15 @@ const FilterContainer = () => {
 
         <View className="flex-row">
           <Checkbox
+            aria-labelledby="favorited"
             checked={!!filterCriteria?.filterIsFavorited}
             onCheckedChange={(checked) => {
               filterActions.toggleIsFavorited();
             }}
           />
-          <Text className="ml-1">Favorited</Text>
+          <Label className="ml-1" nativeID="favorited">
+            Favorited
+          </Label>
         </View>
       </View>
       {/* Tag Selection */}

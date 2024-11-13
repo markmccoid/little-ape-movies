@@ -13,12 +13,10 @@ module.exports = {
       colors: {
         primary: {
           DEFAULT: "hsl(var(--primary))", // RNR Colors
-          // light: "var(--color-primary-light)", // Keep this as it's not in RNR Colors
           foreground: "hsl(var(--primary-foreground))", // RNR Colors
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))", // RNR Colors
-          // light: "var(--color-secondary-light)", // Keep this as it's not in RNR Colors
           foreground: "hsl(var(--secondary-foreground))", // RNR Colors
         },
         background: {
@@ -28,21 +26,11 @@ module.exports = {
           DEFAULT: "hsl(var(--accent))", // RNR Colors (takes precedence)
           foreground: "hsl(var(--accent-foreground))", // RNR Colors
         },
-        // text: {
-        //   DEFAULT: "var(--color-text)", // Keep this as it's not in RNR Colors
-        //   inverted: "var(--color-text-inverted)", // Keep this as it's not in RNR Colors
-        // },
-        // textinput: {
-        //   DEFAULT: "var(--color-textinput)", // Keep this as it's not in RNR Colors
-        // },
         card: {
           DEFAULT: "hsl(var(--card))", // RNR Colors (takes precedence)
-          // inverted: "var(--color-card-inverted)", // Keep this as it's not in RNR Colors
           foreground: "hsl(var(--card-foreground))", // RNR Colors
         },
         border: "hsl(var(--border))", // RNR Colors (takes precedence)
-        // button: "var(--color-button)", // Keep this as it's not in RNR Colors
-        // buttontext: "var(--color-button-text)", // Keep this as it's not in RNR Colors
         selected: "var(--color-selected)", // Keep this as it's not in RNR Colors
         overlay: "var(--color-overlay)", // Keep this as it's not in RNR Colors
         imdbyellow: "var(--color-imdb-yellow)", // Keep this as it's not in RNR Colors
