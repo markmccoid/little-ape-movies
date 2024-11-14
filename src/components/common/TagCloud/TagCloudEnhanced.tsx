@@ -80,7 +80,7 @@ export const TagItem = ({
             size={size === "s" ? 15 : 20}
           />
         )}
-        <Text className="" style={{ color: fgColor }}>
+        <Text className="" style={{ fontSize: 15, color: fgColor }}>
           {tagName}
         </Text>
       </View>

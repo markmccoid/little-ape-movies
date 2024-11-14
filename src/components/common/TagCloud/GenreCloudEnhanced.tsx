@@ -72,7 +72,7 @@ export const GenreItem = ({
           size={size === "s" ? 22 : 30}
           tintColor={localState === "exclude" ? "white" : "black"}
         />
-        <Text className="pl-1" style={{ color: fgColor }}>
+        <Text className="pl-1" style={{ fontSize: 15, color: fgColor }}>
           {tagName}
         </Text>
       </View>

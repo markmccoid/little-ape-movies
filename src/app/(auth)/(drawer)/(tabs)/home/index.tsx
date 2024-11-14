@@ -26,7 +26,7 @@ const Page = () => {
           title: `Movies-${currUser}`,
           headerLeft: () => <NestedStackDrawerToggle />,
           headerRight: () => (
-            <Link href="./home/filtermodal">
+            <Link href="./home/filtermodal" className="py-1 px-2 mr-[-7]">
               <FilterIcon color={colors.primary} />
             </Link>
           ),
