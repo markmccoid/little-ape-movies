@@ -77,7 +77,13 @@ const SearchResult = ({
       // delay so
       await new Promise((resolve) => setTimeout(resolve, 0));
       // Navigate to the movie's detail page
-      router.push(`${linkPath}${movie.id}`);
+      // router.navigate(`${linkPath}${movie.id}`, {params: {movieId: }});
+      router.push({
+        pathname: `${linkPath}[showId]`,
+        params: { showId: movie.id },
+      });
+      // router.push(`${linkPath}${movie.id}`, { relativeToDirectory: true });
+      // router.push(`${linkPath}${movie.id}`, {relativeToDirectory: true});
     } catch (error) {
       // Reset loading state after navigation completes
       console.log("Error navigating to movie detail (SearchResult.tsx)");

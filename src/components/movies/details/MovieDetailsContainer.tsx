@@ -14,8 +14,6 @@ import { MovieDetails, useMovieDetailData, useOMDBData } from "@/store/dataHooks
 import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradient } from "expo-linear-gradient";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
-import { AddIcon, BackIcon, DeleteIcon } from "@/components/common/Icons";
-import showConfirmationPrompt from "@/components/common/showConfirmationPrompt";
 import useMovieStore, { MovieStore, ShowItemType, useMovieActions } from "@/store/store.shows";
 import { movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
 import MDImageDescRow from "./MDImageDescRow";
@@ -30,7 +28,6 @@ import useImageSize from "@/hooks/useImageSize";
 import MDRatings from "./MDRatings";
 import MDMovieVideos from "./MDMovieVideos";
 import MDMovieCast from "./cast/MDMovieCast";
-import { store } from "expo-router/build/global-state/router-store";
 import { eventBus } from "@/store/eventBus";
 import MDDeleteButton from "./MDButtonDelete";
 import MDButtonAdd from "./MDButtonAdd";
@@ -45,7 +42,6 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   //!!
   const { colors } = useCustomTheme();
   const colorScheme = useColorScheme();
-  const [movieAdding, setMovieAdding] = useState(false);
   const navigation = useNavigation();
   const router = useRouter();
   const headerHeight = useHeaderHeight();
@@ -96,14 +92,14 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
     const options: NativeStackNavigationOptions = {
       title: movieTitle || "", //storedMovie?.title || movieDetails?.title || "",
       headerRight: existsInSaved ? HeaderRight : HeaderRightAdd,
-      // headerLeft: () => (
-      //   <Pressable onPress={() => router.back()} className="ml-[-8]">
-      //     <View className="flex-row items-center">
-      //       <SymbolView name="chevron.backward" />
-      //       <Text className="text-lg ">Back</Text>
-      //     </View>
-      //   </Pressable>
-      // ),
+      headerLeft: () => (
+        <Pressable onPress={() => router.back()} className="ml-[-8]">
+          <View className="flex-row items-center">
+            <SymbolView name="chevron.backward" />
+            <Text className="text-lg ">Back</Text>
+          </View>
+        </Pressable>
+      ),
     };
     navigation.setOptions(options);
   }, [movieId, existsInSaved, movieTitle, isLoading, colorScheme]);

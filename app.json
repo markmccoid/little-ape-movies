@@ -32,6 +32,7 @@
       "expo-font",
       "expo-secure-store"
     ],
+    "newArchEnabled": true,
     "name": "little-ape-movies",
     "slug": "little-ape-movies",
     "experiments": {

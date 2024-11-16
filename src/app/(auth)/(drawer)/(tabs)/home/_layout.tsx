@@ -9,7 +9,7 @@ const HomeLayout = () => {
     <Stack screenOptions={{}}>
       <Stack.Screen name="index" options={{ headerStyle: { backgroundColor: colors.card } }} />
       <Stack.Screen
-        name="[showIdHome]"
+        name="[showId]"
         options={{ headerShown: true, headerTransparent: false, title: "" }}
       />
       {/* <Stack.Screen name="[showId]" options={{ headerTransparent: true, title: "" }} /> */}
