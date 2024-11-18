@@ -3,19 +3,22 @@ import React from "react";
 import { Link, useGlobalSearchParams, useRouter } from "expo-router";
 
 const TestRoute = () => {
-  const { test, parm2, parm3 } = useGlobalSearchParams();
+  const { testId, parm2, parm3 } = useGlobalSearchParams();
   const router = useRouter();
+  const generateRandomNumber = () => {
+    return Math.floor(Math.random() * 100) + 1;
+  };
   return (
     <View>
       <Text>
-        TestRoute - {test} = {parm3} - {parm2}
+        TestRoute - {testId} = {parm3} - {parm2}
       </Text>
 
       <TouchableOpacity
         onPress={() =>
-          router.replace({
-            pathname: "/[test]?parm3=x&parm2=whup",
-            params: { test: "next" },
+          router.push({
+            pathname: "/[testId]",
+            params: { testId: `next-${generateRandomNumber()}` },
           })
         }
       >

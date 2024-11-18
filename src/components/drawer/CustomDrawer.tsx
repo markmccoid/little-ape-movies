@@ -1,14 +1,15 @@
 import React from "react";
-import { View, StyleSheet, SafeAreaView } from "react-native";
+import { View, StyleSheet, SafeAreaView, Pressable } from "react-native";
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
   DrawerItem,
   DrawerItemList,
 } from "@react-navigation/drawer";
+import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "@/providers/AuthProvider";
 import { SymbolView } from "expo-symbols";
-import { Link, useNavigation, usePathname, useRouter } from "expo-router";
+import { Link, usePathname, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCustomTheme } from "@/lib/colorThemes";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -19,7 +20,9 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
   const { colors } = useCustomTheme();
+  const router = useRouter();
 
+  const navigation = props.navigation;
   return (
     <View className="flex-1 bg-secondary">
       {/* HEADER */}
@@ -36,11 +39,15 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       </View>
       {/* HOME and SETTINGS Links */}
       <View className="bg-card">
-        <Link href="/home" className="mt-2 mx-2">
-          <View
-            className={`px-[10] py-[5] bg-card flex-row items-center gap-3 rounded-lg w-full`}
-            style={{ margin: 10 }}
-          >
+        <Pressable
+          onPress={async () => {
+            router.replace("./home");
+            await new Promise((resolve) => setTimeout(() => resolve("done"), 100));
+            navigation.closeDrawer();
+          }}
+          className={`px-[10] py-[5] bg-card  w-full`}
+        >
+          <View className="flex-row items-center gap-3 rounded-lg" style={{ margin: 10 }}>
             <SymbolView
               name="house"
               size={20}
@@ -51,7 +58,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
             <Text className="text-lg ">Home</Text>
             {/* {pathname === "/home" && <CheckSquareIcon />} */}
           </View>
-        </Link>
+        </Pressable>
+
         {/* Divider Line */}
         <View className="w-full border-b-hairline" />
 

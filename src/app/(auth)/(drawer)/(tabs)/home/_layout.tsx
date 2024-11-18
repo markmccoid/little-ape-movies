@@ -11,6 +11,7 @@ const HomeLayout = () => {
       <Stack.Screen
         name="[showId]"
         options={{ headerShown: true, headerTransparent: false, title: "" }}
+        getId={({ params }) => params.showId}
       />
       {/* <Stack.Screen name="[showId]" options={{ headerTransparent: true, title: "" }} /> */}
       <Stack.Screen name="filtermodal" options={{ presentation: "modal", headerShown: false }} />

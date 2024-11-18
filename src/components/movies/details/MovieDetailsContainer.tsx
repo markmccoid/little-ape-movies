@@ -32,6 +32,7 @@ import { eventBus } from "@/store/eventBus";
 import MDDeleteButton from "./MDButtonDelete";
 import MDButtonAdd from "./MDButtonAdd";
 import MDTags from "./tagMovies/MDTags";
+import { AnimatePresence, MotiView } from "moti";
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   //!! We need have local state so that we only update component AFTER
@@ -169,13 +170,22 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
             existsInSaved={existsInSaved}
           />
         </View>
-        <View className="my-[2]">
-          <MDTags
-            // movieDetails={finalMovieDetails as MovieDetails}
-            storedMovie={storedMovie}
-            existsInSaved={existsInSaved}
-          />
-        </View>
+
+        {storedMovie?.id && (
+          <MotiView
+            key={storedMovie?.id}
+            from={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ type: "timing", duration: 1000 }}
+            className="my-[2]"
+          >
+            <MDTags
+              // movieDetails={finalMovieDetails as MovieDetails}
+              storedMovie={storedMovie}
+              existsInSaved={existsInSaved}
+            />
+          </MotiView>
+        )}
         {/* WHERE TO WATCH */}
         <View className="my-[2]">
           <HiddenContainerWatchProviders title="Where to Watch" movieId={movieId} height={85}>

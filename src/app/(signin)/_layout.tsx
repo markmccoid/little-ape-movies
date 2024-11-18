@@ -16,7 +16,11 @@ const SignInLayout = () => {
       }}
     >
       <Stack.Screen name="index" options={{ title: "Little Ape Movies" }} />
-      <Stack.Screen name="[test]" options={{ title: "TestStack" }} />
+      <Stack.Screen
+        name="[testId]"
+        options={{ title: "TestStack" }}
+        getId={({ params }) => params.testId}
+      />
     </Stack>
   );
 };

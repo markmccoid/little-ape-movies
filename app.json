@@ -10,9 +10,9 @@
     },
     "icon": "./assets/images/appicon.png",
     "splash": {
-      "image": "./assets/images/StartupScreen.png",
+      "image": "./assets/splashscreen.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "plugins": [
       [
@@ -30,7 +30,15 @@
         }
       ],
       "expo-font",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#000",
+          "image": "./assets/splashscreen.png",
+          "imageWidth": 1284
+        }
+      ]
     ],
     "newArchEnabled": true,
     "name": "little-ape-movies",
