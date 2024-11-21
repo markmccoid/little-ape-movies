@@ -6,6 +6,7 @@ import { eventBus } from "./eventBus";
 import { ImageColors } from "@/utils/color.utils";
 import { reverse, sortBy, unionBy } from "lodash";
 import useSettingsStore from "./store.settings";
+import { useEffect, useState } from "react";
 
 type ShowStreamingProviders = {
   dateAddedEpoch: number;
@@ -54,6 +55,7 @@ export interface MovieStore {
     tagRemove: (tagId: string) => void;
     tagEdit: (tagId: string, newTagName: string) => void;
     tagUpdateOrder: (tags: Tag[]) => void;
+    getShowsTags: (showId: number | undefined) => Pick<Tag, "id" | "name">[] | undefined;
     clearStore: () => void;
   };
 }
@@ -201,6 +203,24 @@ const useMovieStore = create<MovieStore>()(
           set({ tagArray: tags });
         },
         //~ ---------------------------------
+        //~ getShowTags
+        getShowsTags: (showId) => {
+          if (!showId) return;
+          const showTags = get().actions.getShowById(showId)?.tags;
+          if (!showTags) return;
+          const tags = get().tagArray;
+          return showTags
+            .map((showTag) => {
+              const tagInfo = tags.find((el) => el.id === showTag);
+              if (!tagInfo) return;
+              return {
+                id: tagInfo.id,
+                name: tagInfo.name,
+              };
+            })
+            .filter((el): el is Pick<Tag, "id" | "name"> => el !== null && el !== undefined);
+        },
+        //~ ---------------------------------
         //~ clearStore
         clearStore: () => set({ shows: [] }),
       },
@@ -241,6 +261,16 @@ export const useMovieActions = () => {
   return actions;
 };
 
+export const useGetAppliedTags = (showId: number | undefined) => {
+  const { getShowsTags } = useMovieActions();
+  const movies = useMovieStore((state) => state.shows);
+  const [showTags, setShowTags] = useState<Pick<Tag, "id" | "name">[] | undefined>();
+  useEffect(() => {
+    const appliedTags = getShowsTags(showId);
+    setShowTags(appliedTags);
+  }, [showId, movies]);
+  return showTags;
+};
 //~~ ------------------------------------------------------------
 //~~ useMovies
 //~~  Returns the movies to show on the main screen based on the settings

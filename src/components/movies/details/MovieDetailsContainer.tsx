@@ -1,7 +1,5 @@
 import {
   View,
-  Text,
-  TouchableOpacity,
   Image,
   ScrollView,
   useColorScheme,
@@ -31,8 +29,9 @@ import MDMovieCast from "./cast/MDMovieCast";
 import { eventBus } from "@/store/eventBus";
 import MDDeleteButton from "./MDButtonDelete";
 import MDButtonAdd from "./MDButtonAdd";
-import MDTags from "./tagMovies/MDTags";
 import { AnimatePresence, MotiView } from "moti";
+import MDTagsAnim from "./tagMovies/MDTagsAnim";
+import { Text } from "@/components/ui/text";
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   //!! We need have local state so that we only update component AFTER
@@ -93,14 +92,14 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
     const options: NativeStackNavigationOptions = {
       title: movieTitle || "", //storedMovie?.title || movieDetails?.title || "",
       headerRight: existsInSaved ? HeaderRight : HeaderRightAdd,
-      headerLeft: () => (
-        <Pressable onPress={() => router.back()} className="ml-[-8]">
-          <View className="flex-row items-center">
-            <SymbolView name="chevron.backward" />
-            <Text className="text-lg ">Back</Text>
-          </View>
-        </Pressable>
-      ),
+      // headerLeft: () => (
+      //   <Pressable onPress={() => router.back()} className="ml-[-8]">
+      //     <View className="flex-row items-center">
+      //       <SymbolView name="chevron.backward" />
+      //       {/* <Text className="text-lg text-primary font-semibold">Back</Text> */}
+      //     </View>
+      //   </Pressable>
+      // ),
     };
     navigation.setOptions(options);
   }, [movieId, existsInSaved, movieTitle, isLoading, colorScheme]);
@@ -179,7 +178,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
             transition={{ type: "timing", duration: 1000 }}
             className="my-[2]"
           >
-            <MDTags
+            <MDTagsAnim
               // movieDetails={finalMovieDetails as MovieDetails}
               storedMovie={storedMovie}
               existsInSaved={existsInSaved}

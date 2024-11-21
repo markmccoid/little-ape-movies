@@ -15,10 +15,13 @@ import { useCustomTheme } from "@/lib/colorThemes";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { CheckSquareIcon, FilterIcon } from "../common/Icons";
 import { Text } from "@/components/ui/text";
+import Constants from "expo-constants";
+
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const { currentUser, onLogout } = useAuth();
   const insets = useSafeAreaInsets();
-  const pathname = usePathname();
+  const appVersion = Constants.expoConfig?.version;
+
   const { colors } = useCustomTheme();
   const router = useRouter();
 
@@ -26,16 +29,16 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
   return (
     <View className="flex-1 bg-secondary">
       {/* HEADER */}
-      <View
-        className="p-[20] flex-row items-center gap-4 border-b border-border"
-        style={{ marginTop: insets.top }}
-      >
-        <SymbolView
-          name="person.fill"
-          type="palette"
-          colors={[colors.secondaryForeground, colors.secondaryForeground]}
-        />
-        <Text className="text-3xl font-bold">{currentUser}</Text>
+      <View className="flex-col p-[20] border-b border-border ">
+        <View className="flex-row items-center gap-4 " style={{ marginTop: insets.top }}>
+          <SymbolView
+            name="person.fill"
+            type="palette"
+            colors={[colors.secondaryForeground, colors.secondaryForeground]}
+          />
+          <Text className="text-3xl font-bold">{currentUser}</Text>
+        </View>
+        <Text>release {appVersion}</Text>
       </View>
       {/* HOME and SETTINGS Links */}
       <View className="bg-card">
@@ -61,7 +64,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         </Pressable>
 
         {/* Divider Line */}
-        <View className="w-full border-b-hairline" />
+        <View className="w-full border-b-hairline border-border" />
 
         <Link href="/settings" className="m-2  mx-2">
           <View className={`px-[10] py-[5] bg-card flex-row items-center gap-3 w-full rounded-lg`}>
@@ -87,7 +90,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
           <Text className="text-lg ">Saved Filters</Text>
         </View>
       </DrawerContentScrollView>
-      <View style={{ height: insets.bottom + 50 }}>
+      <View style={{ height: insets.bottom + 50 }} className="border-t border-border">
         <TouchableOpacity onPress={onLogout}>
           <View className="h-[50] px-[20] py-[10] flex-row gap-4 items-center">
             <SymbolView
