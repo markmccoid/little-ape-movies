@@ -83,6 +83,9 @@ export const BookmarkPlusIcon = ({ size = 25, color, style }: Props) => {
 export const TagIcon = ({ size = 25, color, style }: Props) => {
   return <FontAwesome name="tags" color={color} size={size} style={style} />;
 };
+export const TagPlusIcon = ({ size = 25, color, style }: Props) => {
+  return <MaterialCommunityIcons name="tag-plus" color={color} size={size} style={style} />;
+};
 
 export const UnTagIcon = ({ size = 25, color, style }: Props) => {
   return <Entypo name="untag" color={color} size={size} style={style} />;

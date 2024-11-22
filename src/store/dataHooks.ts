@@ -122,7 +122,6 @@ export const useMovieDetailData = (movieId: number) => {
     enabled: !!movieId, // Only run query if movieId exists
     // initialData: storedMovie, // Initial data from Zustand
   });
-
   const fetchAdditionalMovieData = async (id: number) => {
     const response = await movieGetDetails(id);
     return response.data as MovieDetails; // Return combined data

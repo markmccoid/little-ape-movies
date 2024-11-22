@@ -12,15 +12,14 @@ type Props = {
   movieDetails: MovieDetails;
   omdbData: OMDBData | undefined;
 };
-
 const MDDetails = ({ movieDetails, omdbData }: Props) => {
   return (
-    <Animated.View className="relative">
+    <View className="">
       <MDBackground />
 
       <View className="flex-row pl-3 pr-2 py-2">
         {/* Left Side Info */}
-        <View className="flex-col w-[50%]">
+        <View className="flex-col">
           <View className="flex-row">
             <Text style={styles.textLabel}>Released:</Text>
             {movieDetails?.id ? (
@@ -31,28 +30,30 @@ const MDDetails = ({ movieDetails, omdbData }: Props) => {
               </View>
             )}
           </View>
-          <View className="flex-row flex-1">
-            <View className="flex-row flex-1">
-              <Text style={styles.textLabel}>Length:</Text>
-              {movieDetails?.id ? (
-                <Text style={styles.textDesc}>
-                  {movieDetails?.runtime && formatTime(movieDetails.runtime).verbose}
-                </Text>
-              ) : (
-                <View className="flex-1 justify-center">
-                  <Skeleton className=" h-3" />
-                </View>
-              )}
-            </View>
 
-            {omdbData ? (
+          <View className="flex-row">
+            <Text style={styles.textLabel}>Length:</Text>
+            {movieDetails?.id ? (
+              <Text style={styles.textDesc}>
+                {movieDetails?.runtime && formatTime(movieDetails.runtime).verbose}
+              </Text>
+            ) : (
+              <View className="flex-1 justify-center">
+                <Skeleton className=" h-3" />
+              </View>
+            )}
+            <Text style={styles.textLabel} className="ml-1">
+              Rated:
+            </Text>
+            {omdbData?.rated ? (
               <Text className="font-semibold ml-1">({omdbData?.rated})</Text>
             ) : (
-              <View className="flex-1 max-w-[35] justify-center">
+              <View className="flex-1 justify-center">
                 <Skeleton className=" h-3" />
               </View>
             )}
           </View>
+
           {movieDetails?.budget !== 0 && (
             <View className="flex-row">
               <Text style={styles.textLabel}>Budget:</Text>
@@ -63,7 +64,7 @@ const MDDetails = ({ movieDetails, omdbData }: Props) => {
           )}
         </View>
         {/* Right Side Info */}
-        <View className="flex-1 ml-4 flex-col">
+        <View className="flex-1 ml-4">
           <Text style={styles.textLabel}>Genres:</Text>
           <View className="flex-row gap-2">
             <Text numberOfLines={2} style={styles.textDesc}>
@@ -72,7 +73,7 @@ const MDDetails = ({ movieDetails, omdbData }: Props) => {
           </View>
         </View>
       </View>
-    </Animated.View>
+    </View>
   );
 };
 
@@ -86,4 +87,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
-export default MDDetails;
+export default React.memo(MDDetails);

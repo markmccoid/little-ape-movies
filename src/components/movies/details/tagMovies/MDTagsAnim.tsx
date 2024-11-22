@@ -13,8 +13,19 @@ import TagCloudEnhanced, {
 } from "@/components/common/TagCloud/TagCloudEnhanced";
 import { AnimatePresence, MotiView } from "moti";
 import { useCustomTheme } from "@/lib/colorThemes";
-import { EditIcon } from "@/components/common/Icons";
-import Animated, { BounceIn, BounceOut, LinearTransition } from "react-native-reanimated";
+import { EditIcon, TagIcon, TagPlusIcon } from "@/components/common/Icons";
+import Animated, {
+  BounceIn,
+  BounceOut,
+  FadeIn,
+  FadeOut,
+  interpolate,
+  LinearTransition,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { Line } from "react-native-svg";
 
 type Props = {
   existsInSaved: boolean;
@@ -30,12 +41,16 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
   const [containerHeight, setContainerHeight] = useState(150);
   const [isMeasured, setIsMeasured] = useState(false);
 
+  const toHeight = useSharedValue(0);
+
   // Measure the size of the "Edit" Tags
   // This is done on a view that is set to opacity zero and abosolute positioning
   // the isMeasured flag lets us HIDE this view once measures AND
   // only show the actual view when the measuring is done.
   const onLayout = (event: LayoutChangeEvent) => {
+    if (isMeasured) return;
     const height = event.nativeEvent.layout.height;
+    toHeight.value = height;
     setContainerHeight(height);
     setIsMeasured(true);
   };
@@ -49,6 +64,18 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
     }
   };
 
+  const tagViewStyle = useAnimatedStyle(() => {
+    if (!showAddTag) {
+      toHeight.value = withTiming(0);
+    } else {
+      toHeight.value = withTiming(containerHeight);
+    }
+
+    return {
+      height: toHeight.value,
+      opacity: interpolate(toHeight.value, [containerHeight, 0], [1, 0]),
+    };
+  });
   return (
     <View className="mx-2">
       {/* This block is to only measure the height then it is not used again */}
@@ -77,15 +104,27 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
         key={1}
         from={{ opacity: 0 }}
         animate={{ opacity: 1 }}
+        // style={{ height: 50 }}
       >
         <Pressable onPress={toggleAddTag} className="">
           <Animated.View
             className="p-1 mr-1 border-hairline bg-secondary rounded-lg flex-row items-center"
-            layout={LinearTransition}
+            layout={LinearTransition.duration(300)}
+            style={{ width: "auto" }}
           >
-            <EditIcon size={20} color={colors.secondaryForeground} />
-            {appliedTags?.length === 0 && (
-              <Text className="ml-5 mr-3 text-secondary-foreground">Add Tags</Text>
+            <MotiView from={{ rotate: "0deg" }} animate={{ rotate: showAddTag ? "90deg" : "0deg" }}>
+              <TagPlusIcon size={20} color={colors.secondaryForeground} />
+            </MotiView>
+            {appliedTags?.length === 0 && !showAddTag && (
+              <MotiView
+                from={{ opacity: 0 }}
+                animate={{ opacity: showAddTag ? 0 : 1 }}
+                transition={{ type: "timing", duration: 700 }}
+              >
+                <Text className="ml-3 mr-2 text-secondary-foreground font-semibold text-base">
+                  Add Tags
+                </Text>
+              </MotiView>
             )}
           </Animated.View>
         </Pressable>
@@ -112,37 +151,39 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
               entering={BounceIn}
               exiting={BounceOut}
             >
-              <Text>{item.name}</Text>
+              <Text className="text-lg">{item.name}</Text>
             </MotiView>
           )}
           itemLayoutAnimation={LinearTransition}
         />
       </MotiView>
 
-      <MotiView
-        from={{ opacity: 0, height: showAddTag ? 0 : containerHeight }}
-        animate={{ opacity: 1, height: showAddTag ? containerHeight : 0 }}
-        // exit={{ opacity: 0, height: 0 }}
-        key={2}
+      <Animated.View
+        // entering={FadeIn.duration(2000)}
+        // exiting={FadeOut.duration(500)}
+        // layout={LinearTransition.duration(500).springify()}
+        style={[
+          tagViewStyle,
+          {
+            overflow: "hidden", // Ensure contents are clipped
+            // opacity: showAddTag ? 1 : 0, // Combine opacity for smooth transitions
+          },
+        ]}
       >
-        {showAddTag && isMeasured && (
-          <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <TagCloudEnhanced>
-              {movieTags?.map((el) => (
-                <TagItemEnhanced
-                  size="s"
-                  onToggleTag={handleToggleTag(el.applied ? "include" : "off")}
-                  state={el.applied ? "include" : "off"}
-                  tagId={el?.id}
-                  tagName={el?.name}
-                  key={el?.id}
-                  type="boolean"
-                />
-              ))}
-            </TagCloudEnhanced>
-          </MotiView>
-        )}
-      </MotiView>
+        <TagCloudEnhanced>
+          {movieTags?.map((el) => (
+            <TagItemEnhanced
+              size="s"
+              onToggleTag={handleToggleTag(el.applied ? "include" : "off")}
+              state={el.applied ? "include" : "off"}
+              tagId={el?.id}
+              tagName={el?.name}
+              key={el?.id}
+              type="boolean"
+            />
+          ))}
+        </TagCloudEnhanced>
+      </Animated.View>
     </View>
   );
 };

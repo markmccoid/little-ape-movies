@@ -16,20 +16,19 @@ import useMovieStore, { MovieStore, ShowItemType, useMovieActions } from "@/stor
 import { movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
 import MDImageDescRow from "./MDImageDescRow";
 import MDWatchProviders from "./watchProviders/MDWatchProviders";
-import MDDetails from "./MDDetails";
 import HiddenContainerAnimated from "@/components/common/HiddenContainer/HiddenContainerAnimated";
 import { useCustomTheme } from "@/lib/colorThemes";
 import HiddenContainerWatchProviders from "@/components/common/HiddenContainer/HiddenContainerWatchProviders";
 import MDMovieRecommendations from "./MDMovieRecommendations";
 import { SymbolView } from "expo-symbols";
 import useImageSize from "@/hooks/useImageSize";
+import MDDetails from "./MDDetails";
 import MDRatings from "./MDRatings";
 import MDMovieVideos from "./MDMovieVideos";
 import MDMovieCast from "./cast/MDMovieCast";
 import { eventBus } from "@/store/eventBus";
 import MDDeleteButton from "./MDButtonDelete";
 import MDButtonAdd from "./MDButtonAdd";
-import { AnimatePresence, MotiView } from "moti";
 import MDTagsAnim from "./tagMovies/MDTagsAnim";
 import { Text } from "@/components/ui/text";
 
@@ -171,19 +170,20 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
         </View>
 
         {storedMovie?.id && (
-          <MotiView
+          <View
             key={storedMovie?.id}
-            from={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ type: "timing", duration: 1000 }}
+            // from={{ opacity: 0 }}
+            // animate={{ opacity: 1 }}
+            // transition={{ type: "timing", duration: 1000 }}
             className="my-[2]"
+            // style={{ minHeight: 20 }}
           >
             <MDTagsAnim
               // movieDetails={finalMovieDetails as MovieDetails}
               storedMovie={storedMovie}
               existsInSaved={existsInSaved}
             />
-          </MotiView>
+          </View>
         )}
         {/* WHERE TO WATCH */}
         <View className="my-[2]">
