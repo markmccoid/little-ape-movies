@@ -10,6 +10,19 @@ type Props = {
  *
  */
 const MotiDetailImage = ({ existsInSaved, posterURL }: Props) => {
+  // All of the shouldRender/requestAnimation frame is to try and get the animation
+  // of the radius to be smooth.
+  const [shouldRender, setShouldRender] = React.useState(false);
+
+  React.useEffect(() => {
+    requestAnimationFrame(() => {
+      setShouldRender(true);
+    });
+    return () => {
+      setShouldRender(false);
+    };
+  }, [existsInSaved]);
+
   const { imageWidth, imageHeight } = useDetailImageSize();
   // Radius once added
   const BORDER_RADIUS_ADDED = 20;
@@ -19,12 +32,12 @@ const MotiDetailImage = ({ existsInSaved, posterURL }: Props) => {
     <MotiView
       className=""
       from={{
-        borderRadius: existsInSaved ? BORDER_RADIUS_SEARCH : BORDER_RADIUS_ADDED,
+        borderRadius: existsInSaved && shouldRender ? BORDER_RADIUS_SEARCH : BORDER_RADIUS_ADDED,
         opacity: 0.5,
         // translateX: -100,
       }}
       animate={{
-        borderRadius: existsInSaved ? BORDER_RADIUS_ADDED : BORDER_RADIUS_SEARCH,
+        borderRadius: existsInSaved && shouldRender ? BORDER_RADIUS_ADDED : BORDER_RADIUS_SEARCH,
         opacity: 1,
         // translateX: 0,
       }}
@@ -46,9 +59,11 @@ const MotiDetailImage = ({ existsInSaved, posterURL }: Props) => {
     >
       <MotiImage
         source={{ uri: posterURL }}
-        from={{ borderRadius: existsInSaved ? BORDER_RADIUS_SEARCH : BORDER_RADIUS_ADDED }}
+        from={{
+          borderRadius: existsInSaved && shouldRender ? BORDER_RADIUS_SEARCH : BORDER_RADIUS_ADDED,
+        }}
         animate={{
-          borderRadius: existsInSaved ? BORDER_RADIUS_ADDED : BORDER_RADIUS_SEARCH,
+          borderRadius: existsInSaved && shouldRender ? BORDER_RADIUS_ADDED : BORDER_RADIUS_SEARCH,
         }}
         transition={{
           type: "timing",

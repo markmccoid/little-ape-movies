@@ -1,11 +1,10 @@
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import React from "react";
-import Animated from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 import MotiDetailImage from "./MotiDetailImage";
 import { MovieDetails } from "@/store/dataHooks";
 import useDetailImageSize from "@/hooks/useDetailImageSize";
 import { ShowItemType } from "@/store/store.shows";
-import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
   existsInSaved: boolean;
@@ -15,8 +14,10 @@ type Props = {
 
 const MDImageDescRow = ({ existsInSaved, movieDetails, storedMovie }: Props) => {
   const posterURL = storedMovie?.posterURL || movieDetails?.posterURL;
+
   return (
-    <View
+    <Animated.View
+      entering={FadeIn}
       style={{
         flexDirection: "row",
         justifyContent: existsInSaved ? "flex-start" : "flex-end",
@@ -65,7 +66,7 @@ const MDImageDescRow = ({ existsInSaved, movieDetails, storedMovie }: Props) => 
           )}
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 };
 

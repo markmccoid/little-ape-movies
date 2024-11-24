@@ -31,7 +31,7 @@ configureReanimatedLogger({
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 10000,
+      staleTime: 10 * 60000, // n * 1 minute
     },
   },
 });

@@ -1,29 +1,46 @@
-import { Image, View, ScrollView, useColorScheme } from "react-native";
+import {
+  View,
+  Image,
+  ScrollView,
+  useColorScheme,
+  ActivityIndicator,
+  Pressable,
+} from "react-native";
 import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
-import { useNavigation } from "expo-router";
+import { useFocusEffect, useNavigation, usePathname, useRouter, useSegments } from "expo-router";
 import { MovieDetails, useMovieDetailData, useOMDBData } from "@/store/dataHooks";
+
+import { LinearGradient } from "expo-linear-gradient";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
-import useMovieStore, { useMovieActions } from "@/store/store.shows";
+import useMovieStore, { MovieStore, ShowItemType, useMovieActions } from "@/store/store.shows";
 import { movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
 import MDImageDescRow from "./MDImageDescRow";
+import MDWatchProviders from "./watchProviders/MDWatchProviders";
+import HiddenContainerAnimated from "@/components/common/HiddenContainer/HiddenContainerAnimated";
+import { useCustomTheme } from "@/lib/colorThemes";
+import HiddenContainerWatchProviders from "@/components/common/HiddenContainer/HiddenContainerWatchProviders";
+import MDMovieRecommendations from "./MDMovieRecommendations";
+import { SymbolView } from "expo-symbols";
+import useImageSize from "@/hooks/useImageSize";
 import MDDetails from "./MDDetails";
 import MDRatings from "./MDRatings";
+import MDMovieVideos from "./MDMovieVideos";
+import MDMovieCast from "./cast/MDMovieCast";
 import { eventBus } from "@/store/eventBus";
 import MDDeleteButton from "./MDButtonDelete";
 import MDButtonAdd from "./MDButtonAdd";
 import MDTagsAnim from "./tagMovies/MDTagsAnim";
-// const Lazy = React.lazy(() => import("./MovieDetailsContainerLazy"));
-import HiddenContainers from "./MovieDetailsHiddenContainers";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { Text } from "@/components/ui/text";
+const Lazy = React.lazy(() => import("./MovieDetailsHiddenContainers"));
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
-  const tabBarHeight = useBottomTabBarHeight();
-  const [finalMovieDetails, setFinalMovieDetails] = useState<MovieDetails>();
   //!! We need have local state so that we only update component AFTER
   //!! it has received focus (see isFocused page)
+  const [finalMovieDetails, setFinalMovieDetails] = useState<MovieDetails>();
   const [movieTitle, setMovieTitle] = useState<string>();
+  const { imageHeight } = useImageSize(3);
   //!!
-
+  const { colors } = useCustomTheme();
   const colorScheme = useColorScheme();
   const navigation = useNavigation();
   const movieActions = useMovieActions();
@@ -35,16 +52,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const { data: omdbData, isLoading: omdbLoading } = useOMDBData(movieDetails?.imdbId);
 
   const isFocused = navigation.isFocused();
-  const [shouldRender, setShouldRender] = React.useState(false);
 
-  // determines when the "where to watch" and below items load.
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      setShouldRender(true);
-    });
-  }, []);
-
-  // console.log("stored", storedMovie, existsInSaved, movieDetails);
   //-- HEADER RIGHT ----------
   const handleAddMovie = useCallback(() => {
     if (!movieDetails) return;
@@ -82,9 +90,19 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
     const options: NativeStackNavigationOptions = {
       title: movieTitle || "", //storedMovie?.title || movieDetails?.title || "",
       headerRight: existsInSaved ? HeaderRight : HeaderRightAdd,
+      // headerLeft: () => (
+      //   <Pressable onPress={() => router.back()} className="ml-[-8]">
+      //     <View className="flex-row items-center">
+      //       <SymbolView name="chevron.backward" />
+      //       {/* <Text className="text-lg text-primary font-semibold">Back</Text> */}
+      //     </View>
+      //   </Pressable>
+      // ),
     };
     navigation.setOptions(options);
   }, [movieId, existsInSaved, movieTitle, isLoading, colorScheme]);
+  const backgroundStartColor = storedMovie?.posterColors?.primary?.color || "#000000";
+  const backgroundEndColor = storedMovie?.posterColors?.darkestColor || "#FFFFFF";
 
   // Once we are focused and not loading, update the local state
   // Local state will be used to update the component
@@ -104,29 +122,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
 
   return (
     <View className="flex-1">
-      {existsInSaved && storedMovie?.posterURL && (
-        <Image
-          source={{ uri: storedMovie?.posterURL }}
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            opacity: 0.2,
-            resizeMode: "contain",
-          }}
-        />
-      )}
-
-      <ScrollView
-        style={{
-          paddingTop: 5,
-          flexGrow: 1,
-          marginBottom: tabBarHeight,
-        }}
-        contentContainerStyle={{ paddingBottom: tabBarHeight + 15 }}
-      >
+      <ScrollView style={{ paddingTop: 5, flexGrow: 1 }}>
         {/* IMAGE and DESC */}
         <View>
           <MDImageDescRow
@@ -149,7 +145,14 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
         </View>
 
         {storedMovie?.id && (
-          <View key={storedMovie?.id} className="my-[2]">
+          <View
+            key={storedMovie?.id}
+            // from={{ opacity: 0 }}
+            // animate={{ opacity: 1 }}
+            // transition={{ type: "timing", duration: 1000 }}
+            className="my-[2]"
+            // style={{ minHeight: 20 }}
+          >
             <MDTagsAnim
               // movieDetails={finalMovieDetails as MovieDetails}
               storedMovie={storedMovie}
@@ -157,7 +160,6 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
             />
           </View>
         )}
-        {shouldRender && <HiddenContainers movieId={finalMovieDetails?.id} />}
         {/* <Lazy movieId={finalMovieDetails?.id} /> */}
       </ScrollView>
     </View>
