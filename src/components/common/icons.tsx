@@ -61,6 +61,14 @@ export const EyeOffOutlineIcon = ({ size = 25, color, style }: Props) => {
   return <MaterialCommunityIcons name="eye-off-outline" size={size} color={color} style={style} />;
 };
 
+export const StarFilledIcon = ({ size = 25, color, style }: Props) => {
+  return <FontAwesome name="star" size={size} color={color} style={style} />;
+};
+
+export const StarUnFilledIcon = ({ size = 25, color, style }: Props) => {
+  return <FontAwesome name="star-o" size={size} color={color} style={style} />;
+};
+
 export const DragHandleIcon = ({ size = 25, color, style }: Props) => {
   return <MaterialIcons name="drag-handle" size={size} color={color} style={style} />;
 };
@@ -277,13 +285,6 @@ export const GripHorizontalIcon = ({ size = 25, color, style }: Props) => {
 //   return <AntDesign name="clouddownload" size={size} color={color} style={style} />;
 // };
 
-// export const StarFilledIcon = ({ size = 25, color, style }: Props) => {
-//   return <FontAwesome name="star" size={size} color={color} style={style} />;
-// };
-
-// export const StarUnFilledIcon = ({ size = 25, color, style }: Props) => {
-//   return <FontAwesome name="star-o" size={size} color={color} style={style} />;
-// };
 // export const InfoCircleIcon = ({ size = 25, color, style }: Props) => {
 //   return <Entypo name="info-with-circle" size={size} color={color} style={style} />;
 // };

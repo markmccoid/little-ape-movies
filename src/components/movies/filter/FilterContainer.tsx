@@ -2,15 +2,16 @@ import { View, Pressable, ScrollView } from "react-native";
 import React, { useLayoutEffect, useState } from "react";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { useNavigation } from "expo-router";
-import useSettingsStore, { useSettingsActions } from "@/store/store.settings";
+import useSettingsStore, { getInclusionIndex, useSettingsActions } from "@/store/store.settings";
 import { Text } from "@/components/ui/text";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import FilterTags from "./FilterTags";
 import FilterGenres from "./FilterGenres";
-import { EraserIcon } from "@/components/common/Icons";
+import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { Eraser } from "@/lib/icons/Eraser";
 import { AnimatePresence, MotiView } from "moti";
+import { filter } from "lodash";
 
 const FilterContainer = () => {
   const navigation = useNavigation();
@@ -24,7 +25,7 @@ const FilterContainer = () => {
     (filterCriteria?.excludeGenres || []).length > 0;
   useLayoutEffect(() => {
     const options: NativeStackNavigationOptions = {
-      title: "Set Filters", //storedMovie?.title || movieDetails?.title || "",
+      title: "Set Filters",
       // headerRight:
       // headerLeft: () => (
       //   <Pressable onPress={() => router.back()} className="ml-[-8]">
@@ -37,11 +38,11 @@ const FilterContainer = () => {
     };
     navigation.setOptions(options);
   });
-
+  console.log("FILTER C", filterCriteria);
   return (
     <ScrollView className="pt-3">
       <View className="flex-row mx-2 gap-4">
-        <View className="flex-row">
+        {/* <View className="flex-row">
           <Checkbox
             aria-labelledby="watched"
             checked={!!filterCriteria?.filterIsWatched}
@@ -69,10 +70,31 @@ const FilterContainer = () => {
           <Label className="ml-1" nativeID="favorited">
             Favorited
           </Label>
-        </View>
+        </View> */}
       </View>
+      {/* //! Need to create a three way selector for both of these AND 
+      //! update the filter code to obey the new selectors */}
+      <SegmentedControl
+        className="w-[100]"
+        values={["Ignore", "Watched", "Unwatched"]}
+        selectedIndex={getInclusionIndex(filterCriteria?.filterIsWatched)}
+        onChange={(event) => {
+          console.log("W Changed", event.nativeEvent.selectedSegmentIndex);
+          const state = event.nativeEvent.selectedSegmentIndex;
+          filterActions.setIsWatchedState(state as 0 | 1 | 2);
+        }}
+      />
+      <View className="h-2" />
+      <SegmentedControl
+        className="w-[100]"
+        values={["Ignore", "Favorites", "Exclude Favs"]}
+        selectedIndex={getInclusionIndex(filterCriteria?.filterIsFavorited)}
+        onChange={(event) => {
+          const state = event.nativeEvent.selectedSegmentIndex;
+          filterActions.setIsFavoritedState(state as 0 | 1 | 2);
+        }}
+      />
       {/* Tag Selection */}
-
       <View className="mx-1 mt-4 bg-primary rounded-lg flex-row items-center justify-between">
         <Text className="px-2 py-1 text-xl font-semibold text-primary-foreground">
           Filter By Tags
@@ -88,7 +110,6 @@ const FilterContainer = () => {
         </AnimatePresence>
       </View>
       <FilterTags />
-
       {/* Genre Selection */}
       <View className="mx-1 mt-4 bg-primary rounded-lg flex-row items-center justify-between">
         <Text className="px-2 py-1 text-xl font-semibold text-primary-foreground">

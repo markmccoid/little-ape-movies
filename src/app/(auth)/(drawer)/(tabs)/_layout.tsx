@@ -2,6 +2,8 @@ import React from "react";
 import { Tabs } from "expo-router";
 import { SearchIcon, AddIcon, MovieIcon, TagIcon } from "@/components/common/Icons";
 import { Search } from "lucide-react-native";
+import { Easing } from "react-native-reanimated";
+import { TransitionPresets, TransitionSpecs } from "@react-navigation/bottom-tabs";
 
 export const unstable_settings = {
   // Ensure any route can link back to `/`
@@ -9,7 +11,12 @@ export const unstable_settings = {
 };
 const Layout = () => {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        ...TransitionPresets.ShiftTransition,
+      }}
+    >
       <Tabs.Screen
         name="home"
         options={{ tabBarIcon: ({ color }) => <MovieIcon size={25} color={color} /> }}

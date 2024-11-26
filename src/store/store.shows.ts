@@ -254,7 +254,7 @@ export const useMovieActions = () => {
   //~ toggleFavorited
   const toggleFavorited = (movieId: number) => {
     const isFavorited = useMovieStore.getState().actions.getShowById(movieId)?.favorited;
-    updateShow(movieId, { watched: isFavorited ? undefined : Date.now() });
+    updateShow(movieId, { favorited: isFavorited ? undefined : Date.now() });
   };
   const actions = { ...useMovieStore((state) => state.actions), toggleWatched, toggleFavorited };
   // return useMovieStore((state) => state.actions);
@@ -290,14 +290,20 @@ export const useMovies = () => {
   // Loop through each saved movie and see if it meets criteria to be shown
   for (const movie of movies) {
     // if looking for watched movies, exclude if not watched, otherwise we don't case
-    if (filterIsWatched) {
-      if (!movie?.watched) {
+    if (filterIsWatched !== "off") {
+      if (
+        (filterIsWatched === "include" && !movie?.watched) ||
+        (filterIsWatched === "exclude" && movie?.watched)
+      ) {
         continue;
       }
     }
     // favorited?
-    if (filterIsFavorited) {
-      if (!movie?.favorited) {
+    if (filterIsFavorited !== "off") {
+      if (
+        (filterIsFavorited === "include" && !movie?.favorited) ||
+        (filterIsFavorited === "exclude" && movie?.favorited)
+      ) {
         continue;
       }
     }

@@ -12,7 +12,6 @@ import { eventBus } from "@/store/eventBus";
 import MDDeleteButton from "./MDButtonDelete";
 import MDButtonAdd from "./MDButtonAdd";
 import MDTagsAnim from "./tagMovies/MDTagsAnim";
-// const Lazy = React.lazy(() => import("./MovieDetailsContainerLazy"));
 import HiddenContainers from "./MovieDetailsHiddenContainers";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
@@ -158,7 +157,6 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
           </View>
         )}
         {shouldRender && <HiddenContainers movieId={finalMovieDetails?.id} />}
-        {/* <Lazy movieId={finalMovieDetails?.id} /> */}
       </ScrollView>
     </View>
   );

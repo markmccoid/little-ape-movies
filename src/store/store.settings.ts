@@ -1,7 +1,14 @@
+import { InclusionState } from "./store.settings";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { StorageAdapter } from "./dataAccess/storageAdapter";
 import { eventBus } from "./eventBus";
+
+// Define the array as the single source of truth
+const inclusionStates = ["off", "include", "exclude"] as const;
+
+// Derive the type from the array
+export type InclusionState = (typeof inclusionStates)[number];
 
 interface SettingsStore {
   searchColumns: 2 | 3;
@@ -10,8 +17,8 @@ interface SettingsStore {
     tierColor: string;
   }[];
   filterCriteria: {
-    filterIsWatched?: boolean;
-    filterIsFavorited?: boolean;
+    filterIsWatched?: InclusionState;
+    filterIsFavorited?: InclusionState;
     includeTags?: string[];
     excludeTags?: string[];
     includeGenres?: string[];
@@ -19,8 +26,8 @@ interface SettingsStore {
   };
   actions: {
     toggleSearchColumns: () => void;
-    toggleIsWatched: () => void;
-    toggleIsFavorited: () => void;
+    setIsWatchedState: (inclusionState: InclusionState | 0 | 1 | 2) => void;
+    setIsFavoritedState: (inclusionState: InclusionState | 0 | 1 | 2) => void;
     updateTagsFilter: (
       tagType: "include" | "exclude",
       tagId: string,
@@ -62,19 +69,19 @@ const useSettingsStore = create<SettingsStore>()(
         // ~ - - - - - - - - - - - - -
         // ~ Filter Criteria Actions
         // ~ - - - - - - - - - - - - -
-        toggleIsWatched: () => {
+        setIsWatchedState: (inclusionState) => {
           set((state) => ({
             filterCriteria: {
               ...state.filterCriteria,
-              filterIsWatched: !state.filterCriteria?.filterIsWatched,
+              filterIsWatched: getInclusionValue(inclusionState),
             },
           }));
         },
-        toggleIsFavorited: () => {
+        setIsFavoritedState: (inclusionState) => {
           set((state) => ({
             filterCriteria: {
               ...state.filterCriteria,
-              filterIsFavorited: !state.filterCriteria?.filterIsFavorited,
+              filterIsFavorited: getInclusionValue(inclusionState),
             },
           }));
         },
@@ -213,5 +220,26 @@ export const useRatingsTier = (rating: string | undefined, type: "imdb" | "rt" |
     }
   }
   return { finalRating: "N/A", ratingColor: "#ccc" };
+};
+//~ -----------------------------------------------------------------------------------------------
+//~ HELPER FUNCTION
+//~ -----------------------------------------------------------------------------------------------
+// --------------
+// -- Helper functions for tri-state filters like Watched and Favorited
+// Takes in an inlcusion string or a inclusion index and returns inclusion string
+function getInclusionValue(inclusionState: InclusionState | 0 | 1 | 2) {
+  // If a number then access the inclusionStates (defined globally) via index
+  if (typeof inclusionState === "number" && !isNaN(inclusionState)) {
+    // Access by index when inclusionState is a number
+    return inclusionStates[inclusionState];
+  }
+  return inclusionState as InclusionState;
+}
+// takes an inclusion string and returns the appropriate index.  Useful for segmented control settings.
+// 0 = "off" , 1 = "includes", 2 = "exclude"
+export const getInclusionIndex = (inclusionState: InclusionState | undefined) => {
+  const inclusionIndex = inclusionStates.findIndex((el) => el === inclusionState);
+  if (inclusionIndex === -1) return 0;
+  return inclusionIndex;
 };
 export default useSettingsStore;

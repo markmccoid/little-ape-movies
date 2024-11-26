@@ -108,12 +108,12 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
       >
         <Pressable onPress={toggleAddTag} className="">
           <Animated.View
-            className="p-1 mr-1 border-hairline bg-secondary rounded-lg flex-row items-center"
+            className="py-1 px-3 mr-1 border-hairline bg-secondary rounded-lg flex-row items-center"
             layout={LinearTransition.duration(300)}
             style={{ width: "auto" }}
           >
             <MotiView from={{ rotate: "0deg" }} animate={{ rotate: showAddTag ? "90deg" : "0deg" }}>
-              <TagPlusIcon size={20} color={colors.secondaryForeground} />
+              <TagPlusIcon size={25} color={colors.secondaryForeground} />
             </MotiView>
             {appliedTags?.length === 0 && !showAddTag && (
               <MotiView
@@ -170,19 +170,21 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
           },
         ]}
       >
-        <TagCloudEnhanced>
-          {movieTags?.map((el) => (
-            <TagItemEnhanced
-              size="s"
-              onToggleTag={handleToggleTag(el.applied ? "include" : "off")}
-              state={el.applied ? "include" : "off"}
-              tagId={el?.id}
-              tagName={el?.name}
-              key={el?.id}
-              type="boolean"
-            />
-          ))}
-        </TagCloudEnhanced>
+        <MotiView from={{ opacity: showAddTag ? 1 : 0 }} animate={{ opacity: showAddTag ? 1 : 0 }}>
+          <TagCloudEnhanced>
+            {movieTags?.map((el) => (
+              <TagItemEnhanced
+                size="s"
+                onToggleTag={handleToggleTag(el.applied ? "include" : "off")}
+                state={el.applied ? "include" : "off"}
+                tagId={el?.id}
+                tagName={el?.name}
+                key={el?.id}
+                type="boolean"
+              />
+            ))}
+          </TagCloudEnhanced>
+        </MotiView>
       </Animated.View>
     </View>
   );

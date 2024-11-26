@@ -5,6 +5,7 @@ import MotiDetailImage from "./MotiDetailImage";
 import { MovieDetails } from "@/store/dataHooks";
 import useDetailImageSize from "@/hooks/useDetailImageSize";
 import { ShowItemType } from "@/store/store.shows";
+import AnimDetailImage from "./AnimDetailImage";
 
 type Props = {
   existsInSaved: boolean;
@@ -41,15 +42,10 @@ const MDImageDescRow = ({ existsInSaved, movieDetails, storedMovie }: Props) => 
             position: "absolute",
           }}
         />
-        <View
-          // sharedTransitionTag="detailImage"
-          key={1}
-          // layout={SequencedTransition.duration(300).reverse().reduceMotion(ReduceMotion.Never)}
-          // exiting={FadeOut.duration(300)}
-          // entering={FadeIn.duration(300)}
-        >
-          <MotiDetailImage existsInSaved={existsInSaved} posterURL={posterURL} />
-        </View>
+        {/* <View           key={1}        > */}
+        {/* <MotiDetailImage existsInSaved={existsInSaved} posterURL={posterURL} /> */}
+        <AnimDetailImage existsInSaved={existsInSaved} posterURL={posterURL} />
+        {/* </View> */}
         <View
           className="flex-1"
           key={2}

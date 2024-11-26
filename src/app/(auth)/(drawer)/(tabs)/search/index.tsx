@@ -53,7 +53,9 @@ const SearchPage = () => {
     const options: NativeStackNavigationOptions = {
       headerShown: false,
     };
-    navigation.setOptions(options);
+    requestAnimationFrame(() => {
+      navigation.setOptions(options);
+    });
   }, []);
 
   // const handleSearchType = (type: SearchType) => {
