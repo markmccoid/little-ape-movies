@@ -1,11 +1,13 @@
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import React from "react";
 import Animated, { FadeIn } from "react-native-reanimated";
-import MotiDetailImage from "./MotiDetailImage";
 import { MovieDetails } from "@/store/dataHooks";
 import useDetailImageSize from "@/hooks/useDetailImageSize";
 import { ShowItemType } from "@/store/store.shows";
 import AnimDetailImage from "./AnimDetailImage";
+
+import * as ContextMenu from "zeego/context-menu";
+import MDDetailContextMenu from "./MDDetailContextMenu";
 
 type Props = {
   existsInSaved: boolean;
@@ -43,8 +45,31 @@ const MDImageDescRow = ({ existsInSaved, movieDetails, storedMovie }: Props) => 
           }}
         />
         {/* <View           key={1}        > */}
-        {/* <MotiDetailImage existsInSaved={existsInSaved} posterURL={posterURL} /> */}
-        <AnimDetailImage existsInSaved={existsInSaved} posterURL={posterURL} />
+        <MDDetailContextMenu
+          shareLink={movieDetails?.imdbURL ? movieDetails?.imdbURL : movieDetails?.posterURL}
+          movieId={storedMovie?.id || movieDetails?.id}
+          movieTitle={storedMovie?.title || movieDetails?.title}
+        >
+          <AnimDetailImage existsInSaved={existsInSaved} posterURL={posterURL} />
+        </MDDetailContextMenu>
+        {/* <ContextMenu.Root>
+          <ContextMenu.Trigger>
+            <AnimDetailImage existsInSaved={existsInSaved} posterURL={posterURL} />
+          </ContextMenu.Trigger>
+          <ContextMenu.Content>
+            <ContextMenu.Item key="author" onSelect={() => console.log("HERE")}>
+              <ContextMenu.ItemTitle>Author</ContextMenu.ItemTitle>
+              <ContextMenu.ItemIcon
+                ios={{
+                  name: "person",
+                  pointSize: 18,
+                  weight: "semibold",
+                  scale: "medium",
+                }}
+              ></ContextMenu.ItemIcon>
+            </ContextMenu.Item>
+          </ContextMenu.Content>
+        </ContextMenu.Root> */}
         {/* </View> */}
         <View
           className="flex-1"

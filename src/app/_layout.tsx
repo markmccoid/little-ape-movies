@@ -10,6 +10,7 @@ import { useFonts } from "expo-font";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Lato_100Thin, Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
 import * as SplashScreen from "expo-splash-screen";
+import * as Linking from "expo-linking";
 
 import { useColorScheme } from "react-native";
 import { ThemeProvider } from "@react-navigation/native";
@@ -56,6 +57,23 @@ const InitialLayout = () => {
   const router = useRouter();
   const segments = useSegments();
   const rootNavigationState = useRootNavigationState();
+
+  useEffect(() => {
+    if (!initialized) return;
+
+    const processInitialURL = async () => {
+      const url = await Linking.getInitialURL();
+      if (url) {
+        const { hostname, path, queryParams } = Linking.parse(url);
+        if (path?.includes("search")) {
+          router.replace("/search");
+        }
+        setTimeout(() => router.push(`/${path}`), 0);
+      }
+    };
+
+    processInitialURL();
+  }, [router, initialized]);
 
   //~~ --------------------------
   //~~ Run initialize

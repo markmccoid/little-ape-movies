@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import React, { useCallback, useState, useRef, useEffect } from "react";
-import { useFocusEffect, useNavigation } from "expo-router";
+import { useFocusEffect, useGlobalSearchParams, useNavigation } from "expo-router";
 import { useIsFocused } from "@react-navigation/native";
 import { SearchBarCommands } from "react-native-screens";
 import { debounce } from "lodash";

@@ -93,7 +93,7 @@ const MoveableItem = ({
     if (positionState[id] !== undefined) {
       setMovingPos(positionState[id] + 1);
       translateY.value = withSpring(positionState[id] * itemHeight);
-      console.log("POS", positionState[id] * itemHeight, id, translateY.value, itemHeight);
+      // console.log("POS", positionState[id] * itemHeight, id, translateY.value, itemHeight);
     }
   }, [positionState[id]]);
   useAnimatedReaction(
