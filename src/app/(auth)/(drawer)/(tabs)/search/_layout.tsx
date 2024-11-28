@@ -8,8 +8,8 @@ const SearchLayout = ({ segment }) => {
       <Stack.Screen name="index" options={{ title: "Search" }} />
       <Stack.Screen
         name="[showId]"
-        options={{ headerTransparent: false, title: "" }}
-        getId={({ params }) => params.showId}
+        options={{ headerShown: false }}
+        // getId={({ params }) => params.showId}
       />
 
       <Stack.Screen name="personmovies/[personId]" />

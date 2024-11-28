@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useGlobalSearchParams } from "expo-router";
+import { Link, useGlobalSearchParams } from "expo-router";
 import MovieDetailsContainer from "@/components/movies/details/MovieDetailsContainer";
 import { View, Text, Image, Dimensions } from "react-native";
 import useMovieStore from "@/store/store.shows";
@@ -8,7 +8,7 @@ const { width, height: screenHeight } = Dimensions.get("window");
 
 const MovieDetailHome = () => {
   const { showId } = useGlobalSearchParams<{ showId: string }>();
-  console.log("MOVIE ID HOME---", showId);
+  // console.log("MOVIE ID HOME---", showId);
   const { storedMovie } = useMovieStore((state) => ({
     storedMovie: state.actions.getShowById(parseInt(showId)),
   }));

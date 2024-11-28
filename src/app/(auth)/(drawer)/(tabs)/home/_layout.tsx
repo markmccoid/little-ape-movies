@@ -10,10 +10,9 @@ const HomeLayout = () => {
       <Stack.Screen name="index" options={{ headerStyle: { backgroundColor: colors.card } }} />
       <Stack.Screen
         name="[showId]"
-        options={{ headerShown: true, headerTransparent: false, title: "" }}
-        getId={({ params }) => params.showId}
+        options={{ headerShown: false }}
+        // getId={({ params }) => params.showId}
       />
-      {/* <Stack.Screen name="[showId]" options={{ headerTransparent: true, title: "" }} /> */}
       <Stack.Screen name="filtermodal" options={{ presentation: "modal", headerShown: false }} />
     </Stack>
   );

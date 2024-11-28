@@ -1,0 +1,32 @@
+import { View, Text, Pressable } from "react-native";
+import React from "react";
+import { Stack, useRouter } from "expo-router";
+import { ChevronLeft } from "@/lib/icons/ChevronLeft";
+
+const ShowIdLayout = () => {
+  const router = useRouter();
+  return (
+    <Stack screenOptions={{}}>
+      <Stack.Screen
+        name="index"
+        options={{
+          headerShown: true,
+          headerLeft: () => (
+            <Pressable onPress={router.back} className="flex-row ml-[-10] items-center">
+              <ChevronLeft size={30} />
+
+              <Text className="text-xl text-primary ">Back</Text>
+            </Pressable>
+          ),
+        }}
+        getId={({ params }) => params.showId}
+      />
+      <Stack.Screen
+        name="detailimagemodal"
+        options={{ presentation: "modal", title: "Change Image" }}
+      />
+    </Stack>
+  );
+};
+
+export default ShowIdLayout;

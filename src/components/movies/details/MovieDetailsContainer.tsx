@@ -1,6 +1,6 @@
-import { Image, View, ScrollView, useColorScheme } from "react-native";
+import { Image, View, ScrollView, useColorScheme, Pressable } from "react-native";
 import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
-import { useNavigation } from "expo-router";
+import { Link, useRouter, useNavigation } from "expo-router";
 import { MovieDetails, useMovieDetailData, useOMDBData } from "@/store/dataHooks";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import useMovieStore, { useMovieActions } from "@/store/store.shows";
@@ -14,8 +14,11 @@ import MDButtonAdd from "./MDButtonAdd";
 import MDTagsAnim from "./tagMovies/MDTagsAnim";
 import HiddenContainers from "./MovieDetailsHiddenContainers";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { Text } from "@/components/ui/text";
+import { ChevronLeft } from "@/lib/icons/ChevronLeft";
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
+  const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
   const [finalMovieDetails, setFinalMovieDetails] = useState<MovieDetails>();
   //!! We need have local state so that we only update component AFTER

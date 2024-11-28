@@ -3,15 +3,24 @@ import * as ContextMenu from "zeego/context-menu";
 import { View, Text } from "react-native";
 import React from "react";
 import { nativeShareItem } from "@/utils/utils";
+import { useRouter } from "expo-router";
 
 type Props = {
   shareLink: string;
   movieId: number;
   movieTitle: string;
+  existsInSaved: boolean;
   children: React.ReactElement; // A single React element
 };
 
-const MDDetailContextMenu = ({ shareLink, movieId, movieTitle, children }: Props) => {
+const MDDetailContextMenu = ({
+  shareLink,
+  movieId,
+  movieTitle,
+  existsInSaved,
+  children,
+}: Props) => {
+  const router = useRouter();
   // console.log("shareLink", shareLink);
   // console.log("createURL", Linking.createURL(`/search/${movieId}`));
   const handleShare = () =>
@@ -21,11 +30,14 @@ const MDDetailContextMenu = ({ shareLink, movieId, movieTitle, children }: Props
       )}`,
       url: shareLink,
     });
+  const handlePickImage = () => {
+    router.navigate({ pathname: `./[showId]/detailimagemodal`, params: { showId: movieId } });
+  };
   return (
     <ContextMenu.Root>
       <ContextMenu.Trigger>{children}</ContextMenu.Trigger>
       <ContextMenu.Content>
-        <ContextMenu.Item key="author" onSelect={handleShare}>
+        <ContextMenu.Item key="share" onSelect={handleShare}>
           <ContextMenu.ItemTitle>{`Share ${movieTitle}`}</ContextMenu.ItemTitle>
           <ContextMenu.ItemIcon
             ios={{
@@ -36,6 +48,19 @@ const MDDetailContextMenu = ({ shareLink, movieId, movieTitle, children }: Props
             }}
           ></ContextMenu.ItemIcon>
         </ContextMenu.Item>
+        {existsInSaved && (
+          <ContextMenu.Item key="changeimage" onSelect={handlePickImage}>
+            <ContextMenu.ItemTitle>{`Pick Image`}</ContextMenu.ItemTitle>
+            <ContextMenu.ItemIcon
+              ios={{
+                name: "photo",
+                pointSize: 18,
+                weight: "semibold",
+                scale: "medium",
+              }}
+            ></ContextMenu.ItemIcon>
+          </ContextMenu.Item>
+        )}
       </ContextMenu.Content>
     </ContextMenu.Root>
   );

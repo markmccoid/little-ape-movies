@@ -7,6 +7,7 @@ import {
   movieGetRecommendations,
   movieGetVideos,
   movieGetCredits,
+  movieGetImages,
 } from "@markmccoid/tmdb_api";
 import { useQuery } from "@tanstack/react-query";
 import { reverse, sortBy } from "lodash";
@@ -217,6 +218,22 @@ export const useMovieCast = (movieId: number | undefined) => {
     queryFn: async () => {
       const resp = await movieGetCredits(movieId);
       return resp.data.cast;
+    },
+    staleTime: 600000,
+  });
+
+  return { data, isLoading, ...rest };
+};
+
+//~~ --------------------------------------------------------------------------------
+//~ Get Movie Images
+//~~ --------------------------------------------------------------------------------
+export const useMovieImages = (movieId: number | undefined) => {
+  const { data, isLoading, ...rest } = useQuery({
+    queryKey: ["movieImages", movieId],
+    queryFn: async () => {
+      const resp = await movieGetImages(movieId);
+      return resp.data;
     },
     staleTime: 600000,
   });

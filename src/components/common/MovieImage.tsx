@@ -1,5 +1,5 @@
-import { View, Text, ImageStyle, ImageProps, Image } from "react-native";
-import { Image as ExpoImage, ImageContentFit } from "expo-image";
+import { View, Text, ImageStyle, ImageProps, Image as RNImage } from "react-native";
+import { Image, ImageContentFit } from "expo-image";
 import React from "react";
 import { getDefaultPosterImage } from "@/utils/utils";
 

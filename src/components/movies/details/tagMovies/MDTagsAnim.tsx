@@ -55,7 +55,7 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
     setIsMeasured(true);
   };
 
-  const handleToggleTag = (currState: "include" | "off") => async (tagId: string) => {
+  const handleToggleTag = (currState: "include" | "off") => (tagId: string) => {
     if (!storedMovie?.id) return;
     if (currState === "include") {
       actions.updateShowTags(storedMovie?.id, tagId, "remove");
@@ -86,8 +86,8 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
             {movieTags?.map((el) => (
               <TagItemEnhanced
                 size="s"
-                onToggleTag={handleToggleTag(el.applied ? "include" : "off")}
-                state={el.applied ? "include" : "off"}
+                onToggleTag={() => {}}
+                state={"off"}
                 tagId={el?.id}
                 tagName={el?.name}
                 key={el?.id}
@@ -145,9 +145,6 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
                 borderRadius: 8,
               }}
               key={item.id}
-              // from={{ opacity: 0, scale: 0.5 }}
-              // animate={{ opacity: 1, scale: 1 }}
-              // transition={{ type: "timing", delay: index * 100 }}
               entering={BounceIn}
               exiting={BounceOut}
             >

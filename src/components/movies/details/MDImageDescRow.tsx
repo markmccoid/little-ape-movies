@@ -49,27 +49,11 @@ const MDImageDescRow = ({ existsInSaved, movieDetails, storedMovie }: Props) => 
           shareLink={movieDetails?.imdbURL ? movieDetails?.imdbURL : movieDetails?.posterURL}
           movieId={storedMovie?.id || movieDetails?.id}
           movieTitle={storedMovie?.title || movieDetails?.title}
+          existsInSaved={existsInSaved}
         >
           <AnimDetailImage existsInSaved={existsInSaved} posterURL={posterURL} />
         </MDDetailContextMenu>
-        {/* <ContextMenu.Root>
-          <ContextMenu.Trigger>
-            <AnimDetailImage existsInSaved={existsInSaved} posterURL={posterURL} />
-          </ContextMenu.Trigger>
-          <ContextMenu.Content>
-            <ContextMenu.Item key="author" onSelect={() => console.log("HERE")}>
-              <ContextMenu.ItemTitle>Author</ContextMenu.ItemTitle>
-              <ContextMenu.ItemIcon
-                ios={{
-                  name: "person",
-                  pointSize: 18,
-                  weight: "semibold",
-                  scale: "medium",
-                }}
-              ></ContextMenu.ItemIcon>
-            </ContextMenu.Item>
-          </ContextMenu.Content>
-        </ContextMenu.Root> */}
+
         {/* </View> */}
         <View
           className="flex-1"

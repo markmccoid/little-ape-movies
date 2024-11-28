@@ -39,6 +39,8 @@ export const TagItem = ({
 }: Props) => {
   const { colors } = useCustomTheme();
   const [localState, setLocalState] = useState(state);
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const bgColor =
     localState === "include" ? "green" : localState === "exclude" ? colors.deleteRed : "white";
   const fgColor = localState === "exclude" ? "white" : "black";
@@ -48,15 +50,20 @@ export const TagItem = ({
     setLocalState(state);
   }, [state]);
 
-  const handleStateChange = async (tagId: string) => {
+  const handleStateChange = (tagId: string) => {
     const prevState = localState;
+    setIsProcessing(true);
     setLocalState(cycleState(localState, type));
-    try {
-      await onToggleTag(tagId);
-    } catch (error) {
-      console.log("Error setting Genre Tag");
-      setLocalState(prevState);
-    }
+
+    setTimeout(() => {
+      try {
+        onToggleTag(tagId);
+      } catch (error) {
+        console.log("Error setting Genre Tag");
+        setLocalState(prevState);
+      }
+    }, 0);
+    setTimeout(() => setIsProcessing(false), 0);
   };
 
   return (
@@ -66,12 +73,13 @@ export const TagItem = ({
       className="border border-border py-[5] px-[7] m-[5] text-center"
       style={{ backgroundColor: bgColor, borderRadius: 10 }}
       key={tagId}
+      disabled={isProcessing}
       onPress={() => handleStateChange(tagId)}
       // onPress={() => onToggleTag(tagId)}
       //isSelected={isSelected} //used in styled components
     >
       <View className="flex-row items-center">
-        {state === "exclude" ? (
+        {localState === "exclude" ? (
           <UnTagIcon size={size === "s" ? 15 : 20} color="white" style={{ paddingRight: 8 }} />
         ) : (
           <AntDesign

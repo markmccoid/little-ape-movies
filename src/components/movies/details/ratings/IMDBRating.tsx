@@ -19,7 +19,7 @@ const IMDBRating = ({ rating, votes, imdbId }: Props) => {
       <TouchableOpacity
         onPress={async () => {
           Linking.openURL(imdbRatingURL).catch((err) =>
-            console.log("Error opening WatchProvider", err)
+            console.log("Error opening imdbRatingURL", err)
           );
         }}
         style={{ paddingTop: 5 }}

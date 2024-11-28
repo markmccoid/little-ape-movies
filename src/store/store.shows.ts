@@ -107,10 +107,10 @@ const useMovieStore = create<MovieStore>()(
         //~ ---------------------------------
         //~ updateShow
         updateShow: (id, updatedShow) => {
+          // NOTE: only == in case string insted of number is passed in as id
           set((state) => ({
-            shows: state.shows.map((m) => (m.id === id ? { ...m, ...updatedShow } : m)),
+            shows: state.shows.map((el) => (el.id == id ? { ...el, ...updatedShow } : el)),
           }));
-          // console.log("UPDATE Show", updatedShow);
         },
         //~ ---------------------------------
         //~ updateShowTags
@@ -124,7 +124,7 @@ const useMovieStore = create<MovieStore>()(
           if (action === "remove") {
             newShowTags = showTags.filter((tag) => tag !== tagId);
           } else {
-            newShowTags = [...showTags, tagId];
+            newShowTags = [...new Set([...showTags, tagId])];
           }
           currShow.tags = newShowTags;
           set({ shows: allShows });
