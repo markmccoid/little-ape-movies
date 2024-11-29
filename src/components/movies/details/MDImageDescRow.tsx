@@ -1,13 +1,17 @@
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Pressable } from "react-native";
 import React from "react";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { MovieDetails } from "@/store/dataHooks";
 import useDetailImageSize from "@/hooks/useDetailImageSize";
-import { ShowItemType } from "@/store/store.shows";
+import { ShowItemType, useMovieActions } from "@/store/store.shows";
 import AnimDetailImage from "./AnimDetailImage";
 
-import * as ContextMenu from "zeego/context-menu";
 import MDDetailContextMenu from "./MDDetailContextMenu";
+import MDBackground from "./MDBackground";
+import { Sparkles } from "@/lib/icons/Sparkles";
+import { Eye } from "@/lib/icons/Eye";
+import { useCustomTheme } from "@/lib/colorThemes";
+import { AnimatePresence, MotiView } from "moti";
 
 type Props = {
   existsInSaved: boolean;
@@ -17,7 +21,8 @@ type Props = {
 
 const MDImageDescRow = ({ existsInSaved, movieDetails, storedMovie }: Props) => {
   const posterURL = storedMovie?.posterURL || movieDetails?.posterURL;
-
+  const actions = useMovieActions();
+  const { colors } = useCustomTheme();
   return (
     <Animated.View
       entering={FadeIn}
@@ -26,42 +31,60 @@ const MDImageDescRow = ({ existsInSaved, movieDetails, storedMovie }: Props) => 
         justifyContent: existsInSaved ? "flex-start" : "flex-end",
       }}
     >
-      {/* {existsInSaved ? ( */}
       <View className="flex-row flex-1 py-2 pl-2">
-        <View
-          style={{
-            backgroundColor: "white",
-            opacity: 0.5,
-            borderRadius: 10,
-            shadowColor: "#000000",
-            shadowOffset: {
-              width: 0,
-              height: 0,
-            },
-            shadowOpacity: 0.4,
-            shadowRadius: 2,
-            ...StyleSheet.absoluteFillObject,
-            position: "absolute",
-          }}
-        />
-        {/* <View           key={1}        > */}
+        <MDBackground />
+
         <MDDetailContextMenu
           shareLink={movieDetails?.imdbURL ? movieDetails?.imdbURL : movieDetails?.posterURL}
           movieId={storedMovie?.id || movieDetails?.id}
           movieTitle={storedMovie?.title || movieDetails?.title}
           existsInSaved={existsInSaved}
         >
-          <AnimDetailImage existsInSaved={existsInSaved} posterURL={posterURL} />
+          <View>
+            <Pressable
+              className="absolute z-10 bottom-[-5] left-[-5]"
+              onPress={() => actions.toggleFavorited(storedMovie.id)}
+            >
+              <AnimatePresence>
+                {storedMovie?.favorited && (
+                  <MotiView
+                    from={{ opacity: 0, scale: 0.6 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0.5, scale: 0.6 }}
+                    transition={{ type: "timing", duration: 200 }}
+                  >
+                    <Sparkles fill="yellow" strokeWidth={1} className="color-black" size={22} />
+                  </MotiView>
+                )}
+              </AnimatePresence>
+            </Pressable>
+            <Pressable
+              className="absolute z-10 bottom-[-5] right-[-5]"
+              onPress={() => actions.toggleWatched(storedMovie.id)}
+            >
+              <AnimatePresence>
+                {storedMovie?.watched && (
+                  <MotiView
+                    from={{ opacity: 0, scale: 0.6 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0.5, scale: 0.6 }}
+                    transition={{ type: "timing", duration: 200 }}
+                  >
+                    <Eye
+                      fill={colors.includeGreen}
+                      strokeWidth={1}
+                      className="color-black"
+                      size={22}
+                    />
+                  </MotiView>
+                )}
+              </AnimatePresence>
+            </Pressable>
+            <AnimDetailImage existsInSaved={existsInSaved} posterURL={posterURL} />
+          </View>
         </MDDetailContextMenu>
 
-        {/* </View> */}
-        <View
-          className="flex-1"
-          key={2}
-          // layout={SequencedTransition.duration(300).reverse().reduceMotion(ReduceMotion.Never)}
-          // exiting={FadeOut.duration(300)}
-          // entering={FadeIn.duration(300)}
-        >
+        <View className="flex-1" key={2}>
           {movieDetails?.id ? (
             <Overview overview={movieDetails?.overview} />
           ) : (

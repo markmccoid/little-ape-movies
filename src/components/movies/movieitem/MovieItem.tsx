@@ -63,7 +63,7 @@ const MovieItem = ({ movie, isMovieLoading, setIsMovieLoading }: Props) => {
         }}
       >
         <View
-          className="absolute p-1 bottom-0 w-full z-0 bg-red-500 "
+          className="absolute bottom-0 w-full z-10 bg-red-500 "
           style={{
             height: extraHeight + verticalMargin,
             borderBottomEndRadius: 10,

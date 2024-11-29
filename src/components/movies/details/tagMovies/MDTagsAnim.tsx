@@ -25,7 +25,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { Line } from "react-native-svg";
+import MDFavWatched from "./MDFavWatched";
 
 type Props = {
   existsInSaved: boolean;
@@ -95,6 +95,7 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
               />
             ))}
           </TagCloudEnhanced>
+          <MDFavWatched storedMovie={storedMovie} />
         </View>
       )}
       {/* END */}
@@ -182,6 +183,7 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
             ))}
           </TagCloudEnhanced>
         </MotiView>
+        <MDFavWatched storedMovie={storedMovie} />
       </Animated.View>
     </View>
   );

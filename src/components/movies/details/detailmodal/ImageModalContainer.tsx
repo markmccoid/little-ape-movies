@@ -46,7 +46,11 @@ const ImageModalContainer = ({ movieId }: Props) => {
   return (
     <Animated.View entering={FadeIn.duration(1000)} exiting={FadeOut}>
       {largeImageURL ? (
-        <Animated.View className={`mx-[${MARGIN}] mt-2`} entering={FadeIn} exiting={FadeOut}>
+        <Animated.View
+          style={{ marginHorizontal: MARGIN, marginTop: 5 }}
+          entering={FadeIn}
+          exiting={FadeOut}
+        >
           <View className="flex-row gap-3 justify-end mr-2 mb-2 mt-2">
             <Button onPress={handleUpdateImage}>
               <Text>Select</Text>
@@ -68,9 +72,12 @@ const ImageModalContainer = ({ movieId }: Props) => {
         </Animated.View>
       ) : (
         <Animated.ScrollView
-          className={`mx-[${MARGIN}]`}
-          contentContainerClassName={`flex-row flex-wrap gap-[${MARGIN}]`}
-          style={{ paddingTop: 10 }}
+          contentContainerStyle={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+          }}
+          style={{ marginHorizontal: MARGIN, paddingTop: 10 }}
           entering={FadeIn}
         >
           {movieImages.map((image, index) => {
@@ -84,6 +91,7 @@ const ImageModalContainer = ({ movieId }: Props) => {
                   imageStyle={{
                     borderRadius: 10,
                     borderWidth: StyleSheet.hairlineWidth,
+                    marginBottom: 10,
                   }}
                 />
               </TouchableOpacity>
