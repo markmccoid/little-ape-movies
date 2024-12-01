@@ -12,6 +12,8 @@ import { Sparkles } from "@/lib/icons/Sparkles";
 import { Eye } from "@/lib/icons/Eye";
 import { useCustomTheme } from "@/lib/colorThemes";
 import { AnimatePresence, MotiView } from "moti";
+import { MotiWatched } from "./tagMovies/MotiWatchedIcons";
+import { MotiFavorited } from "./tagMovies/MotiFavoriteIcons";
 
 type Props = {
   existsInSaved: boolean;
@@ -41,45 +43,21 @@ const MDImageDescRow = ({ existsInSaved, movieDetails, storedMovie }: Props) => 
           existsInSaved={existsInSaved}
         >
           <View>
+            {/* Favorite Star */}
             <Pressable
               className="absolute z-10 bottom-[-5] left-[-5]"
               onPress={() => actions.toggleFavorited(storedMovie.id)}
             >
-              <AnimatePresence>
-                {storedMovie?.favorited && (
-                  <MotiView
-                    from={{ opacity: 0, scale: 0.6 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0.5, scale: 0.6 }}
-                    transition={{ type: "timing", duration: 200 }}
-                  >
-                    <Sparkles fill="yellow" strokeWidth={1} className="color-black" size={22} />
-                  </MotiView>
-                )}
-              </AnimatePresence>
+              <AnimatePresence>{storedMovie?.favorited && <MotiFavorited />}</AnimatePresence>
             </Pressable>
+            {/* Watched Eye */}
             <Pressable
               className="absolute z-10 bottom-[-5] right-[-5]"
               onPress={() => actions.toggleWatched(storedMovie.id)}
             >
-              <AnimatePresence>
-                {storedMovie?.watched && (
-                  <MotiView
-                    from={{ opacity: 0, scale: 0.6 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0.5, scale: 0.6 }}
-                    transition={{ type: "timing", duration: 200 }}
-                  >
-                    <Eye
-                      fill={colors.includeGreen}
-                      strokeWidth={1}
-                      className="color-black"
-                      size={22}
-                    />
-                  </MotiView>
-                )}
-              </AnimatePresence>
+              <AnimatePresence>{storedMovie?.watched && <MotiWatched />}</AnimatePresence>
             </Pressable>
+            {/* Poster IMAGE */}
             <AnimDetailImage existsInSaved={existsInSaved} posterURL={posterURL} />
           </View>
         </MDDetailContextMenu>

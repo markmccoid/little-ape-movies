@@ -1,11 +1,11 @@
 import { View, Pressable } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Sparkle } from "@/lib/icons/Sparkle";
 import { Sparkles } from "@/lib/icons/Sparkles";
 import { EyeOff } from "@/lib/icons/EyeOff";
 import { Eye } from "@/lib/icons/Eye";
 import MDBackground from "../MDBackground";
-import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
+import { ShowItemType, useMovieActions } from "@/store/store.shows";
 import { Text } from "@/components/ui/text";
 import { useCustomTheme } from "@/lib/colorThemes";
 import { AnimatePresence, MotiView } from "moti";
@@ -16,19 +16,33 @@ type Props = {
 const MDFavWatched = ({ storedMovie }: Props) => {
   const actions = useMovieActions();
   const { colors } = useCustomTheme();
+  const [localWatched, setLocalWatched] = useState(!!storedMovie?.watched);
+  const [localFavorited, setLocalFavorited] = useState(!!storedMovie?.favorited);
   if (!storedMovie?.id) return;
+
+  const handleWatched = () => {
+    setLocalWatched((prev) => !!!prev);
+    setTimeout(() => actions.toggleWatched(storedMovie.id), 200);
+  };
+
+  const handleFavorited = () => {
+    setLocalFavorited((prev) => !!!prev);
+    setTimeout(() => actions.toggleFavorited(storedMovie.id), 200);
+  };
+
+  useEffect(() => {
+    setLocalFavorited(!!storedMovie?.favorited);
+    setLocalWatched(!!storedMovie?.watched);
+  }, [storedMovie?.favorited, storedMovie?.watched]);
 
   return (
     <View className="flex-row h-[40] items-center justify-center px-3">
       <MDBackground />
-      <Pressable
-        onPress={() => actions.toggleWatched(storedMovie.id)}
-        className="flex-row items-center"
-      >
+      <Pressable onPress={handleWatched} className="flex-row items-center">
         {/* Reserve space for icons */}
         <View style={{ width: 40, height: 40, justifyContent: "center", alignItems: "center" }}>
           <AnimatePresence>
-            {storedMovie.watched ? (
+            {localWatched ? (
               <MotiView
                 key="eye"
                 from={{
@@ -84,14 +98,11 @@ const MDFavWatched = ({ storedMovie }: Props) => {
       </Pressable>
 
       <View className="mx-3" />
-      <Pressable
-        onPress={() => actions.toggleFavorited(storedMovie.id)}
-        className="flex-row items-center"
-      >
+      <Pressable onPress={handleFavorited} className="flex-row items-center">
         {/* Reserve space for icons */}
         <View style={{ width: 40, height: 40, justifyContent: "center", alignItems: "center" }}>
           <AnimatePresence>
-            {storedMovie.favorited ? (
+            {localFavorited ? (
               <MotiView
                 key="on"
                 from={{

@@ -1,5 +1,5 @@
 import { View, Text, Image, Dimensions, Pressable, InteractionManager } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { Link, useFocusEffect, useNavigation, useRouter } from "expo-router";
 import { ShowItemType } from "@/store/store.shows";
 import { getMovieItemSizing } from "./movieItemHelpers";
@@ -23,6 +23,8 @@ const MovieItem = ({ movie, isMovieLoading, setIsMovieLoading }: Props) => {
     getMovieItemSizing();
   const router = useRouter();
   const { colors } = useCustomTheme();
+
+  const [actionBarShown, toggleActionBarShown] = useReducer((state) => !state, false);
 
   //~ --- handleMovieSelect ---
   const handleMovieSelect = async () => {
@@ -59,40 +61,28 @@ const MovieItem = ({ movie, isMovieLoading, setIsMovieLoading }: Props) => {
           overflow: "hidden",
           marginVertical: verticalMargin,
           marginRight: gap,
-          height: imageHeight + extraHeight,
+          // height: imageHeight + extraHeight,
+          height: imageHeight + 10,
         }}
       >
-        <View
-          className="absolute bottom-0 w-full z-10 bg-red-500 "
+        {/* <View
+          className={`absolute bottom-0 w-full bg-red-500`}
           style={{
             height: extraHeight + verticalMargin,
             borderBottomEndRadius: 10,
             borderBottomStartRadius: 10,
+            zIndex: actionBarShown ? 10 : 10,
           }}
-        >
-          <MovieItemActionBar movie={movie} />
-        </View>
-        {/* <Link href={`/(auth)/(drawer)/(tabs)/home/${movie.id}`} push disabled> */}
+        > */}
+        {/* <View className="relative z-20 h-[15]">
+          <View className="absolute bottom-0 h-[10] z-10">
+            <Text className="text-white font-bold">^^</Text>
+          </View> */}
+        <MovieItemActionBar movie={movie} isVisible={actionBarShown} />
+        {/* </View> */}
+        {/* </View> */}
 
-        <Pressable
-          onPress={handleMovieSelect}
-          disabled={isMovieLoading}
-          // onPress={async () => {
-          //   // if not already routed, push route and set ref
-          //   // ref will be reset in useEffect
-          //   // if (!pickedRef.current) {
-          //   console.log("MovieID-Loading?", movie.id, isMovieLoading);
-          //   if (isMovieLoading) return;
-          //   setIsMovieLoading(true);
-          //   await new Promise((resolve) => setTimeout(() => resolve("done"), 1));
-          //   router.push(`/(auth)/(drawer)/(tabs)/home/${movie.id}`);
-          //   pickedRef.current = true;
-          //   setIsMovieLoading(false);
-          //   // } else {
-          //   //   pickedRef.current = false;
-          //   // }
-          // }}
-        >
+        <Pressable onPress={handleMovieSelect} disabled={isMovieLoading}>
           <MovieImage
             posterURL={movie?.posterURL}
             imageWidth={imageWidth}
@@ -109,7 +99,6 @@ const MovieItem = ({ movie, isMovieLoading, setIsMovieLoading }: Props) => {
             }
           />
         </Pressable>
-        {/* </Link> */}
       </View>
     </View>
   );
