@@ -1,5 +1,5 @@
 import { View, ScrollView, Pressable, StyleSheet, LayoutChangeEvent } from "react-native";
-import React, { useEffect, useLayoutEffect, useReducer, useState } from "react";
+import React, { useEffect, useLayoutEffect, useReducer, useRef, useState } from "react";
 import { Text } from "@/components/ui/text";
 import useMovieStore, {
   ShowItemType,
@@ -26,6 +26,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import MDFavWatched from "./MDFavWatched";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   existsInSaved: boolean;
@@ -37,11 +38,13 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
   const actions = useMovieActions();
   const tags = useMovieStore((state) => state.tagArray);
   const appliedTags = useGetAppliedTags(storedMovie?.id);
-  const movieTags = updateTagState(tags, storedMovie?.tags || []);
-  const [containerHeight, setContainerHeight] = useState(150);
-  const [isMeasured, setIsMeasured] = useState(false);
 
+  const movieTags = updateTagState(tags, storedMovie?.tags || []);
+  const [containerHeight, setContainerHeight] = useState(0);
+  const [isMeasured, setIsMeasured] = useState(false);
   const toHeight = useSharedValue(0);
+  // Initial Render ref so that the animation doesn't play on first load
+  const initialRender = useRef(true);
 
   // Measure the size of the "Edit" Tags
   // This is done on a view that is set to opacity zero and abosolute positioning
@@ -50,7 +53,7 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
   const onLayout = (event: LayoutChangeEvent) => {
     if (isMeasured) return;
     const height = event.nativeEvent.layout.height;
-    toHeight.value = height;
+    // toHeight.value = height;
     setContainerHeight(height);
     setIsMeasured(true);
   };
@@ -75,7 +78,7 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
       height: toHeight.value,
       opacity: interpolate(toHeight.value, [containerHeight, 0], [1, 0]),
     };
-  });
+  }, [isMeasured, showAddTag]);
   return (
     <View className="mx-2">
       {/* This block is to only measure the height then it is not used again */}
@@ -100,13 +103,8 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
       )}
       {/* END */}
 
-      <MotiView
-        className="flex-row items-center justify-center"
-        key={1}
-        from={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        // style={{ height: 50 }}
-      >
+      <View className="flex-row items-center justify-center">
+        {/* Add Tag Button */}
         <Pressable onPress={toggleAddTag} className="">
           <Animated.View
             className="py-1 px-3 mr-1 border-hairline bg-secondary rounded-lg flex-row items-center"
@@ -136,30 +134,27 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
           keyExtractor={(item) => item.id}
           horizontal
           renderItem={({ item, index }) => (
-            <MotiView
-              className={`flex-row justify-center items-center px-[5] py-[2] mr-[5] ${
-                showAddTag ? "opacity-55" : "opacity-100"
-              }`}
+            <Animated.View
+              className={`flex-row justify-center items-center px-[5] py-[2] mr-[5] 
+                ${showAddTag ? "opacity-55" : "opacity-100"}`}
               style={{
                 backgroundColor: colors.colorSelected,
                 borderWidth: StyleSheet.hairlineWidth,
                 borderRadius: 8,
               }}
               key={item.id}
-              entering={BounceIn}
-              exiting={BounceOut}
+              entering={initialRender.current ? undefined : BounceIn.duration(100)}
+              exiting={BounceOut.duration(100)}
+              onLayout={() => (initialRender.current = false)}
             >
               <Text className="text-lg">{item.name}</Text>
-            </MotiView>
+            </Animated.View>
           )}
           itemLayoutAnimation={LinearTransition}
         />
-      </MotiView>
+      </View>
 
       <Animated.View
-        // entering={FadeIn.duration(2000)}
-        // exiting={FadeOut.duration(500)}
-        // layout={LinearTransition.duration(500).springify()}
         style={[
           tagViewStyle,
           {
@@ -168,7 +163,7 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
           },
         ]}
       >
-        <MotiView from={{ opacity: showAddTag ? 1 : 0 }} animate={{ opacity: showAddTag ? 1 : 0 }}>
+        <View>
           <TagCloudEnhanced>
             {movieTags?.map((el) => (
               <TagItemEnhanced
@@ -182,7 +177,7 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
               />
             ))}
           </TagCloudEnhanced>
-        </MotiView>
+        </View>
         <MDFavWatched storedMovie={storedMovie} />
       </Animated.View>
     </View>

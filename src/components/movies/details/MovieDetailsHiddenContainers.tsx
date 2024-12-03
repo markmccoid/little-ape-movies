@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import HiddenContainerAnimated from "@/components/common/HiddenContainer/HiddenContainerAnimated";
 import MDMovieRecommendations from "./MDMovieRecommendations";
 import HiddenContainerWatchProviders from "@/components/common/HiddenContainer/HiddenContainerWatchProviders";
@@ -10,6 +10,7 @@ import useImageSize from "@/hooks/useImageSize";
 
 const MovieDetailsHiddenContainers = ({ movieId }) => {
   const { imageHeight } = useImageSize(3);
+
   return (
     <>
       <View className="my-[2]">

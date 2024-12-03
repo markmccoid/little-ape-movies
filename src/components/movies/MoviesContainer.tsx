@@ -65,12 +65,12 @@ const MoviesContainer = () => {
       <MovieAnimatedView index={index} scrollY={scrollY}>
         <MovieItem
           movie={item}
-          isMovieLoading={isMovieLoading}
-          setIsMovieLoading={setIsMovieLoading}
+          // isMovieLoading={isMovieLoading}
+          // setIsMovieLoading={setIsMovieLoading}
         />
       </MovieAnimatedView>
     ),
-    [isMovieLoading]
+    []
   );
 
   return (
@@ -78,7 +78,7 @@ const MoviesContainer = () => {
       data={movies}
       ref={flatListRef}
       renderItem={renderItem}
-      extraData={isMovieLoading}
+      // extraData={isMovieLoading}
       // keyExtractor={(item, index) => index.toString()}
       keyExtractor={(item) => item.id.toString()}
       numColumns={2}

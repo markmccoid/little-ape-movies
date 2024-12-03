@@ -12,7 +12,6 @@ import useSettingsStore, { useSettingsActions } from "@/store/store.settings";
 
 const HomeIndex = () => {
   const { colors } = useCustomTheme();
-  const currUser = getCurrentUser();
   const { includeTags, excludeTags, includeGenres } = useSettingsStore(
     (state) => state.filterCriteria
   );
@@ -28,9 +27,6 @@ const HomeIndex = () => {
     <View className="bg-background flex-1">
       <Stack.Screen
         options={{
-          headerShown: true,
-          title: `Movies-${currUser}`,
-          headerLeft: () => <NestedStackDrawerToggle />,
           headerRight: () => (
             <View>
               {!!filterCount.includeTagsCount && (

@@ -4,6 +4,8 @@ import MovieDetailsContainer from "@/components/movies/details/MovieDetailsConta
 import { View, Text, Image, Dimensions } from "react-native";
 import useMovieStore from "@/store/store.shows";
 import { LinearGradient } from "expo-linear-gradient";
+import { useMovieDetailData } from "@/store/dataHooks";
+import MDImageDescRow from "@/components/movies/details/MDImageDescRow";
 const { width, height: screenHeight } = Dimensions.get("window");
 
 const MovieDetailSearch = () => {
@@ -12,7 +14,7 @@ const MovieDetailSearch = () => {
   const { storedMovie } = useMovieStore((state) => ({
     storedMovie: state.actions.getShowById(parseInt(showId)),
   }));
-
+  const { movieDetails, isLoading } = useMovieDetailData(parseInt(showId));
   const [shouldRender, setShouldRender] = React.useState(false);
 
   useEffect(() => {
@@ -29,7 +31,13 @@ const MovieDetailSearch = () => {
         colors={[backgroundStartColor, backgroundEndColor]}
         style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, opacity: 0.4 }}
       />
-
+      <View className="opacity-0 h-0">
+        <MDImageDescRow
+          movieDetails={movieDetails}
+          storedMovie={storedMovie}
+          existsInSaved={!!storedMovie?.existsInSaved}
+        />
+      </View>
       {shouldRender && <MovieDetailsContainer movieId={parseInt(showId, 10)} />}
     </View>
   );

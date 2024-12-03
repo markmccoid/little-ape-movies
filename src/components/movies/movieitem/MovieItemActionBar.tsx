@@ -4,8 +4,8 @@ import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.show
 import { AnimatePresence, MotiView } from "moti";
 import { DeleteIcon } from "@/components/common/Icons";
 import { useCustomTheme } from "@/lib/colorThemes";
-import { MotiNotWatched, MotiWatched } from "../details/tagMovies/MotiWatchedIcons";
-import { MotiFavorited, MotiNotFavorited } from "../details/tagMovies/MotiFavoriteIcons";
+import { NotWatched, Watched } from "../details/tagMovies/WatchedIcons";
+import { Favorited, NotFavorited } from "../details/tagMovies/FavoriteIcons";
 import { SquareChevronUp } from "@/lib/icons/SquareChevronUp";
 type MovieItemActionBarProps = {
   movie: ShowItemType;
@@ -72,12 +72,10 @@ const MovieItemActionBar: React.FC<MovieItemActionBarProps> = ({ movie, isVisibl
             <DeleteIcon size={15} color="black" />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleWatched}>
-            <AnimatePresence>{localWatched ? <MotiWatched /> : <MotiNotWatched />}</AnimatePresence>
+            {localWatched ? <Watched /> : <NotWatched />}
           </TouchableOpacity>
           <TouchableOpacity onPress={handleFavorited}>
-            <AnimatePresence>
-              {localFavorited ? <MotiFavorited /> : <MotiNotFavorited />}
-            </AnimatePresence>
+            {localFavorited ? <Favorited /> : <NotFavorited />}
           </TouchableOpacity>
         </View>
       </MotiView>

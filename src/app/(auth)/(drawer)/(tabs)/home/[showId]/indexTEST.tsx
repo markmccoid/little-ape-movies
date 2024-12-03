@@ -1,23 +1,25 @@
 import { Image, View, ScrollView, useColorScheme, Pressable } from "react-native";
 import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
-import { Link, useRouter, useNavigation } from "expo-router";
+import { Link, useRouter, useNavigation, useLocalSearchParams } from "expo-router";
 import { MovieDetails, useMovieDetailData, useOMDBData } from "@/store/dataHooks";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import useMovieStore, { useMovieActions } from "@/store/store.shows";
 import { movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
-import MDImageDescRow from "./MDImageDescRow";
-import MDDetails from "./MDDetails";
-import MDRatings from "./MDRatings";
+import MDImageDescRow from "@/components/movies/details/MDImageDescRow";
+import MDDetails from "@/components/movies/details/MDDetails";
+import MDRatings from "@/components/movies/details/MDRatings";
 import { eventBus } from "@/store/eventBus";
-import MDDeleteButton from "./MDButtonDelete";
-import MDButtonAdd from "./MDButtonAdd";
-import MDTagsAnim from "./tagMovies/MDTagsAnim";
-import HiddenContainers from "./MovieDetailsHiddenContainers";
+import MDDeleteButton from "@/components/movies/details/MDButtonDelete";
+import MDButtonAdd from "@/components/movies/details/MDButtonAdd";
+import MDTagsAnim from "@/components/movies/details/tagMovies/MDTagsAnim";
+import HiddenContainers from "@/components/movies/details/MovieDetailsHiddenContainers";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
-const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
-  const router = useRouter();
+const IndexTest = () => {
+  const { showId } = useLocalSearchParams<{ showId: string }>();
+  const movieId = parseInt(showId, 10);
   const tabBarHeight = useBottomTabBarHeight();
+  const [finalMovieDetails, setFinalMovieDetails] = useState<MovieDetails>();
   //!! We need have local state so that we only update component AFTER
   //!! it has received focus (see isFocused page)
   const [movieTitle, setMovieTitle] = useState<string>();
@@ -32,13 +34,14 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const existsInSaved = !!storedMovie?.existsInSaved;
   const { movieDetails, isLoading } = useMovieDetailData(movieId);
   const { data: omdbData, isLoading: omdbLoading } = useOMDBData(movieDetails?.imdbId);
-  const [finalMovieDetails, setFinalMovieDetails] = useState<MovieDetails>(movieDetails);
 
   const isFocused = navigation.isFocused();
   const [shouldRender, setShouldRender] = React.useState(false);
 
+  console.log("MDC ShouldRender", shouldRender);
   // determines when the "where to watch" and below items load.
   useEffect(() => {
+    console.log("MDC-AnimationFrame");
     requestAnimationFrame(() => {
       setShouldRender(true);
     });
@@ -89,7 +92,9 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   // Once we are focused and not loading, update the local state
   // Local state will be used to update the component
   useEffect(() => {
+    console.log("MDC-useEffect isFocused,isLoading", isFocused, isLoading);
     if (isFocused && !isLoading) {
+      setFinalMovieDetails(movieDetails);
       setMovieTitle(storedMovie?.title || movieDetails?.title || "");
     }
   }, [isFocused, isLoading]);
@@ -100,7 +105,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   //   if (existsInSaved) {
   //     eventBus.publish("UPDATE_SHOW_PROVIDERS", storedMovie?.id);
   //   }
-  // }, [existsInSaved]);
+  //}, [existsInSaved]);
   return (
     <View className="flex-1">
       {existsInSaved && storedMovie?.posterURL && (
@@ -129,7 +134,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
         {/* IMAGE and DESC */}
         <View>
           <MDImageDescRow
-            movieDetails={movieDetails as MovieDetails}
+            movieDetails={finalMovieDetails as MovieDetails}
             storedMovie={storedMovie}
             existsInSaved={existsInSaved}
           />
@@ -148,7 +153,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
           />
         </View>
 
-        {existsInSaved && (
+        {storedMovie?.id && (
           <View key={storedMovie?.id} className="my-[2]">
             <MDTagsAnim
               // movieDetails={finalMovieDetails as MovieDetails}
@@ -157,12 +162,11 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
             />
           </View>
         )}
-        <HiddenContainers movieId={finalMovieDetails?.id} />
-        {/* {shouldRender && <HiddenContainers movieId={finalMovieDetails?.id} />} */}
+        {shouldRender && <HiddenContainers movieId={finalMovieDetails?.id} />}
       </ScrollView>
     </View>
   );
 };
 
-// export default MovieDetailsContainer;
-export default React.memo(MovieDetailsContainer);
+export default IndexTest;
+// export default React.memo(MovieDetailsContainer);

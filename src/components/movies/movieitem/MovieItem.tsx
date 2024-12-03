@@ -15,10 +15,10 @@ import { useCustomTheme } from "@/lib/colorThemes";
 // const imageHeight = imageWidth * 1.5;
 type Props = {
   movie: ShowItemType;
-  isMovieLoading: boolean;
-  setIsMovieLoading: (arg: boolean) => void;
+  isMovieLoading?: boolean;
+  setIsMovieLoading?: (arg: boolean) => void;
 };
-const MovieItem = ({ movie, isMovieLoading, setIsMovieLoading }: Props) => {
+const MovieItem = ({ movie, isMovieLoading = false, setIsMovieLoading = () => {} }: Props) => {
   const { imageHeight, imageWidth, verticalMargin, extraHeight, horizontalMargin, gap } =
     getMovieItemSizing();
   const router = useRouter();
@@ -27,15 +27,17 @@ const MovieItem = ({ movie, isMovieLoading, setIsMovieLoading }: Props) => {
   const [actionBarShown, toggleActionBarShown] = useReducer((state) => !state, false);
 
   //~ --- handleMovieSelect ---
-  const handleMovieSelect = async () => {
+  const handleMovieSelect = () => {
     // Prevent further presses if a movie is already loading
-    if (isMovieLoading) return;
-    // Set loading state to true
-    setIsMovieLoading(true);
+    // setIsMovieLoading(true);
+    console.log("MOVIE HOME DETAIL", `${movie.id}`);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1));
+      // await new Promise((resolve) => setTimeout(resolve, 0));
       // Navigate to the movie's detail page
-      router.push(`/(auth)/(drawer)/(tabs)/home/${movie.id}`);
+      router.push({
+        pathname: `/(auth)/(drawer)/(tabs)/home/[showId]`,
+        params: { showId: movie.id },
+      });
     } catch (error) {
       // Reset loading state after navigation completes
       console.log("Error navigating to movie detail (MovieItem.tsx)");
@@ -104,7 +106,7 @@ const MovieItem = ({ movie, isMovieLoading, setIsMovieLoading }: Props) => {
   );
 };
 
-export default MovieItem;
+export default React.memo(MovieItem);
 
 /* 
 <Link href={`./home/${movie.id}`}>

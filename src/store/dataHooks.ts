@@ -106,6 +106,7 @@ export const useOMDBData = (imdbID: string | undefined) => {
     queryKey: ["omdbdata", imdbID],
     queryFn: () => getOMDBData(imdbID!),
     enabled: !!imdbID, // Only run query if movieId exists
+    // staleTime: 600000,
   });
 };
 
@@ -121,6 +122,7 @@ export const useMovieDetailData = (movieId: number) => {
     queryKey: ["movie", movieId],
     queryFn: () => fetchAdditionalMovieData(movieId),
     enabled: !!movieId, // Only run query if movieId exists
+    // staleTime: 600000,
     // initialData: storedMovie, // Initial data from Zustand
   });
   const fetchAdditionalMovieData = async (id: number) => {
@@ -175,6 +177,7 @@ type movieRecommendationsResults = {
   voteCount: number;
 };
 export const useMovieRecommendations = (movieId: number) => {
+  console.log("Query movie recs");
   const { data, isLoading, ...rest } = useQuery({
     queryKey: ["movierecommendations", movieId],
     queryFn: async () => {

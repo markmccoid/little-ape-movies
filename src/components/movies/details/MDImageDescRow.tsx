@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Pressable } from "react-native";
 import React from "react";
-import Animated, { FadeIn } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { MovieDetails } from "@/store/dataHooks";
 import useDetailImageSize from "@/hooks/useDetailImageSize";
 import { ShowItemType, useMovieActions } from "@/store/store.shows";
@@ -14,6 +14,8 @@ import { useCustomTheme } from "@/lib/colorThemes";
 import { AnimatePresence, MotiView } from "moti";
 import { MotiWatched } from "./tagMovies/MotiWatchedIcons";
 import { MotiFavorited } from "./tagMovies/MotiFavoriteIcons";
+import { Favorited } from "./tagMovies/FavoriteIcons";
+import { Watched } from "./tagMovies/WatchedIcons";
 
 type Props = {
   existsInSaved: boolean;
@@ -42,21 +44,32 @@ const MDImageDescRow = ({ existsInSaved, movieDetails, storedMovie }: Props) => 
           movieTitle={storedMovie?.title || movieDetails?.title}
           existsInSaved={existsInSaved}
         >
-          <View>
+          <View className="relative">
             {/* Favorite Star */}
-            <Pressable
-              className="absolute z-10 bottom-[-5] left-[-5]"
-              onPress={() => actions.toggleFavorited(storedMovie.id)}
-            >
-              <AnimatePresence>{storedMovie?.favorited && <MotiFavorited />}</AnimatePresence>
-            </Pressable>
+            {storedMovie?.favorited && (
+              <Animated.View
+                entering={FadeIn}
+                exiting={FadeOut}
+                className="absolute z-10 bottom-[-5] left-[-5]"
+              >
+                <Pressable onPress={() => actions.toggleFavorited(storedMovie.id)}>
+                  {/* {!!storedMovie?.favorited && <MotiFavorited />} */}
+                  <Favorited />
+                </Pressable>
+              </Animated.View>
+            )}
             {/* Watched Eye */}
-            <Pressable
-              className="absolute z-10 bottom-[-5] right-[-5]"
-              onPress={() => actions.toggleWatched(storedMovie.id)}
-            >
-              <AnimatePresence>{storedMovie?.watched && <MotiWatched />}</AnimatePresence>
-            </Pressable>
+            {storedMovie?.watched && (
+              <Animated.View
+                entering={FadeIn}
+                exiting={FadeOut}
+                className="absolute z-10 bottom-[-5] right-[-5]"
+              >
+                <Pressable onPress={() => actions.toggleWatched(storedMovie.id)}>
+                  <Watched />
+                </Pressable>
+              </Animated.View>
+            )}
             {/* Poster IMAGE */}
             <AnimDetailImage existsInSaved={existsInSaved} posterURL={posterURL} />
           </View>
