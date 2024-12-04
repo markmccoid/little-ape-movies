@@ -45,6 +45,11 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const isFocused = navigation.isFocused();
   const [shouldRender, setShouldRender] = React.useState(false);
 
+  useEffect(() => {
+    if (!isLoading) {
+      setFinalMovieDetails(movieDetails);
+    }
+  }, [isLoading]);
   // determines when the "where to watch" and below items load.
   useEffect(() => {
     requestAnimationFrame(() => {
@@ -84,7 +89,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   // needs to update
   useLayoutEffect(() => {
     const options: NativeStackNavigationOptions = {
-      title: movieTitle || "", //storedMovie?.title || movieDetails?.title || "",
+      // title: movieTitle || "", //storedMovie?.title || movieDetails?.title || "",
       headerRight: existsInSaved ? HeaderRight : HeaderRightAdd,
     };
     navigation.setOptions(options);
@@ -99,12 +104,12 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   }, [isFocused, isLoading]);
 
   //~ Update streaming providers
-  // useEffect(() => {
-  //   console.log("EXISTS IN SAVED Effect", existsInSaved);
-  //   if (existsInSaved) {
-  //     eventBus.publish("UPDATE_SHOW_PROVIDERS", storedMovie?.id);
-  //   }
-  // }, [existsInSaved]);
+  useEffect(() => {
+    if (existsInSaved) {
+      requestAnimationFrame(() => eventBus.publish("UPDATE_SHOW_PROVIDERS", storedMovie?.id));
+    }
+  }, [existsInSaved]);
+
   return (
     <View className="flex-1">
       {existsInSaved && storedMovie?.posterURL && (

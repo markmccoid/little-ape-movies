@@ -7,6 +7,8 @@ import Animated, {
   FadeIn,
   useSharedValue,
   useAnimatedScrollHandler,
+  BounceOut,
+  BounceIn,
 } from "react-native-reanimated";
 import useMovieStore, { ShowItemType, useMovieActions, useMovies } from "@/store/store.shows";
 import MovieItem from "./movieitem/MovieItem";
@@ -63,11 +65,13 @@ const MoviesContainer = () => {
   const renderItem = useCallback(
     ({ item, index }: { item: ShowItemType; index: number }) => (
       <MovieAnimatedView index={index} scrollY={scrollY}>
-        <MovieItem
-          movie={item}
-          // isMovieLoading={isMovieLoading}
-          // setIsMovieLoading={setIsMovieLoading}
-        />
+        <Animated.View entering={FadeIn.duration(300)}>
+          <MovieItem
+            movie={item}
+            // isMovieLoading={isMovieLoading}
+            // setIsMovieLoading={setIsMovieLoading}
+          />
+        </Animated.View>
       </MovieAnimatedView>
     ),
     []

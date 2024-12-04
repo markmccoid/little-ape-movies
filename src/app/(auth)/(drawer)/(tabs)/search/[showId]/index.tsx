@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
-import { useGlobalSearchParams } from "expo-router";
+import { useGlobalSearchParams, useNavigation } from "expo-router";
 import MovieDetailsContainer from "@/components/movies/details/MovieDetailsContainer";
 import { View, Text, Image, Dimensions } from "react-native";
 import useMovieStore from "@/store/store.shows";
 import { LinearGradient } from "expo-linear-gradient";
 import { useMovieDetailData } from "@/store/dataHooks";
 import MDImageDescRow from "@/components/movies/details/MDImageDescRow";
+import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 const { width, height: screenHeight } = Dimensions.get("window");
 
 const MovieDetailSearch = () => {
@@ -16,12 +17,17 @@ const MovieDetailSearch = () => {
   }));
   const { movieDetails, isLoading } = useMovieDetailData(parseInt(showId));
   const [shouldRender, setShouldRender] = React.useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
+    const options: NativeStackNavigationOptions = {
+      title: storedMovie?.title || movieDetails?.title || "",
+    };
+    navigation.setOptions(options);
     requestAnimationFrame(() => {
       setShouldRender(true);
     });
-  }, []);
+  }, [isLoading]);
   const backgroundStartColor = storedMovie?.posterColors?.primary?.color || "#000000";
   const backgroundEndColor = storedMovie?.posterColors?.darkestColor || "#FFFFFF";
 

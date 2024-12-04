@@ -23,6 +23,7 @@ interface WatchProviderSection {
 }
 
 const MDWatchProviders = ({ movieId }: Props) => {
+  console.log("MDWatchProv movie id", movieId);
   if (!movieId) return null;
 
   const { watchProviders, justWatchLink, isLoading } = useMovieWatchProviders(movieId);

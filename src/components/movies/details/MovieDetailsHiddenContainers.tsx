@@ -8,7 +8,7 @@ import MDMovieVideos from "./MDMovieVideos";
 import MDMovieCast from "./cast/MDMovieCast";
 import useImageSize from "@/hooks/useImageSize";
 
-const MovieDetailsHiddenContainers = ({ movieId }) => {
+const MovieDetailsHiddenContainers = ({ movieId }: { movieId: number }) => {
   const { imageHeight } = useImageSize(3);
 
   return (
