@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { View, Text, TouchableOpacity, Pressable } from "react-native";
 import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
 import { AnimatePresence, MotiView } from "moti";
@@ -19,6 +19,7 @@ const MovieItemActionBar: React.FC<MovieItemActionBarProps> = ({ movie, isVisibl
   const [localWatched, setLocalWatched] = React.useState(!!watched);
   const [localFavorited, setLocalFavorited] = React.useState(!!watched);
   const [isShown, toggleIsShown] = useReducer((state) => !state, false);
+  const initialRender = React.useRef(true);
 
   useEffect(() => {
     if (localWatched !== !!watched) {
@@ -37,14 +38,20 @@ const MovieItemActionBar: React.FC<MovieItemActionBarProps> = ({ movie, isVisibl
     setLocalFavorited((prev) => !prev);
     setTimeout(() => movieActions.toggleFavorited(movie.id), 100);
   };
+  const actionHeightFrom = initialRender.current ? undefined : isShown ? 35 : 85;
+  const actionHeightAnimate = initialRender.current ? undefined : isShown ? 85 : 35;
+
   return (
     <MotiView
-      from={{ height: isShown ? 35 : 85 }}
-      animate={{ height: isShown ? 85 : 35 }}
+      from={{ height: actionHeightFrom }}
+      animate={{ height: actionHeightAnimate }}
+      // from={{ height: isShown ? 35 : 85 }}
+      // animate={{ height: isShown ? 85 : 35 }}
       transition={{ type: "timing", duration: 700 }}
       className="absolute z-20 h-[35] bottom-0"
+      onLayout={() => (initialRender.current = false)}
     >
-      <Pressable onPress={toggleIsShown} className="justify-center flex-row top-3 z-30">
+      <Pressable onPress={toggleIsShown} className="justify-center flex-row top-3 z-30 rounded-lg">
         <MotiView
           from={{ rotate: isShown ? "0deg" : "180deg" }}
           animate={{ rotate: isShown ? "180deg" : "0deg" }}

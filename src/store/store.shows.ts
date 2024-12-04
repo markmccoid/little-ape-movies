@@ -8,6 +8,67 @@ import { reverse, sortBy, unionBy } from "lodash";
 import useSettingsStore from "./store.settings";
 import { useEffect, useState } from "react";
 
+//!!
+const addShowAsync =
+  (
+    set: (
+      partial:
+        | MovieStore
+        | Partial<MovieStore>
+        | ((state: MovieStore) => MovieStore | Partial<MovieStore>),
+      replace?: boolean | undefined
+    ) => void,
+    get: () => MovieStore
+  ) =>
+  async (show: movieSearchByTitle_Results) => {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const showExists = doesShowExist(
+          get().shows.map((el) => el.id),
+          show.id
+        );
+
+        // If the show already exists or lacks an ID, resolve immediately.
+        if (showExists || !show.id) {
+          resolve();
+        }
+
+        const newShow = {
+          id: show.id,
+          title: show.title,
+          posterURL: show?.posterURL,
+          backdropURL: show?.backdropURL,
+          releaseDateEpoch: show?.releaseDate?.epoch || 0,
+          dateAddedEpoch: Date.now(),
+          genres: show?.genres,
+          rating: 0,
+          tags: [],
+          existsInSaved: true,
+          streaming: {
+            dateAddedEpoch: Date.now(),
+            providers: [],
+          },
+        };
+
+        set((state) => ({ shows: [...state.shows, newShow] }));
+
+        // Simulate delay for background processes
+        // await new Promise((resolve) => setTimeout(resolve, 5000));
+
+        // Trigger the event bus actions
+        eventBus.publish("TAG_SEARCH_RESULTS");
+        eventBus.publish("GENERATE_GENRES_ARRAY");
+        eventBus.publish("UPDATE_SHOW_PROVIDERS", show.id);
+        eventBus.publish("GET_SHOW_COLORS", newShow.id, newShow?.posterURL);
+        console.log("COLORS DONE");
+        requestAnimationFrame(() => resolve());
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+//!!!
+
 type ShowStreamingProviders = {
   dateAddedEpoch: number;
   // Just store the providerId
@@ -45,11 +106,11 @@ export interface MovieStore {
   // Updated with on the providers stored on shows, updated via "UPDATE_SHOW_PROVIDERS" event bus call.
   streamingProviders: ProviderInfo[];
   actions: {
-    addShow: (show: movieSearchByTitle_Results) => void;
+    addShow: (show: movieSearchByTitle_Results) => Promise<void>;
     updateShow: (id: number, updatedShow: Partial<ShowItemType>) => void;
     updateShowTags: (id: number, tagId: string, action: "add" | "remove") => void;
     updateStreamingProviders: (newProviders: ProviderInfo[] | undefined) => void;
-    removeShow: (id: number) => void;
+    removeShow: (id: number) => Promise<void>;
     getShowById: (id: number) => ShowItemType | undefined;
     tagAdd: (tag: string) => void;
     tagRemove: (tagId: string) => void;
@@ -72,38 +133,41 @@ const useMovieStore = create<MovieStore>()(
       ...movieInitialState,
       actions: {
         //~ ---------------------------------
-        //~ addShow
-        addShow: (show) => {
-          const showExists = doesShowExist(
-            get().shows.map((el) => el.id),
-            show.id
-          );
-          // If movie exists do nothing
-          if (showExists || !show.id) return;
-
-          const newShow: ShowItemType = {
-            id: show.id,
-            title: show.title,
-            posterURL: show?.posterURL,
-            backdropURL: show?.backdropURL,
-            releaseDateEpoch: show?.releaseDate?.epoch || 0,
-            dateAddedEpoch: Date.now(),
-            genres: show?.genres,
-            rating: 0,
-            tags: [],
-            existsInSaved: true,
-            streaming: {
-              dateAddedEpoch: Date.now(),
-              providers: [],
-            },
-          };
-          set((state) => ({ shows: [...state.shows, newShow] }));
-
-          eventBus.publish("UPDATE_SHOW_PROVIDERS", show.id);
-          eventBus.publish("TAG_SEARCH_RESULTS");
-          eventBus.publish("GET_SHOW_COLORS", newShow.id, newShow?.posterURL);
-          eventBus.publish("GENERATE_GENRES_ARRAY");
-        },
+        //~ NEW addShow
+        addShow: addShowAsync(set, get),
+        //~ ---------------------------------
+        //~ OLD addShow
+        // addShow: async (show) => {
+        //   const showExists = doesShowExist(
+        //     get().shows.map((el) => el.id),
+        //     show.id
+        //   );
+        //   // If movie exists do nothing
+        //   if (showExists || !show.id) return;
+        //   new Promise((resolve) => resolve("done"));
+        //   const newShow: ShowItemType = {
+        //     id: show.id,
+        //     title: show.title,
+        //     posterURL: show?.posterURL,
+        //     backdropURL: show?.backdropURL,
+        //     releaseDateEpoch: show?.releaseDate?.epoch || 0,
+        //     dateAddedEpoch: Date.now(),
+        //     genres: show?.genres,
+        //     rating: 0,
+        //     tags: [],
+        //     existsInSaved: true,
+        //     streaming: {
+        //       dateAddedEpoch: Date.now(),
+        //       providers: [],
+        //     },
+        //   };
+        //   set((state) => ({ shows: [...state.shows, newShow] }));
+        //   requestAnimationFrame(() => {
+        //     eventBus.publish("TAG_SEARCH_RESULTS");
+        //     eventBus.publish("GENERATE_GENRES_ARRAY");
+        //     eventBus.publish("UPDATE_SHOW_PROVIDERS", show.id);
+        //   });
+        // },
         //~ ---------------------------------
         //~ updateShow
         updateShow: (id, updatedShow) => {
@@ -131,11 +195,12 @@ const useMovieStore = create<MovieStore>()(
         },
         //~ ---------------------------------
         //~ removeShow
-        removeShow: (id) => {
-          set((state) => ({
-            shows: state.shows.filter((m) => m.id !== id),
-          }));
-          eventBus.publish("TAG_SEARCH_RESULTS");
+        removeShow: async (id) => {
+          requestAnimationFrame(() =>
+            set((state) => ({
+              shows: state.shows.filter((m) => m.id !== id),
+            }))
+          );
         },
         //~ ---------------------------------
         //~ getShowById
@@ -359,4 +424,5 @@ export const updateTagState = (tags: Tag[], appliedTagIds: string[]) => {
     applied: appliedTagSet.has(tag.id),
   }));
 };
+
 export default useMovieStore;

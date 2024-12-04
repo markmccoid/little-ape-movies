@@ -24,9 +24,6 @@ import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import SearchInput from "@/components/search/SearchInput";
 import SearchInputAccessoryView from "@/components/search/SearchInputAccessoryView";
 
-import { GripHorizontal } from "@/lib/icons/GripHorizontals";
-
-import { Button } from "@/components/ui/button";
 import { GripHorizontalIcon } from "@/components/common/Icons";
 import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle";
 
@@ -94,52 +91,9 @@ const SearchPage = () => {
               animate={{ transform: [{ rotateZ: searchColumns === 2 ? "90deg" : "0deg" }] }}
             >
               <GripHorizontalIcon color={colors.primary} />
-              {/* <SymbolView
-                name="arrow.left.and.right.text.vertical"
-                // name="rectangle.expand.vertical"
-                style={{
-                  width: 25,
-                  height: 25,
-                }}
-                colors={searchColumns === 2 ? [colors.primary, "green"] : ["green", colors.primary]}
-                type="palette"
-              /> */}
             </MotiView>
           </Pressable>
         </View>
-        {/* <View className="flex-row gap-3 items-center" style={{ marginLeft: 20 }}>
-          <Pressable
-            onPress={() => {
-              handleSearchType("title");
-            }}
-            className={`p-2`}
-          >
-            <MotiText
-              from={{ opacity: searchType === "title" ? 0.5 : 1 }}
-              animate={{ opacity: searchType === "title" ? 1 : 0.5 }}
-              transition={{
-                type: "timing",
-                duration: 300,
-              }}
-              className={`text-text ${searchType === "title" ? "" : "opacity-50"}`}
-            >
-              Title
-            </MotiText>
-          </Pressable>
-          <Pressable onPress={() => handleSearchType("person")} className={`p-2`}>
-            <MotiText
-              from={{ opacity: searchType === "person" ? 0.5 : 1 }}
-              animate={{ opacity: searchType === "person" ? 1 : 0.5 }}
-              transition={{
-                type: "timing",
-                duration: 300,
-              }}
-              className={`text-text`}
-            >
-              Person
-            </MotiText>
-          </Pressable>
-        </View> */}
         <SearchInputAccessoryView />
       </View>
 

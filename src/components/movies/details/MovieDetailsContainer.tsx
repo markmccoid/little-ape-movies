@@ -1,4 +1,12 @@
-import { Image, View, ScrollView, useColorScheme, Pressable } from "react-native";
+import {
+  Image,
+  View,
+  ScrollView,
+  useColorScheme,
+  Text,
+  Pressable,
+  TouchableOpacity,
+} from "react-native";
 import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Link, useRouter, useNavigation } from "expo-router";
 import { MovieDetails, useMovieDetailData, useOMDBData } from "@/store/dataHooks";
@@ -18,10 +26,6 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
-  //!! We need have local state so that we only update component AFTER
-  //!! it has received focus (see isFocused page)
-  const [movieTitle, setMovieTitle] = useState<string>();
-  //!!
 
   const colorScheme = useColorScheme();
   const navigation = useNavigation();
@@ -33,6 +37,10 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const { movieDetails, isLoading } = useMovieDetailData(movieId);
   const { data: omdbData, isLoading: omdbLoading } = useOMDBData(movieDetails?.imdbId);
   const [finalMovieDetails, setFinalMovieDetails] = useState<MovieDetails>(movieDetails);
+  //!! We need have local state so that we only update component AFTER
+  //!! it has received focus (see isFocused page)
+  const [movieTitle, setMovieTitle] = useState<string>(movieDetails?.title || "");
+  //!!
 
   const isFocused = navigation.isFocused();
   const [shouldRender, setShouldRender] = React.useState(false);
@@ -46,7 +54,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
 
   // console.log("stored", storedMovie, existsInSaved, movieDetails);
   //-- HEADER RIGHT ----------
-  const handleAddMovie = useCallback(() => {
+  const handleAddMovie = useCallback(async () => {
     if (!movieDetails) return;
     const movieToAdd = {
       id: movieDetails.id,
@@ -59,7 +67,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
       videos: movieDetails.videos,
     } as movieSearchByTitle_Results;
 
-    movieActions.addShow(movieToAdd);
+    await movieActions.addShow(movieToAdd);
   }, [finalMovieDetails]);
 
   //~~ --------------------------------
@@ -68,11 +76,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
     <MDDeleteButton movieId={storedMovie?.id} removeShow={movieActions.removeShow} />
   );
   const HeaderRightAdd = () => {
-    return (
-      <>
-        <MDButtonAdd addShow={handleAddMovie} />
-      </>
-    );
+    return <MDButtonAdd addShow={handleAddMovie} />;
   };
   //~~ --------------------------------
 

@@ -6,11 +6,7 @@ import useMovieStore from "@/store/store.shows";
 import SearchContainer from "../SearchContainer";
 
 const MovieSearchContainer = () => {
-  // const { isLoading } = useSearchResults();
   const { movies, isLoading, fetchNextPage } = useTitleSearch();
-  const searchType = useSearchStore((state) => state.searchType);
-  // const { setNextPage } = useSearchStore((state) => state.actions);
-  const movieActions = useMovieStore((state) => state.actions);
 
   return <SearchContainer movies={movies} fetchNextPage={fetchNextPage} />;
 };

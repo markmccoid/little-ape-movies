@@ -13,13 +13,12 @@ const { width, height: screenHeight } = Dimensions.get("window");
 
 const MovieDetailHome = () => {
   const { showId } = useLocalSearchParams<{ showId: string }>();
-  const isReady = useIsReady();
   const { storedMovie } = useMovieStore((state) => ({
     storedMovie: state.actions.getShowById(parseInt(showId)),
   }));
   const { movieDetails, isLoading } = useMovieDetailData(parseInt(showId));
   const [shouldRender, setShouldRender] = React.useState(false);
-  console.log("MOVIE ID HOME---", showId, isReady, shouldRender, storedMovie?.id);
+  console.log("MOVIE ID HOME---", showId);
 
   useEffect(() => {
     requestAnimationFrame(() => {

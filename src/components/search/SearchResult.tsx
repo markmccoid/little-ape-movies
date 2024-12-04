@@ -8,6 +8,7 @@ import { useCustomTheme } from "@/lib/colorThemes";
 import { Link, router, useFocusEffect, usePathname, useSegments } from "expo-router";
 import useImageSize from "@/hooks/useImageSize";
 import { Text } from "@/components/ui/text";
+
 //~~  SearchResult Component
 type Props = {
   movie: MovieSearchResults;
@@ -86,7 +87,10 @@ const SearchResult = ({
       // router.push(`${linkPath}${movie.id}`, {relativeToDirectory: true});
     } catch (error) {
       // Reset loading state after navigation completes
+
       console.log("Error navigating to movie detail (SearchResult.tsx)");
+    } finally {
+      setIsMovieLoading(false);
     }
   };
   return (

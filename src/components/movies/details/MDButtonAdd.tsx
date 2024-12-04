@@ -3,7 +3,7 @@ import { TouchableOpacity, View, Text, ActivityIndicator } from "react-native";
 import { useCustomTheme } from "@/lib/colorThemes";
 import { SymbolView } from "expo-symbols";
 type Props = {
-  addShow: () => void;
+  addShow: () => Promise<void>;
 };
 
 const MDButtonAdd = ({ addShow }: Props) => {
@@ -11,21 +11,15 @@ const MDButtonAdd = ({ addShow }: Props) => {
   const { colors } = useCustomTheme();
   const handleAdd = async () => {
     if (isProcessing) return;
-
     setIsProcessing(true);
-    // Since addShow is not async and it takes a while, await a fake promise so isProcessing can take effect
     await new Promise((resolve) => setTimeout(() => resolve("done"), 0));
-    try {
-      addShow();
-
-      // Navigate back to the desired screen
-    } catch (error) {
-      console.error("Add operation failed:", error);
-    } finally {
-      setIsProcessing(false);
-    }
+    await addShow();
+    setIsProcessing(false);
   };
 
+  if (isProcessing) {
+    return <ActivityIndicator size="small" />;
+  }
   return (
     <TouchableOpacity
       disabled={isProcessing}
@@ -34,11 +28,7 @@ const MDButtonAdd = ({ addShow }: Props) => {
         isProcessing ? "opacity-50" : ""
       }`}
     >
-      {isProcessing ? (
-        <ActivityIndicator size="small" />
-      ) : (
-        <SymbolView name="plus.app" tintColor={colors.text} size={30} />
-      )}
+      <SymbolView name="plus.app" tintColor={colors.text} size={30} />
     </TouchableOpacity>
   );
 };

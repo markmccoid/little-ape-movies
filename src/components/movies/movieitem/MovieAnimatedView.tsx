@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import Animated, { useAnimatedStyle, SharedValue, FadeOut } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, SharedValue, FadeOut, FadeIn } from "react-native-reanimated";
 import {
   getViewMoviesOpacity,
   getViewMoviesRotates,

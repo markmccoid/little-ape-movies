@@ -40,19 +40,22 @@ const SearchContainer = ({ movies, fetchNextPage }: Props) => {
     }, [])
   );
 
-  const renderItem = ({ item, index }: { item: MovieSearchResults; index: number }) => {
-    return (
-      <SearchResult
-        movie={item}
-        isMovieLoading={isMovieLoading}
-        setIsMovieLoading={setIsMovieLoading}
-        onAddMovie={movieActions.addShow}
-        onRemoveMovie={movieActions.removeShow}
-        numColumns={numColumns}
-        spacing={{ bottomMargin: BOTTOM_MARGIN, extraHeight: EXTRA_HEIGHT }}
-      />
-    );
-  };
+  const renderItem = useCallback(
+    ({ item, index }: { item: MovieSearchResults; index: number }) => {
+      return (
+        <SearchResult
+          movie={item}
+          isMovieLoading={isMovieLoading}
+          setIsMovieLoading={setIsMovieLoading}
+          onAddMovie={movieActions.addShow}
+          onRemoveMovie={movieActions.removeShow}
+          numColumns={numColumns}
+          spacing={{ bottomMargin: BOTTOM_MARGIN, extraHeight: EXTRA_HEIGHT }}
+        />
+      );
+    },
+    [movies]
+  );
 
   const getItemLayout = (_, index: number) => ({
     length: imageHeight + BOTTOM_MARGIN + EXTRA_HEIGHT, // Item height plus in SearchResult there is A bottom margin and extra height added to imageHeight

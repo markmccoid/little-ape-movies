@@ -11,6 +11,7 @@ const ShowIdLayout = () => {
         name="index"
         options={{
           headerShown: true,
+          title: "",
           headerLeft: () => (
             <Pressable onPress={router.back} className="flex-row ml-[-10] items-center">
               <ChevronLeft size={30} />
