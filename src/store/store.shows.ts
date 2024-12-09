@@ -11,13 +11,16 @@ import { useEffect, useState } from "react";
 //!!
 const addShowAsync =
   (
-    set: (
-      partial:
-        | MovieStore
-        | Partial<MovieStore>
-        | ((state: MovieStore) => MovieStore | Partial<MovieStore>),
-      replace?: boolean | undefined
-    ) => void,
+    set: {
+      (
+        partial:
+          | MovieStore
+          | Partial<MovieStore>
+          | ((state: MovieStore) => MovieStore | Partial<MovieStore>),
+        replace?: false
+      ): void;
+      (state: MovieStore | ((state: MovieStore) => MovieStore), replace: true): void;
+    },
     get: () => MovieStore
   ) =>
   async (show: movieSearchByTitle_Results) => {
@@ -196,11 +199,9 @@ const useMovieStore = create<MovieStore>()(
         //~ ---------------------------------
         //~ removeShow
         removeShow: async (id) => {
-          requestAnimationFrame(() =>
-            set((state) => ({
-              shows: state.shows.filter((m) => m.id !== id),
-            }))
-          );
+          set((state) => ({
+            shows: state.shows.filter((m) => m.id !== id),
+          }));
         },
         //~ ---------------------------------
         //~ getShowById

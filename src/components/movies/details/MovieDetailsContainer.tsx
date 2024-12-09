@@ -6,6 +6,7 @@ import {
   Text,
   Pressable,
   TouchableOpacity,
+  InteractionManager,
 } from "react-native";
 import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Link, useRouter, useNavigation } from "expo-router";
@@ -30,12 +31,15 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const colorScheme = useColorScheme();
   const navigation = useNavigation();
   const movieActions = useMovieActions();
-  const { storedMovie } = useMovieStore((state) => ({
-    storedMovie: state.actions.getShowById(movieId),
-  }));
+  // const movies = useMovieStore((state) => state.shows);
+  // const { storedMovie } = useMovieStore((state) => ({
+  //   storedMovie: state.actions.getShowById,
+  // });
+  const storedMovie = movieActions.getShowById(movieId);
   const existsInSaved = !!storedMovie?.existsInSaved;
   const { movieDetails, isLoading } = useMovieDetailData(movieId);
   const { data: omdbData, isLoading: omdbLoading } = useOMDBData(movieDetails?.imdbId);
+
   const [finalMovieDetails, setFinalMovieDetails] = useState<MovieDetails>(movieDetails);
   //!! We need have local state so that we only update component AFTER
   //!! it has received focus (see isFocused page)
@@ -106,7 +110,9 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   //~ Update streaming providers
   useEffect(() => {
     if (existsInSaved) {
-      requestAnimationFrame(() => eventBus.publish("UPDATE_SHOW_PROVIDERS", storedMovie?.id));
+      InteractionManager.runAfterInteractions(() =>
+        eventBus.publish("UPDATE_SHOW_PROVIDERS", storedMovie?.id)
+      );
     }
   }, [existsInSaved]);
 
@@ -166,8 +172,8 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
             />
           </View>
         )}
-        <HiddenContainers movieId={finalMovieDetails?.id} />
-        {/* {shouldRender && <HiddenContainers movieId={finalMovieDetails?.id} />} */}
+        {/* <HiddenContainers movieId={finalMovieDetails?.id} /> */}
+        {shouldRender && <HiddenContainers movieId={finalMovieDetails?.id} />}
       </ScrollView>
     </View>
   );
