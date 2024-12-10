@@ -134,21 +134,23 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
           keyExtractor={(item) => item.id}
           horizontal
           renderItem={({ item, index }) => (
-            <Animated.View
-              className={`flex-row justify-center items-center px-[5] py-[2] mr-[5] 
+            <Pressable onPress={toggleAddTag}>
+              <Animated.View
+                className={`flex-row justify-center items-center px-[5] py-[2] mr-[5] 
                 ${showAddTag ? "opacity-55" : "opacity-100"}`}
-              style={{
-                backgroundColor: colors.colorSelected,
-                borderWidth: StyleSheet.hairlineWidth,
-                borderRadius: 8,
-              }}
-              key={item.id}
-              entering={initialRender.current ? undefined : BounceIn.duration(100)}
-              exiting={BounceOut.duration(100)}
-              onLayout={() => (initialRender.current = false)}
-            >
-              <Text className="text-lg">{item.name}</Text>
-            </Animated.View>
+                style={{
+                  backgroundColor: colors.colorSelected,
+                  borderWidth: StyleSheet.hairlineWidth,
+                  borderRadius: 8,
+                }}
+                key={item.id}
+                entering={initialRender.current ? undefined : BounceIn.duration(100)}
+                exiting={BounceOut.duration(100)}
+                onLayout={() => (initialRender.current = false)}
+              >
+                <Text className="text-lg">{item.name}</Text>
+              </Animated.View>
+            </Pressable>
           )}
           itemLayoutAnimation={LinearTransition}
         />

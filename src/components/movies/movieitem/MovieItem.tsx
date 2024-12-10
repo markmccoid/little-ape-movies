@@ -4,8 +4,9 @@ import { Link, useFocusEffect, useNavigation, useRouter } from "expo-router";
 import { ShowItemType } from "@/store/store.shows";
 import { getMovieItemSizing } from "./movieItemHelpers";
 import MovieImage from "@/components/common/MovieImage";
-import MovieItemActionBar from "./MovieItemActionBar";
+import ActionBarContainer from "./actionbar/ActionBarContainer";
 import { useCustomTheme } from "@/lib/colorThemes";
+import { hide } from "expo-splash-screen";
 
 // const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 // const availableWidth = screenWidth - 20; // Subtract left and right margins
@@ -15,22 +16,31 @@ import { useCustomTheme } from "@/lib/colorThemes";
 // const imageHeight = imageWidth * 1.5;
 type Props = {
   movie: ShowItemType;
-  isMovieLoading?: boolean;
-  setIsMovieLoading?: (arg: boolean) => void;
+  hideAll: boolean;
+  // handleHideActionBar: (arg: boolean) => void;
 };
-const MovieItem = ({ movie, isMovieLoading = false, setIsMovieLoading = () => {} }: Props) => {
+const MovieItem = ({ movie, hideAll }: Props) => {
   const { imageHeight, imageWidth, verticalMargin, extraHeight, horizontalMargin, gap } =
     getMovieItemSizing();
   const router = useRouter();
   const { colors } = useCustomTheme();
 
   const [actionBarShown, toggleActionBarShown] = useReducer((state) => !state, false);
+  const handleActionBarShown = () => toggleActionBarShown();
+
+  //- when hideAll is true, close the actionBar if it is showing
+  useEffect(() => {
+    if (hideAll) {
+      if (actionBarShown) {
+        toggleActionBarShown();
+      }
+    }
+  }, [hideAll]);
 
   //~ --- handleMovieSelect ---
   const handleMovieSelect = () => {
     // Prevent further presses if a movie is already loading
     // setIsMovieLoading(true);
-    console.log("MOVIE HOME DETAIL", `${movie.id}`);
     try {
       // await new Promise((resolve) => setTimeout(resolve, 0));
       // Navigate to the movie's detail page
@@ -38,6 +48,10 @@ const MovieItem = ({ movie, isMovieLoading = false, setIsMovieLoading = () => {}
         pathname: `/(auth)/(drawer)/(tabs)/home/[showId]`,
         params: { showId: movie.id },
       });
+
+      // if (actionBarShown) {
+      //   toggleActionBarShown();
+      // }
     } catch (error) {
       // Reset loading state after navigation completes
       console.log("Error navigating to movie detail (MovieItem.tsx)");
@@ -63,28 +77,17 @@ const MovieItem = ({ movie, isMovieLoading = false, setIsMovieLoading = () => {}
           overflow: "hidden",
           marginVertical: verticalMargin,
           marginRight: gap,
-          // height: imageHeight + extraHeight,
-          height: imageHeight + 10,
+          height: imageHeight,
         }}
       >
-        {/* <View
-          className={`absolute bottom-0 w-full bg-red-500`}
-          style={{
-            height: extraHeight + verticalMargin,
-            borderBottomEndRadius: 10,
-            borderBottomStartRadius: 10,
-            zIndex: actionBarShown ? 10 : 10,
-          }}
-        > */}
-        {/* <View className="relative z-20 h-[15]">
-          <View className="absolute bottom-0 h-[10] z-10">
-            <Text className="text-white font-bold">^^</Text>
-          </View> */}
-        <MovieItemActionBar movie={movie} isVisible={actionBarShown} />
-        {/* </View> */}
-        {/* </View> */}
+        {/* ACTION BAR */}
+        <ActionBarContainer
+          movie={movie}
+          isVisible={actionBarShown}
+          toggleVisibility={handleActionBarShown}
+        />
 
-        <Pressable onPress={handleMovieSelect} disabled={isMovieLoading}>
+        <Pressable onPress={handleMovieSelect} onLongPress={toggleActionBarShown}>
           <MovieImage
             posterURL={movie?.posterURL}
             imageWidth={imageWidth}
@@ -107,25 +110,3 @@ const MovieItem = ({ movie, isMovieLoading = false, setIsMovieLoading = () => {}
 };
 
 export default React.memo(MovieItem);
-
-/* 
-<Link href={`./home/${movie.id}`}>
-  <Image
-    source={{ uri: movie.posterURL }}
-    style={{ width: 140, height: 200, resizeMode: "contain" }}
-    className="rounded-lg m-1 border border-border"
-  />
-</Link>
-<TouchableOpacity className="flex-col ml-3 flex-1" onPress={() => removeMovie(movie.id)}>
-  <Text className="text-text text-lg font-semibold text-center" numberOfLines={2}>
-    {movie.id}
-    {movie.title}
-  </Text>
-  <Image
-    source={{ uri: movie.backdropURL }}
-    style={{ width: 230, height: 150, resizeMode: "contain" }}
-  />
-  <Text className="text-text">{dayjs(movie.dateAddedEpoch).format("MM/DD/YYYY mm:ss")}</Text>
-  
-</TouchableOpacity> 
-*/

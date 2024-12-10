@@ -31,7 +31,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const colorScheme = useColorScheme();
   const navigation = useNavigation();
   const movieActions = useMovieActions();
-  // const movies = useMovieStore((state) => state.shows);
+  const movies = useMovieStore((state) => state.shows);
   // const { storedMovie } = useMovieStore((state) => ({
   //   storedMovie: state.actions.getShowById,
   // });

@@ -275,15 +275,20 @@ const useMovieStore = create<MovieStore>()(
           const showTags = get().actions.getShowById(showId)?.tags;
           if (!showTags) return;
           const tags = get().tagArray;
-          return showTags
-            .map((showTag) => {
-              const tagInfo = tags.find((el) => el.id === showTag);
-              if (!tagInfo) return;
-              return {
-                id: tagInfo.id,
-                name: tagInfo.name,
-              };
-            })
+          const selectedTags = showTags.map((showTag) => {
+            // use the tagIndex as the position so we can sort in the same order as in the tags screen
+            const tagIndex = tags.findIndex((el) => el.id === showTag);
+            const tagInfo = tags[tagIndex]; //tags.find((el) => el.id === showTag);
+            if (!tagInfo) return;
+            return {
+              id: tagInfo.id,
+              name: tagInfo.name,
+              position: tagIndex,
+            };
+          });
+
+          return sortBy(selectedTags, "position")
+            .map((final) => ({ id: final?.id, name: final?.name }))
             .filter((el): el is Pick<Tag, "id" | "name"> => el !== null && el !== undefined);
         },
         //~ ---------------------------------

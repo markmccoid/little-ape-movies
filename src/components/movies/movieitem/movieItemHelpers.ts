@@ -8,7 +8,7 @@ export const getMovieItemSizing = () => {
   const { imageHeight, imageWidth } = useImageSize.getSizes(2, horizontalMargin, gap);
 
   const verticalMargin = 8;
-  const EXTRA_HEIGHT = 30;
+  const EXTRA_HEIGHT = 0;
   // ItemHeight includes the margin
   const itemHeight = imageHeight + EXTRA_HEIGHT + verticalMargin * 2;
   return {
