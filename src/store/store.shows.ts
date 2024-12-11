@@ -4,9 +4,10 @@ import { StorageAdapter } from "./dataAccess/storageAdapter";
 import { movieSearchByTitle_Results, ProviderInfo } from "@markmccoid/tmdb_api";
 import { eventBus } from "./eventBus";
 import { ImageColors } from "@/utils/color.utils";
-import { reverse, sortBy, unionBy } from "lodash";
+import { orderBy, reverse, sortBy, unionBy } from "lodash";
 import useSettingsStore from "./store.settings";
 import { useEffect, useState } from "react";
+import { formatEpoch } from "@/utils/utils";
 
 //!!
 const addShowAsync =
@@ -41,14 +42,14 @@ const addShowAsync =
           title: show.title,
           posterURL: show?.posterURL,
           backdropURL: show?.backdropURL,
-          releaseDateEpoch: show?.releaseDate?.epoch || 0,
-          dateAddedEpoch: Date.now(),
+          releaseDateEpoch: formatEpoch(show?.releaseDate?.epoch || 0),
+          dateAddedEpoch: formatEpoch(Date.now()),
           genres: show?.genres,
           rating: 0,
           tags: [],
           existsInSaved: true,
           streaming: {
-            dateAddedEpoch: Date.now(),
+            dateAddedEpoch: formatEpoch(Date.now()),
             providers: [],
           },
         };
@@ -236,7 +237,7 @@ const useMovieStore = create<MovieStore>()(
           const id = Date.now().toString(36);
           const newTags = [
             ...currTags,
-            { id, name: tag, dateAdded: Date.now(), pos: currTags.length },
+            { id, name: tag, dateAdded: formatEpoch(Date.now()), pos: currTags.length },
           ];
           console.log("NEW Tags", newTags);
           set({ tagArray: newTags });
@@ -320,12 +321,12 @@ export const useMovieActions = () => {
   //~ toggleWatched
   const toggleWatched = (movieId: number) => {
     const isWatched = useMovieStore.getState().actions.getShowById(movieId)?.watched;
-    updateShow(movieId, { watched: isWatched ? undefined : Date.now() });
+    updateShow(movieId, { watched: isWatched ? undefined : formatEpoch(Date.now()) });
   };
   //~ toggleFavorited
   const toggleFavorited = (movieId: number) => {
     const isFavorited = useMovieStore.getState().actions.getShowById(movieId)?.favorited;
-    updateShow(movieId, { favorited: isFavorited ? undefined : Date.now() });
+    updateShow(movieId, { favorited: isFavorited ? undefined : formatEpoch(Date.now()) });
   };
   const actions = { ...useMovieStore((state) => state.actions), toggleWatched, toggleFavorited };
   // return useMovieStore((state) => state.actions);
@@ -410,9 +411,18 @@ export const useMovies = () => {
     // if we make it here, then add the movie to our filtered list
     filteredMovies.push(movie);
   }
-
+  //!! Potential Sort Fields
+  // filteredMovies[0].watched;
+  // filteredMovies[0].favorited;
+  // filteredMovies[0].title;
+  // filteredMovies[0].dateAddedEpoch;
+  // filteredMovies[0].rating;
   // sort
-  filteredMovies = reverse(sortBy(filteredMovies, "dateAddedEpoch"));
+  filteredMovies = orderBy(
+    filteredMovies,
+    ["rating", "dateAddedEpoch", "title"],
+    ["desc", "asc", "asc"]
+  );
   return filteredMovies;
 };
 

@@ -1,12 +1,12 @@
 import { View, Text, Image, Dimensions, Pressable, InteractionManager } from "react-native";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
-import { Link, useFocusEffect, useNavigation, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { ShowItemType } from "@/store/store.shows";
 import { getMovieItemSizing } from "./movieItemHelpers";
 import MovieImage from "@/components/common/MovieImage";
 import ActionBarContainer from "./actionbar/ActionBarContainer";
 import { useCustomTheme } from "@/lib/colorThemes";
-import { hide } from "expo-splash-screen";
+import dayjs from "dayjs";
 
 // const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 // const availableWidth = screenWidth - 20; // Subtract left and right margins
@@ -17,9 +17,10 @@ import { hide } from "expo-splash-screen";
 type Props = {
   movie: ShowItemType;
   hideAll: boolean;
+  column: 0 | 1;
   // handleHideActionBar: (arg: boolean) => void;
 };
-const MovieItem = ({ movie, hideAll }: Props) => {
+const MovieItem = ({ movie, hideAll, column }: Props) => {
   const { imageHeight, imageWidth, verticalMargin, extraHeight, horizontalMargin, gap } =
     getMovieItemSizing();
   const router = useRouter();
@@ -85,9 +86,13 @@ const MovieItem = ({ movie, hideAll }: Props) => {
           movie={movie}
           isVisible={actionBarShown}
           toggleVisibility={handleActionBarShown}
+          column={column}
         />
 
         <Pressable onPress={handleMovieSelect} onLongPress={toggleActionBarShown}>
+          <Text>
+            {dayjs.unix(movie.dateAddedEpoch).format("MM-DD-YYYY")}-{movie.rating}
+          </Text>
           <MovieImage
             posterURL={movie?.posterURL}
             imageWidth={imageWidth}

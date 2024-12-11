@@ -45,15 +45,17 @@ const MoviesContainer = () => {
 
   const renderItem = useCallback(
     ({ item, index }: { item: ShowItemType; index: number }) => {
+      const column = (index % 2) as 0 | 1;
+
       return (
         <MovieAnimatedView index={index} scrollY={scrollY}>
           <Animated.View entering={FadeIn.duration(300)}>
-            <MovieItem movie={item} hideAll={hideAll} />
+            <MovieItem movie={item} hideAll={hideAll} column={column} />
           </Animated.View>
         </MovieAnimatedView>
       );
     },
-    [hideAll]
+    [hideAll, movies]
   );
 
   return (

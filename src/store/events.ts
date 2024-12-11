@@ -3,6 +3,7 @@ import { eventBus } from "./eventBus";
 import { movieGetWatchProviders, WatchProvidersType } from "@markmccoid/tmdb_api";
 import useMovieStore, { useMovies } from "./store.shows";
 import { getImageColors } from "@/utils/color.utils";
+import { formatEpoch } from "@/utils/utils";
 
 //~~ -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //~~ Update Show Data Code
@@ -30,7 +31,7 @@ const createUpdateShowProviders = (queryClient: QueryClient) => async (showId: n
   // Update the movie record with the streaming providers
   useMovieStore.getState().actions.updateShow(showId, {
     streaming: {
-      dateAddedEpoch: Date.now(),
+      dateAddedEpoch: formatEpoch(Date.now()),
       providers: wproviders?.stream ? wproviders.stream.map((el) => el.providerId) : [],
     },
   });

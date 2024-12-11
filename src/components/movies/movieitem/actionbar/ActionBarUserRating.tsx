@@ -3,6 +3,7 @@ import React from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
 import Animated, {
+  clamp,
   Extrapolation,
   interpolate,
   interpolateColor,
@@ -13,18 +14,20 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useCustomTheme } from "@/lib/colorThemes";
+import useImageSize from "@/hooks/useImageSize";
 
 const { width, height } = Dimensions.get("window");
-const BUTTON_WIDTH = 50;
-const LEFT_MARGIN = 20;
-
-const positionFactor = Math.floor((width - BUTTON_WIDTH / 2) / 10);
+const BUTTON_WIDTH = 30;
+const LEFT_MARGIN = 0;
 
 type Props = {
   updateRating: (rating: number) => void;
   rating: number | undefined;
+  column: 0 | 1;
 };
-const UserRating = ({ updateRating, rating = 0 }: Props) => {
+const UserRating = ({ updateRating, rating = 0, column }: Props) => {
+  const { imageHeight, imageWidth, gap } = useImageSize();
+  const positionFactor = Math.floor((imageWidth - BUTTON_WIDTH / 2) / 10);
   const { colors } = useCustomTheme();
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
@@ -34,22 +37,37 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
   const buttonOffsetx = useSharedValue(0);
   const textScale = useSharedValue(0);
   const [currRating, setCurrRating] = React.useState(rating);
+  const columnOffset = column === 1 ? gap * 2 + imageWidth : gap;
 
+  React.useEffect(() => {
+    setCurrRating(rating);
+  }, [rating]);
   const gesture = Gesture.Pan()
     .activateAfterLongPress(300)
     .onStart((event) => {
       "worklet";
       runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
-      translateY.value = withSpring(-55);
-      buttonOffsetx.value = BUTTON_WIDTH / 2 - event.x;
+      translateY.value = withSpring(-35);
+      buttonOffsetx.value = BUTTON_WIDTH / 4 - event.x;
       isPanActive.value = true;
     })
     .onChange((event) => {
       "worklet";
-      translateX.value = event.translationX;
+      // Define a right and left absolute value threshold for an image
+      // based on which column it is in
+      const rightThreshold = column === 1 ? width - 15 : imageWidth + 15;
+      const leftThreshold = column === 1 ? width - 15 - imageWidth : 15;
+      // Only update translateX.value to the new event.translationX IF absoluteX is in
+      // the bounds of our right/left threshold values
+      translateX.value =
+        event.absoluteX >= leftThreshold && event.absoluteX <= rightThreshold
+          ? event.translationX
+          : translateX.value; // Keep the last value if out of bounds
+
       // Now we determine what rating number to show based on the position of the view.
       // some tweaking done, hopefully works on most devices.
-      const posAbsoluteX = event.absoluteX + buttonOffsetx.value - 8;
+      const posAbsoluteX = event.absoluteX + buttonOffsetx.value - columnOffset;
+
       const newPosition = Math.floor(posAbsoluteX / positionFactor);
       let calcCurrRating = newPosition >= 10 ? 10 : newPosition <= 0 ? 0 : newPosition;
 
@@ -99,13 +117,13 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
     };
   });
   return (
-    <View className="z-10" style={{ marginLeft: LEFT_MARGIN }}>
+    <View className="relative z-50" style={{ marginLeft: LEFT_MARGIN }}>
       <GestureDetector gesture={gesture}>
         <Animated.View
           style={[rStyle, { width: BUTTON_WIDTH, borderRadius: 30 }]}
           className="bg-primary flex-row justify-center items-center border border-border"
         >
-          <Animated.Text style={textStyle} className="text-3xl font-bold">
+          <Animated.Text style={textStyle} className="text-xl font-bold">
             {currRating}
           </Animated.Text>
         </Animated.View>

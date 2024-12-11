@@ -15,9 +15,13 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import UserRating from "@/components/common/UserRating";
+import ActionBarUserRating from "./ActionBarUserRating";
+import ActionInfoPanel from "./ActionInfoPanel";
 
 type MovieItemActionBarProps = {
   movie: ShowItemType;
+  column: 0 | 1;
   isVisible: boolean;
   toggleVisibility: () => void;
 };
@@ -26,20 +30,20 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
   movie,
   isVisible,
   toggleVisibility,
+  column,
 }) => {
   const MIN_HEIGHT = 0;
   const MAX_HEIGHT = 185;
-  const movieActions = useMovieActions();
   const initialRender = React.useRef(true);
   const actionHeight = useSharedValue(MIN_HEIGHT);
 
-  const actionHeightFrom = initialRender.current ? 0 : isVisible ? 0 : 175;
-  const actionHeightAnimate = initialRender.current ? 0 : isVisible ? 175 : 0;
+  // const movieActions = useMovieActions();
+  // const actionHeightFrom = initialRender.current ? 0 : isVisible ? 0 : 175;
+  // const actionHeightAnimate = initialRender.current ? 0 : isVisible ? 175 : 0;
   // actionHeight.value = isVisible ? 175 : 0;
   const startY = useSharedValue(MIN_HEIGHT);
 
   const handleVisibilityChange = () => {
-    console.log("handleVisibi", actionHeight.value);
     if (isVisible) {
       actionHeight.value = withTiming(MIN_HEIGHT);
     } else {
@@ -108,31 +112,22 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
       <GestureDetector gesture={panGesture}>
         <Pressable
           onPress={handleVisibilityChange}
-          className="justify-center flex-row top-1 z-30 rounded-lg"
+          className="justify-center flex-row top-0 rounded-lg"
         >
-          <Animated.View
-            style={[iconAnimStyle]}
-            // from={{ rotateZ: isVisible ? "0deg" : "180deg" }}
-            // animate={{ rotateZ: isVisible ? "180deg" : "0deg" }}
-            // transition={{ type: "timing", duration: 1500 }}
-          >
+          <Animated.View style={[iconAnimStyle]}>
             <SquareChevronUp className="color-white bg-black" />
           </Animated.View>
         </Pressable>
       </GestureDetector>
       <MotiView
-        // from={{ height: isShown ? 35 : 65 }}
-        // animate={{ height: isShown ? 65 : 35 }}
-        // transition={{ type: "timing", duration: 1000 }}
         from={{ opacity: isVisible ? 0 : 1 }}
         animate={{ opacity: isVisible ? 1 : 0 }}
         transition={{ type: "timing", duration: 700 }}
-        // exit={{ opacity: isShown ? 1 : 0 }}
-        className="z-10 flex-row w-full bg-red-500  items-center justify-between h-full border"
+        className="z-20 flex-col w-full bg-purple-300 items-start h-full border-hairline "
+        style={{ borderTopRightRadius: 10, borderTopLeftRadius: 10 }}
       >
-        <View className="flex-row w-full bg-red-500 items-start justify-between h-full mt-2">
-          <ActionBarButtons movieId={movie.id} />
-        </View>
+        <ActionBarButtons movie={movie} column={column} />
+        <ActionInfoPanel movie={movie} />
       </MotiView>
     </Animated.View>
   );

@@ -2,8 +2,10 @@ import { View, Text, Pressable, useColorScheme } from "react-native";
 import React from "react";
 import { Link } from "expo-router";
 import { useAuth } from "@/providers/AuthProvider";
+import { useMovieActions } from "@/store/store.shows";
 
 const Settings = () => {
+  const actions = useMovieActions();
   const { currentUser: user, onLogout } = useAuth();
   const colorScheme = useColorScheme();
   return (
@@ -13,6 +15,9 @@ const Settings = () => {
       <Link href="/(auth)/(drawer)/settings/settingone">
         <Text>Setting Page 1</Text>
       </Link>
+      <Pressable onPress={actions.clearStore}>
+        <Text>Clear ALL movies</Text>
+      </Pressable>
       <Pressable onPress={() => onLogout()}>
         <Text>Log Out</Text>
       </Pressable>
