@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
   existsInSaved: boolean;
-  movieDetails: MovieDetails;
+  movieDetails: MovieDetails | undefined;
   omdbData: OMDBData | undefined;
 };
 const MDDetails = ({ movieDetails, omdbData }: Props) => {

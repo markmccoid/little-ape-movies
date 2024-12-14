@@ -5,73 +5,9 @@ import { movieSearchByTitle_Results, ProviderInfo } from "@markmccoid/tmdb_api";
 import { eventBus } from "./eventBus";
 import { ImageColors } from "@/utils/color.utils";
 import { orderBy, reverse, sortBy, unionBy } from "lodash";
-import useSettingsStore from "./store.settings";
+import useSettingsStore, { SortField } from "./store.settings";
 import { useEffect, useState } from "react";
 import { formatEpoch } from "@/utils/utils";
-
-//!!
-const addShowAsync =
-  (
-    set: {
-      (
-        partial:
-          | MovieStore
-          | Partial<MovieStore>
-          | ((state: MovieStore) => MovieStore | Partial<MovieStore>),
-        replace?: false
-      ): void;
-      (state: MovieStore | ((state: MovieStore) => MovieStore), replace: true): void;
-    },
-    get: () => MovieStore
-  ) =>
-  async (show: movieSearchByTitle_Results) => {
-    return new Promise<void>(async (resolve, reject) => {
-      try {
-        const showExists = doesShowExist(
-          get().shows.map((el) => el.id),
-          show.id
-        );
-
-        // If the show already exists or lacks an ID, resolve immediately.
-        if (showExists || !show.id) {
-          resolve();
-        }
-
-        const newShow = {
-          id: show.id,
-          title: show.title,
-          posterURL: show?.posterURL,
-          backdropURL: show?.backdropURL,
-          releaseDateEpoch: formatEpoch(show?.releaseDate?.epoch || 0),
-          dateAddedEpoch: formatEpoch(Date.now()),
-          genres: show?.genres,
-          rating: 0,
-          tags: [],
-          existsInSaved: true,
-          streaming: {
-            dateAddedEpoch: formatEpoch(Date.now()),
-            providers: [],
-          },
-        };
-
-        set((state) => ({ shows: [...state.shows, newShow] }));
-
-        // Simulate delay for background processes
-        // await new Promise((resolve) => setTimeout(resolve, 5000));
-
-        // Trigger the event bus actions
-        eventBus.publish("TAG_SEARCH_RESULTS");
-        eventBus.publish("GENERATE_GENRES_ARRAY");
-        eventBus.publish("UPDATE_SHOW_PROVIDERS", show.id);
-        eventBus.publish("GET_SHOW_COLORS", newShow.id, newShow?.posterURL);
-        console.log("COLORS DONE");
-        requestAnimationFrame(() => resolve());
-      } catch (error) {
-        reject(error);
-      }
-    });
-  };
-//!!!
 
 type ShowStreamingProviders = {
   dateAddedEpoch: number;
@@ -87,7 +23,7 @@ export type ShowItemType = {
   releaseDateEpoch: number;
   dateAddedEpoch: number; // milliseconds elapsed since January 1, 1970
   genres: string[]; // Genres as strings
-  rating: number;
+  rating: number; // User Rating
   tags: string[];
   existsInSaved: boolean;
   streaming: ShowStreamingProviders;
@@ -138,7 +74,53 @@ const useMovieStore = create<MovieStore>()(
       actions: {
         //~ ---------------------------------
         //~ NEW addShow
-        addShow: addShowAsync(set, get),
+        addShow: async (show: movieSearchByTitle_Results) => {
+          return new Promise<void>(async (resolve, reject) => {
+            try {
+              const showExists = doesShowExist(
+                get().shows.map((el) => el.id),
+                show.id
+              );
+
+              // If the show already exists or lacks an ID, resolve immediately.
+              if (showExists || !show.id) {
+                resolve();
+              }
+
+              const newShow = {
+                id: show.id,
+                title: show.title,
+                posterURL: show?.posterURL,
+                backdropURL: show?.backdropURL,
+                releaseDateEpoch: formatEpoch(show?.releaseDate?.epoch || 0),
+                dateAddedEpoch: formatEpoch(Date.now()),
+                genres: show?.genres,
+                rating: 0,
+                tags: [],
+                existsInSaved: true,
+                streaming: {
+                  dateAddedEpoch: formatEpoch(Date.now()),
+                  providers: [],
+                },
+              };
+
+              set((state) => ({ shows: [...state.shows, newShow] }));
+
+              // Simulate delay for background processes
+              // await new Promise((resolve) => setTimeout(resolve, 5000));
+
+              // Trigger the event bus actions
+              eventBus.publish("TAG_SEARCH_RESULTS");
+              eventBus.publish("GENERATE_GENRES_ARRAY");
+              eventBus.publish("UPDATE_SHOW_PROVIDERS", show.id);
+              eventBus.publish("GET_SHOW_COLORS", newShow.id, newShow?.posterURL);
+              console.log("COLORS DONE");
+              requestAnimationFrame(() => resolve());
+            } catch (error) {
+              reject(error);
+            }
+          });
+        },
         //~ ---------------------------------
         //~ OLD addShow
         // addShow: async (show) => {
@@ -356,6 +338,8 @@ export const useMovies = () => {
     includeGenres,
     excludeGenres,
   } = useSettingsStore((state) => state.filterCriteria);
+  const sortSettings = useSettingsStore((state) => state.sortSettings);
+
   const movies = useMovieStore((state) => state.shows);
 
   let filteredMovies: ShowItemType[] = [];
@@ -418,19 +402,43 @@ export const useMovies = () => {
   // filteredMovies[0].dateAddedEpoch;
   // filteredMovies[0].rating;
   // sort
-  filteredMovies = orderBy(
-    filteredMovies,
-    ["rating", "dateAddedEpoch", "title"],
-    ["desc", "asc", "asc"]
-  );
+  console.log("Sort Settings", getSort(sortSettings).sortFields);
+  const { sortFields, sortDirections } = getSort(sortSettings);
+
+  filteredMovies = orderBy(filteredMovies, sortFields, sortDirections);
   return filteredMovies;
 };
 
 //-- UTILS
+
+//- --------------------------------------
+// Get active sort in correct order
+//- --------------------------------------
+const getSort = (sortSettings: SortField[]) => {
+  const filteredAndSortedFields = sortSettings
+    .filter((field) => field.active) // Filter for active fields
+    .sort((a, b) => a.index - b.index); // Sort by index in ascending order
+
+  const sortFields = filteredAndSortedFields.map((field) => field.sortField);
+  const sortDirections = filteredAndSortedFields.map((field) => field.sortDirection);
+
+  return {
+    sortedFields: filteredAndSortedFields,
+    sortFields,
+    sortDirections,
+  };
+};
+
+//- --------------------------------------
+// doesShowExist
+//- --------------------------------------
 const doesShowExist = (allShows: number[], showToCheck: number) => {
   return allShows.includes(showToCheck);
 };
 
+//- --------------------------------------
+// updateTagState
+//- --------------------------------------
 export const updateTagState = (tags: Tag[], appliedTagIds: string[]) => {
   // Create a Set for fast lookups of applied tags
   const appliedTagSet = new Set(appliedTagIds);

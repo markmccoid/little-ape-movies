@@ -49,7 +49,7 @@ const MoviesContainer = () => {
 
       return (
         <MovieAnimatedView index={index} scrollY={scrollY}>
-          <Animated.View entering={FadeIn.duration(300)}>
+          <Animated.View entering={FadeIn.duration(500)}>
             <MovieItem movie={item} hideAll={hideAll} column={column} />
           </Animated.View>
         </MovieAnimatedView>

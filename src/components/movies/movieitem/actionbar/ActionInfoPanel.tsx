@@ -10,8 +10,10 @@ const ActionInfoPanel = ({ movie }: Props) => {
   return (
     <View className="mt-2 px-2">
       <Text>Date Added: {dayjs.unix(movie.dateAddedEpoch).format("MM-DD-YYYY")}</Text>
-      <Text>Date Added: {movie.releaseDateEpoch}</Text>
-      <Text>Date Added: {movie.dateAddedEpoch}</Text>
+      <Text>Date Rel: {dayjs.unix(movie.releaseDateEpoch).format("MM-DD-YYYY")}</Text>
+      <Text>
+        Date Epochs: {movie.dateAddedEpoch} / {movie.releaseDateEpoch}
+      </Text>
     </View>
   );
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, SafeAreaView, Pressable } from "react-native";
+import { View, StyleSheet, SafeAreaView, Pressable, ScrollView } from "react-native";
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
@@ -16,8 +16,11 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { CheckSquareIcon, FilterIcon } from "../common/Icons";
 import { Text } from "@/components/ui/text";
 import Constants from "expo-constants";
+import useSettingsStore, { useSettingsActions } from "@/store/store.settings";
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
+  const savedQuickSorts = useSettingsStore.getState().savedQuickSorts;
+  const settingsActions = useSettingsActions();
   const { currentUser, onLogout } = useAuth();
   const insets = useSafeAreaInsets();
   const appVersion = Constants.expoConfig?.version;
@@ -80,16 +83,77 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         </Link>
       </View>
       {/* Saved Queries ??? */}
-      <DrawerContentScrollView
-        {...props}
-        className="bg-card border-t-hairline border-border"
-        contentContainerStyle={{ paddingTop: 0, marginTop: 5 }}
+      <View
+        className={`p-[10] pl-[20] bg-card flex-row items-center gap-3 w-full border-border border-t-hairline`}
       >
-        <View className={`p-[10] pl-[20] bg-card flex-row items-center gap-3 w-full rounded-lg`}>
-          <FilterIcon size={18} color={colors.text} />
-          <Text className="text-lg ">Saved Filters</Text>
-        </View>
-      </DrawerContentScrollView>
+        <FilterIcon size={18} color={colors.primary} />
+        <Text className="text-lg ">Saved Filters</Text>
+      </View>
+      <View className="flex-1">
+        <ScrollView
+          // {...props}
+          className="border-t-hairline border-border mt-0 flex-1"
+          contentContainerStyle={{
+            paddingTop: 0,
+            marginLeft: 20,
+            // paddingHorizontal: 0,
+            // marginHorizontal: 0,
+            // backgroundColor: "gray",
+            // borderWidth: 1,
+          }}
+        >
+          <View className={`bg-primary border-border border-hairline py-1 px-2 rounded-l-lg my-1`}>
+            <Text className="text-lg font-semibold color-primary-foreground">Saved Filters</Text>
+          </View>
+          <View className={`bg-primary border-border border-hairline py-1 px-2 rounded-l-lg my-1`}>
+            <Text className="text-lg font-semibold color-primary-foreground">Saved Filters</Text>
+          </View>
+          <View className={`bg-primary border-border border-hairline py-1 px-2 rounded-l-lg my-1`}>
+            <Text className="text-lg font-semibold color-primary-foreground">Saved Filters</Text>
+          </View>
+        </ScrollView>
+      </View>
+      <View className={`p-[10] pl-[20] bg-card flex-row items-center gap-3 w-full `}>
+        <SymbolView
+          name="slider.horizontal.3"
+          size={20}
+          weight="bold"
+          type="palette"
+          colors={[colors.text, colors.text]}
+        />
+        <Text className="text-lg ">Quick Sort</Text>
+      </View>
+      <ScrollView
+        className="border-t-hairline border-border mt-0 flex-1"
+        contentContainerStyle={{
+          paddingTop: 0,
+          marginLeft: 20,
+        }}
+      >
+        {savedQuickSorts?.map((sort) => {
+          return (
+            <View
+              key={sort.id}
+              className={`bg-primary border-border border-hairline py-1 px-2 rounded-l-lg my-1`}
+            >
+              <Pressable
+                onPress={() => {
+                  settingsActions.updateSortSettings(sort.sort);
+                  navigation.closeDrawer();
+                }}
+              >
+                <Text
+                  numberOfLines={1}
+                  adjustsFontSizeToFit={true}
+                  className="text-primary-foreground text-lg font-semibold"
+                >
+                  {sort.name}
+                </Text>
+              </Pressable>
+            </View>
+          );
+        })}
+      </ScrollView>
       <View style={{ height: insets.bottom + 50 }} className="border-t border-border">
         <TouchableOpacity onPress={onLogout}>
           <View className="h-[50] px-[20] py-[10] flex-row gap-4 items-center">

@@ -9,9 +9,11 @@ const SettingsLayout = () => {
         name="index"
         options={{
           headerLeft: () => <NestedStackDrawerToggle />,
+          title: "Settings",
         }}
       />
-      <Stack.Screen name="settingone" />
+      <Stack.Screen name="savedfiltersroute" />
+      <Stack.Screen name="quicksortroute" />
     </Stack>
   );
 };

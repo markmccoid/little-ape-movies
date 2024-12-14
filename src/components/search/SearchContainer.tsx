@@ -9,6 +9,14 @@ import useSettingsStore from "@/store/store.settings";
 import { MotiView } from "moti";
 import useImageSize from "@/hooks/useImageSize";
 import { useFocusEffect } from "expo-router";
+import Animated, {
+  BounceIn,
+  BounceInLeft,
+  BounceInRight,
+  FadeIn,
+  FadeInRight,
+  FadeOut,
+} from "react-native-reanimated";
 
 type Props = {
   movies: MovieSearchResults[];
@@ -43,15 +51,17 @@ const SearchContainer = ({ movies, fetchNextPage }: Props) => {
   const renderItem = useCallback(
     ({ item, index }: { item: MovieSearchResults; index: number }) => {
       return (
-        <SearchResult
-          movie={item}
-          isMovieLoading={isMovieLoading}
-          setIsMovieLoading={setIsMovieLoading}
-          onAddMovie={movieActions.addShow}
-          onRemoveMovie={movieActions.removeShow}
-          numColumns={numColumns}
-          spacing={{ bottomMargin: BOTTOM_MARGIN, extraHeight: EXTRA_HEIGHT }}
-        />
+        <Animated.View entering={FadeInRight} exiting={FadeOut}>
+          <SearchResult
+            movie={item}
+            isMovieLoading={isMovieLoading}
+            setIsMovieLoading={setIsMovieLoading}
+            onAddMovie={movieActions.addShow}
+            onRemoveMovie={movieActions.removeShow}
+            numColumns={numColumns}
+            spacing={{ bottomMargin: BOTTOM_MARGIN, extraHeight: EXTRA_HEIGHT }}
+          />
+        </Animated.View>
       );
     },
     [movies]
@@ -64,7 +74,7 @@ const SearchContainer = ({ movies, fetchNextPage }: Props) => {
   });
 
   return (
-    <View className="flex-1">
+    <Animated.View className="flex-1">
       <FlatList
         data={movies}
         ref={flatListRef}
@@ -86,7 +96,7 @@ const SearchContainer = ({ movies, fetchNextPage }: Props) => {
         keyboardShouldPersistTaps="handled" // Prevent keyboard from persisting when tapping on items
         getItemLayout={getItemLayout}
       />
-    </View>
+    </Animated.View>
   );
 };
 

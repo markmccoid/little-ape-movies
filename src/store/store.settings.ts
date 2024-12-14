@@ -1,13 +1,48 @@
+import { SavedFilters } from "./store.settings";
+import { sortArray } from "@/components/common/DragAndSort/helperFunctions";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { StorageAdapter } from "./dataAccess/storageAdapter";
 import { eventBus } from "./eventBus";
-
+import { defaultSortSettings, quickSorts } from "./sortSettings";
 // Define the array as the single source of truth
 const inclusionStates = ["off", "include", "exclude"] as const;
 
 // Derive the type from the array
 export type InclusionState = (typeof inclusionStates)[number];
+type FilterCriteria = {
+  filterIsWatched?: InclusionState;
+  filterIsFavorited?: InclusionState;
+  includeTags?: string[];
+  excludeTags?: string[];
+  includeGenres?: string[];
+  excludeGenres?: string[];
+};
+
+export type SavedFilters = {
+  id: string;
+  name: string;
+  index: number;
+  filter: FilterCriteria;
+  sort: SortField[];
+};
+
+export type SortField = {
+  id: string;
+  index: number;
+  active: boolean;
+  sortDirection: "asc" | "desc";
+  sortField: string;
+  title: string;
+  type: "alpha" | "date" | "number";
+};
+
+export type SavedQuickSorts = {
+  id: string;
+  index: number;
+  name: string;
+  sort: SortField[];
+};
 
 interface SettingsStore {
   searchColumns: 2 | 3;
@@ -15,14 +50,10 @@ interface SettingsStore {
     tierLimit: number;
     tierColor: string;
   }[];
-  filterCriteria: {
-    filterIsWatched?: InclusionState;
-    filterIsFavorited?: InclusionState;
-    includeTags?: string[];
-    excludeTags?: string[];
-    includeGenres?: string[];
-    excludeGenres?: string[];
-  };
+  filterCriteria: FilterCriteria;
+  sortSettings: SortField[];
+  savedFilters: SavedFilters[];
+  savedQuickSorts: SavedQuickSorts[];
   actions: {
     toggleSearchColumns: () => void;
     setIsWatchedState: (inclusionState: InclusionState | 0 | 1 | 2) => void;
@@ -38,9 +69,13 @@ interface SettingsStore {
       action: "add" | "remove"
     ) => void;
     clearFilters: (filter: "Tags" | "Genres" | "all") => void;
+    updateSortSettings: (sortFields: SortField[]) => void;
   };
 }
 
+//~ - - - - - - - - - - - - - -
+//~ Initial Settings State
+//~ - - - - - - - - - - - - - -
 const settingsInitialState = {
   searchColumns: 3 as 2 | 3, // Default value, adjust as needed
   ratingsTiers: [
@@ -54,6 +89,9 @@ const settingsInitialState = {
     },
   ],
   filterCriteria: {},
+  savedQuickSorts: quickSorts,
+  savedFilters: [],
+  sortSettings: defaultSortSettings,
 };
 
 const useSettingsStore = create<SettingsStore>()(
@@ -166,12 +204,18 @@ const useSettingsStore = create<SettingsStore>()(
             filterCriteria: { ...state.filterCriteria, [includeFilter]: [], [excludeFilter]: [] },
           }));
         },
+        updateSortSettings: (sortFields) => {
+          set({ sortSettings: sortFields });
+        },
       },
     }),
     {
       name: "settings-storage",
       storage: createJSONStorage(() => StorageAdapter),
-      partialize: (state) => ({ searchColumns: state.searchColumns }),
+      partialize: (state) => ({
+        searchColumns: state.searchColumns,
+        sortSetting: state.sortSettings,
+      }),
       // onRehydrateStorage: (state) => {
       //   console.log("Setting Rehydrate", state);
       // },

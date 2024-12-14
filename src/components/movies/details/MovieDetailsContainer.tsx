@@ -39,8 +39,6 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const existsInSaved = !!storedMovie?.existsInSaved;
   const { movieDetails, isLoading } = useMovieDetailData(movieId);
   const { data: omdbData, isLoading: omdbLoading } = useOMDBData(movieDetails?.imdbId);
-
-  const [finalMovieDetails, setFinalMovieDetails] = useState<MovieDetails>(movieDetails);
   //!! We need have local state so that we only update component AFTER
   //!! it has received focus (see isFocused page)
   const [movieTitle, setMovieTitle] = useState<string>(movieDetails?.title || "");
@@ -49,11 +47,6 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const isFocused = navigation.isFocused();
   const [shouldRender, setShouldRender] = React.useState(false);
 
-  useEffect(() => {
-    if (!isLoading) {
-      setFinalMovieDetails(movieDetails);
-    }
-  }, [isLoading]);
   // determines when the "where to watch" and below items load.
   useEffect(() => {
     requestAnimationFrame(() => {
@@ -65,19 +58,8 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   //-- HEADER RIGHT ----------
   const handleAddMovie = useCallback(async () => {
     if (!movieDetails) return;
-    const movieToAdd = {
-      id: movieDetails.id,
-      title: movieDetails.title,
-      overview: movieDetails.overview,
-      releaseDate: movieDetails.releaseDate,
-      posterURL: movieDetails.posterURL,
-      backdropURL: movieDetails.backdropURL,
-      genres: movieDetails.genres,
-      videos: movieDetails.videos,
-    } as movieSearchByTitle_Results;
-
-    await movieActions.addShow(movieToAdd);
-  }, [finalMovieDetails]);
+    await movieActions.addShow(movieDetails);
+  }, [isLoading]);
 
   //~~ --------------------------------
   //~~ Setup Header Right Components
@@ -157,7 +139,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
         {/* MOVIE DETAILS */}
         <View className="my-[2]">
           <MDDetails
-            movieDetails={finalMovieDetails as MovieDetails}
+            movieDetails={movieDetails}
             omdbData={omdbData}
             existsInSaved={existsInSaved}
           />
@@ -165,15 +147,11 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
 
         {existsInSaved && (
           <View key={storedMovie?.id} className="my-[2]">
-            <MDTagsAnim
-              // movieDetails={finalMovieDetails as MovieDetails}
-              storedMovie={storedMovie}
-              existsInSaved={existsInSaved}
-            />
+            <MDTagsAnim storedMovie={storedMovie} existsInSaved={existsInSaved} />
           </View>
         )}
-        {/* <HiddenContainers movieId={finalMovieDetails?.id} /> */}
-        {shouldRender && <HiddenContainers movieId={finalMovieDetails?.id} />}
+        {/* shouldRender is set inside requestAnimationFrame */}
+        {shouldRender && <HiddenContainers movieId={movieDetails?.id || 0} />}
       </ScrollView>
     </View>
   );

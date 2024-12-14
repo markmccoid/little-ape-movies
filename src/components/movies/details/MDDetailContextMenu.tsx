@@ -6,9 +6,9 @@ import { nativeShareItem } from "@/utils/utils";
 import { useRouter } from "expo-router";
 
 type Props = {
-  shareLink: string;
-  movieId: number;
-  movieTitle: string;
+  shareLink: string | undefined;
+  movieId: number | undefined;
+  movieTitle: string | undefined;
   existsInSaved: boolean;
   children: React.ReactElement; // A single React element
 };

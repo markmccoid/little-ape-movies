@@ -1,12 +1,12 @@
 import { View, Text } from "react-native";
 import React from "react";
 
-const SettingOne = () => {
+const SavedFiltersRoute = () => {
   return (
     <View>
-      <Text>SettingOne</Text>
+      <Text>SavedFiltersRoute</Text>
     </View>
   );
 };
 
-export default SettingOne;
+export default SavedFiltersRoute;

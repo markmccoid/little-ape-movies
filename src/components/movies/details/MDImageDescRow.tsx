@@ -8,18 +8,13 @@ import AnimDetailImage from "./AnimDetailImage";
 
 import MDDetailContextMenu from "./MDDetailContextMenu";
 import MDBackground from "./MDBackground";
-import { Sparkles } from "@/lib/icons/Sparkles";
-import { Eye } from "@/lib/icons/Eye";
 import { useCustomTheme } from "@/lib/colorThemes";
-import { AnimatePresence, MotiView } from "moti";
-import { MotiWatched } from "./tagMovies/MotiWatchedIcons";
-import { MotiFavorited } from "./tagMovies/MotiFavoriteIcons";
 import { Favorited } from "./tagMovies/FavoriteIcons";
 import { Watched } from "./tagMovies/WatchedIcons";
 
 type Props = {
   existsInSaved: boolean;
-  movieDetails: MovieDetails;
+  movieDetails: MovieDetails | undefined;
   storedMovie: ShowItemType | undefined;
 };
 
