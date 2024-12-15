@@ -1,4 +1,4 @@
-import { SavedQuickSorts, SortField } from "./store.settings";
+import { SortField } from "./store.settings";
 // filteredMovies[0].watched;
 // filteredMovies[0].favorited;
 // filteredMovies[0].title;
@@ -53,6 +53,8 @@ export const defaultSortSettings: SortField[] = [
   },
 ];
 
+// Create a couple of default quick sorts that are added
+// When app is first started (for each)
 export const quickSorts: SavedQuickSorts[] = [
   {
     id: "1",

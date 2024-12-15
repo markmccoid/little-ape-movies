@@ -37,7 +37,7 @@ export type SortField = {
   type: "alpha" | "date" | "number";
 };
 
-export type SavedQuickSorts = {
+export type SavedQuickSort = {
   id: string;
   index: number;
   name: string;
@@ -53,7 +53,7 @@ interface SettingsStore {
   filterCriteria: FilterCriteria;
   sortSettings: SortField[];
   savedFilters: SavedFilters[];
-  savedQuickSorts: SavedQuickSorts[];
+  savedQuickSorts: SavedQuickSort[];
   actions: {
     toggleSearchColumns: () => void;
     setIsWatchedState: (inclusionState: InclusionState | 0 | 1 | 2) => void;
@@ -70,6 +70,7 @@ interface SettingsStore {
     ) => void;
     clearFilters: (filter: "Tags" | "Genres" | "all") => void;
     updateSortSettings: (sortFields: SortField[]) => void;
+    addUpdateQuickSort: (newQuickSort: Omit<SavedQuickSort, "index">) => void;
   };
 }
 
@@ -206,6 +207,20 @@ const useSettingsStore = create<SettingsStore>()(
         },
         updateSortSettings: (sortFields) => {
           set({ sortSettings: sortFields });
+        },
+
+        addUpdateQuickSort: (newQuickSort) => {
+          const savedQS = get().savedQuickSorts;
+          // if existing quickSort this will return the index otherwise undefined
+          const qsExists = savedQS.find((el) => el.id === newQuickSort.id)?.index;
+          // if undefined, put as last quickSort
+          const savedIndex = qsExists || savedQS.length;
+          // Filter out in case we are updating
+          const newQS = [
+            { ...newQuickSort, index: savedIndex },
+            ...savedQS.filter((el) => el.id !== newQuickSort.id),
+          ];
+          set({ savedQuickSorts: newQS });
         },
       },
     }),
