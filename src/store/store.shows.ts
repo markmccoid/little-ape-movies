@@ -402,7 +402,6 @@ export const useMovies = () => {
   // filteredMovies[0].dateAddedEpoch;
   // filteredMovies[0].rating;
   // sort
-  console.log("Sort Settings", getSort(sortSettings).sortFields);
   const { sortFields, sortDirections } = getSort(sortSettings);
 
   filteredMovies = orderBy(filteredMovies, sortFields, sortDirections);

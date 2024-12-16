@@ -137,8 +137,10 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
               className={`bg-primary border-border border-hairline py-1 px-2 rounded-l-lg my-1`}
             >
               <Pressable
-                onPress={() => {
+                onPress={async () => {
                   settingsActions.updateSortSettings(sort.sort);
+                  router.replace("./home");
+                  await new Promise((resolve) => setTimeout(() => resolve("done"), 100));
                   navigation.closeDrawer();
                 }}
               >

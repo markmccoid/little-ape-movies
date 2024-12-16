@@ -1,3 +1,4 @@
+import { sortBy } from "lodash";
 import { SavedFilters } from "./store.settings";
 import { sortArray } from "@/components/common/DragAndSort/helperFunctions";
 import { create } from "zustand";
@@ -71,6 +72,8 @@ interface SettingsStore {
     clearFilters: (filter: "Tags" | "Genres" | "all") => void;
     updateSortSettings: (sortFields: SortField[]) => void;
     addUpdateQuickSort: (newQuickSort: Omit<SavedQuickSort, "index">) => void;
+    overwriteAllQuickSorts: (quickSorts: SavedQuickSort[]) => void;
+    deleteQuickSort: (qsId: string) => void;
   };
 }
 
@@ -210,17 +213,30 @@ const useSettingsStore = create<SettingsStore>()(
         },
 
         addUpdateQuickSort: (newQuickSort) => {
-          const savedQS = get().savedQuickSorts;
+          // Sort based on existing indexes
+          const sortedQS = sortBy(get().savedQuickSorts, "index");
+          // Reindex (make sure 0 ... n)
+          const savedQS = sortedQS.map((el, index) => ({ ...el, index }));
+
           // if existing quickSort this will return the index otherwise undefined
           const qsExists = savedQS.find((el) => el.id === newQuickSort.id)?.index;
           // if undefined, put as last quickSort
           const savedIndex = qsExists || savedQS.length;
           // Filter out in case we are updating
+          console.log("Saved INdex", savedIndex, newQuickSort);
           const newQS = [
             { ...newQuickSort, index: savedIndex },
             ...savedQS.filter((el) => el.id !== newQuickSort.id),
           ];
           set({ savedQuickSorts: newQS });
+        },
+        overwriteAllQuickSorts: (quickSorts: SavedQuickSort[]) =>
+          set({ savedQuickSorts: quickSorts }),
+        deleteQuickSort: (qsId: string) => {
+          set((state) => ({
+            ...state,
+            savedQuickSorts: state.savedQuickSorts.filter((el) => el.id !== qsId),
+          }));
         },
       },
     }),
@@ -230,6 +246,7 @@ const useSettingsStore = create<SettingsStore>()(
       partialize: (state) => ({
         searchColumns: state.searchColumns,
         sortSetting: state.sortSettings,
+        savedQuickSorts: state.savedQuickSorts,
       }),
       // onRehydrateStorage: (state) => {
       //   console.log("Setting Rehydrate", state);

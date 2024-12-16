@@ -12,8 +12,18 @@ const SettingsLayout = () => {
           title: "Settings",
         }}
       />
-      <Stack.Screen name="savedfiltersroute" />
-      <Stack.Screen name="quicksortroute" />
+      <Stack.Screen
+        name="savedfiltersroute"
+        options={{
+          title: "Saved Filters",
+        }}
+      />
+      <Stack.Screen
+        name="quicksortroute"
+        options={{
+          title: "Quick Sorts",
+        }}
+      />
     </Stack>
   );
 };

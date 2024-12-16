@@ -4,6 +4,7 @@ import Animated, {
   useSharedValue,
   useAnimatedScrollHandler,
   useAnimatedRef,
+  LinearTransition,
 } from "react-native-reanimated";
 
 import DefaultHandle from "./Handle";
@@ -168,6 +169,7 @@ const DragDropEntry = ({
   return (
     // <PositionsProvider positions={positions}>
     <Animated.ScrollView
+      layout={LinearTransition}
       ref={scrollViewRef}
       onScroll={handleScroll}
       scrollEventThrottle={16}
