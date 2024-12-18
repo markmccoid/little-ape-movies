@@ -222,12 +222,11 @@ const useSettingsStore = create<SettingsStore>()(
           // if undefined, put as last quickSort
           const savedIndex = qsExists || savedQS.length;
           // Filter out in case we are updating
-          console.log("Saved INdex", savedIndex, newQuickSort);
           const newQS = [
             { ...newQuickSort, index: savedIndex },
             ...savedQS.filter((el) => el.id !== newQuickSort.id),
           ];
-          set({ savedQuickSorts: newQS });
+          set({ savedQuickSorts: [...sortBy(newQS, "index")] });
         },
         overwriteAllQuickSorts: (quickSorts: SavedQuickSort[]) =>
           set({ savedQuickSorts: quickSorts }),

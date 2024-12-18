@@ -11,12 +11,10 @@ import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withDecay,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import ActionInfoPanel from "./ActionInfoPanel";
-import ActionBarDelete from "./ActionBarDelete";
+import ActionBarTags from "./ActionBarTags";
 
 type MovieItemActionBarProps = {
   movie: ShowItemType;
@@ -32,7 +30,7 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
   column,
 }) => {
   const MIN_HEIGHT = 0;
-  const MIDDLE_HEIGHT = 110;
+  const MIDDLE_HEIGHT = 70;
   const MAX_HEIGHT = 205;
   const initialRender = useRef(true);
   const actionHeight = useSharedValue(MIDDLE_HEIGHT); // Start at MIDDLE
@@ -125,7 +123,9 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
         style={{ borderTopRightRadius: 10, borderTopLeftRadius: 10 }}
       >
         <ActionBarButtons movie={movie} column={column} isVisible={isVisible} />
-        <ActionInfoPanel movie={movie} />
+        <View className="h-[10]" />
+        <ActionBarTags movieId={movie.id} />
+        {/* <ActionInfoPanel movie={movie} /> */}
       </MotiView>
     </Animated.View>
   );

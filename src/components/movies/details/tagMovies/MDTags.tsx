@@ -27,19 +27,15 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
   const tags = useMovieStore((state) => state.tagArray);
   const appliedTags = useGetAppliedTags(storedMovie?.id);
   const movieTags = updateTagState(tags, storedMovie?.tags || []);
+
   const [containerHeight, setContainerHeight] = useState(0);
-  const [containerHeight2, setContainerHeight2] = useState(0);
 
   // Track maximum height between the two views
   const onLayout = (event) => {
     const height = event.nativeEvent.layout.height;
     setContainerHeight(height);
   };
-  const onLayout2 = (event) => {
-    const height = event.nativeEvent.layout.height;
-    setContainerHeight2(height);
-  };
-  console.log("H", containerHeight);
+
   //type DetailTags = (typeof movieTags)[number]
   // const [localTags, setLocalTags] = useState<DetailTags[]>(movieTags)
 

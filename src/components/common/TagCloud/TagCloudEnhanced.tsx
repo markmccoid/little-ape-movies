@@ -40,10 +40,15 @@ export const TagItem = ({
   const { colors } = useCustomTheme();
   const [localState, setLocalState] = useState(state);
   const [isProcessing, setIsProcessing] = useState(false);
-
   const bgColor =
     localState === "include" ? "green" : localState === "exclude" ? colors.deleteRed : "white";
   const fgColor = localState === "exclude" ? "white" : "black";
+
+  const fontSize = size === "xs" ? 12 : size === "s" ? 15 : 18;
+  const iconSize = size === "xs" ? 12 : size === "s" ? 15 : 20;
+  const yPadding = size === "xs" ? 3 : size === "s" ? 5 : 5;
+  const xPadding = size === "xs" ? 5 : size === "s" ? 7 : 7;
+  const margin = size === "xs" ? 3 : size === "s" ? 5 : 5;
 
   // Using localState so updates are optimistic
   React.useEffect(() => {
@@ -70,8 +75,15 @@ export const TagItem = ({
     <TouchableOpacity
       onLongPress={onLongPress ? () => onLongPress(tagId) : undefined}
       activeOpacity={0.8}
-      className="border border-border py-[5] px-[7] m-[5] text-center"
-      style={{ backgroundColor: bgColor, borderRadius: 10 }}
+      className="border border-border text-center"
+      // className="border border-border py-[5] px-[7] m-[5] text-center"
+      style={{
+        backgroundColor: bgColor,
+        borderRadius: 10,
+        paddingVertical: yPadding,
+        paddingHorizontal: xPadding,
+        margin: margin,
+      }}
       key={tagId}
       disabled={isProcessing}
       onPress={() => handleStateChange(tagId)}
@@ -80,15 +92,15 @@ export const TagItem = ({
     >
       <View className="flex-row items-center">
         {localState === "exclude" ? (
-          <UnTagIcon size={size === "s" ? 15 : 20} color="white" style={{ paddingRight: 8 }} />
+          <UnTagIcon size={iconSize} color="white" style={{ paddingRight: 8 }} />
         ) : (
           <AntDesign
             style={{ paddingRight: 5 }}
             name={localState !== "off" ? "tag" : "tago"}
-            size={size === "s" ? 15 : 20}
+            size={iconSize}
           />
         )}
-        <Text className="" style={{ fontSize: 15, color: fgColor }}>
+        <Text className="" style={{ fontSize: fontSize, color: fgColor }}>
           {tagName}
         </Text>
       </View>

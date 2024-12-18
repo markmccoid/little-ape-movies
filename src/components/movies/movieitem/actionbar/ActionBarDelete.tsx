@@ -6,6 +6,9 @@ import { useMovieActions } from "@/store/store.shows";
 import { AnimatePresence, MotiView } from "moti";
 import { eventBus } from "@/store/eventBus";
 
+/**
+ * Called from MovieItem.tsx -
+ */
 type Props = {
   movieId: number;
   actionBarShown: boolean;
@@ -39,7 +42,7 @@ const ActionBarDelete = ({ movieId, actionBarShown }: Props) => {
             from={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 500 }}
+            transition={{ duration: 600 }}
             className="absolute top-[0] right-[4] z-50 px-1 py-2 bg-muted rounded-full border-hairline"
           >
             <SymbolView name="trash.fill" tintColor={"red"} />
