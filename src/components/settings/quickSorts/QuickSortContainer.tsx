@@ -28,16 +28,6 @@ const QuickSortContainer = () => {
   };
   return (
     <View className="flex-1 flex-col">
-      <View className="flex-row justify-end">
-        <Pressable
-          className="py-1 px-2 border-hairline bg-secondary"
-          onPress={handleRestoreDefaults}
-        >
-          <Text className="text-secondary-foreground">Restore Defaults</Text>
-        </Pressable>
-      </View>
-      <CurrentQuickSorts setEditId={handleSetEditId} />
-
       {!showAddNew && !editId && (
         <Animated.View
           className="flex-row justify-end mt-1 mr-4"
@@ -49,6 +39,16 @@ const QuickSortContainer = () => {
           </Button>
         </Animated.View>
       )}
+      {/* <View className="flex-row justify-end">
+        <Pressable
+          className="py-1 px-2 border-hairline bg-secondary"
+          onPress={handleRestoreDefaults}
+        >
+          <Text className="text-secondary-foreground">Restore Defaults</Text>
+        </Pressable>
+      </View> */}
+      <CurrentQuickSorts setEditId={handleSetEditId} />
+
       {(showAddNew || editId) && <QuickSortAddNew handleHide={handleHide} editId={editId} />}
     </View>
   );

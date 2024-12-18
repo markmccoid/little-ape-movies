@@ -45,15 +45,19 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       </View>
       {/* HOME and SETTINGS Links */}
       <View className="bg-card">
-        <Pressable
+        {/* <Pressable
           onPress={async () => {
             router.replace("./home");
             await new Promise((resolve) => setTimeout(() => resolve("done"), 100));
             navigation.closeDrawer();
           }}
           className={`px-[10] py-[5] bg-card  w-full`}
-        >
-          <View className="flex-row items-center gap-3 rounded-lg" style={{ margin: 10 }}>
+        > */}
+        <Link href="/home" className={`m-2  mx-2`}>
+          <View
+            className="px-[10] py-[5] bg-card flex-row items-center gap-3 w-full rounded-lg"
+            style={{ margin: 10 }}
+          >
             <SymbolView
               name="house"
               size={20}
@@ -64,7 +68,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
             <Text className="text-lg ">Home</Text>
             {/* {pathname === "/home" && <CheckSquareIcon />} */}
           </View>
-        </Pressable>
+        </Link>
+        {/* </Pressable> */}
 
         {/* Divider Line */}
         <View className="w-full border-b-hairline border-border" />
@@ -113,14 +118,26 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
           </View>
         </ScrollView>
       </View>
-      <View className={`p-[10] pl-[20] bg-card flex-row items-center gap-3 w-full `}>
-        <SymbolView
-          name="slider.horizontal.3"
-          size={20}
-          weight="bold"
-          type="palette"
-          colors={[colors.text, colors.text]}
-        />
+      <View className={` pl-[20] bg-card flex-row items-center gap-3 w-full `}>
+        <Pressable
+          className="p-[10] ml-[-10]"
+          onPress={() => {
+            router.push({ pathname: "/(auth)/(drawer)/settings" });
+            // Need the setTimeout so that the first push finishes before this route
+            setTimeout(
+              () => router.push({ pathname: "/(auth)/(drawer)/settings/quicksortroute" }),
+              0
+            );
+          }}
+        >
+          <SymbolView
+            name="slider.horizontal.3"
+            size={20}
+            weight="bold"
+            type="palette"
+            colors={[colors.text, colors.text]}
+          />
+        </Pressable>
         <Text className="text-lg ">Quick Sort</Text>
       </View>
       <ScrollView

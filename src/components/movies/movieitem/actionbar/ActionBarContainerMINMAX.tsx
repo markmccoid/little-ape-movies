@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState, useRef } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { View, Text, TouchableOpacity, Pressable } from "react-native";
 import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
 import { AnimatePresence, MotiView } from "moti";
@@ -15,6 +15,8 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import UserRating from "@/components/common/UserRating";
+import ActionBarUserRating from "./ActionBarUserRating";
 import ActionInfoPanel from "./ActionInfoPanel";
 import ActionBarDelete from "./ActionBarDelete";
 
@@ -32,60 +34,65 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
   column,
 }) => {
   const MIN_HEIGHT = 0;
-  const MIDDLE_HEIGHT = 110;
-  const MAX_HEIGHT = 205;
-  const initialRender = useRef(true);
-  const actionHeight = useSharedValue(MIDDLE_HEIGHT); // Start at MIDDLE
-  const startY = useSharedValue(MIN_HEIGHT); // Start at MIDDLE
+  const MAX_HEIGHT = 185;
+  const initialRender = React.useRef(true);
+  const actionHeight = useSharedValue(MIN_HEIGHT);
+
+  // const movieActions = useMovieActions();
+  // const actionHeightFrom = initialRender.current ? 0 : isVisible ? 0 : 175;
+  // const actionHeightAnimate = initialRender.current ? 0 : isVisible ? 175 : 0;
+  // actionHeight.value = isVisible ? 175 : 0;
+  const startY = useSharedValue(MIN_HEIGHT);
 
   const handleVisibilityChange = () => {
+    // if (isVisible) {
+    //   actionHeight.value = withTiming(MIN_HEIGHT);
+    // } else {
+    //   actionHeight.value = withTiming(MAX_HEIGHT);
+    // }
     animateVisibilityChange();
     toggleVisibility();
   };
 
   const animateVisibilityChange = () => {
     if (isVisible) {
-      actionHeight.value = withTiming(MIDDLE_HEIGHT, { duration: 500 });
+      actionHeight.value = withTiming(MAX_HEIGHT, { duration: 500 });
     } else {
       actionHeight.value = withTiming(MIN_HEIGHT, { duration: 500 });
     }
   };
 
   useEffect(() => {
-    if (initialRender.current) {
-      actionHeight.value = withTiming(MIN_HEIGHT, { duration: 0 });
-      startY.value = MIN_HEIGHT;
-      initialRender.current = false;
-    } else {
-      animateVisibilityChange();
-    }
+    animateVisibilityChange();
+    // if (isVisible) {
+    //   actionHeight.value = withTiming(MAX_HEIGHT, { duration: 500 });
+    // } else {
+    //   actionHeight.value = withTiming(MIN_HEIGHT, { duration: 500 });
+    // }
   }, [isVisible]);
 
   const panGesture = Gesture.Pan()
     .onBegin((event) => {
+      // Store the initial height when gesture begins
       startY.value = actionHeight.value;
     })
     .onUpdate((event) => {
+      // Calculate new height based on translation
+      // Negative translationY means pulling down (increasing height)
       const newHeight = startY.value - event.translationY;
-      actionHeight.value = clamp(newHeight, MIN_HEIGHT, MAX_HEIGHT + 10);
+      // Clamp the height between min and max values
+      actionHeight.value = clamp(newHeight, MIN_HEIGHT, MAX_HEIGHT);
     })
     .onEnd(() => {
-      const middleToMaxThreshold = MIDDLE_HEIGHT + (MAX_HEIGHT - MIDDLE_HEIGHT) / 1.9;
-      const minToMiddleThreshold = MIN_HEIGHT + (MIDDLE_HEIGHT - MIN_HEIGHT) / 2;
-      // console.log("MD", middleToMaxThreshold);
-      // console.log("MN", minToMiddleThreshold);
-      // console.log("ACT", actionHeight.value);
-      let targetHeight;
-      if (actionHeight.value > middleToMaxThreshold) {
-        targetHeight = MAX_HEIGHT;
-      } else if (actionHeight.value > minToMiddleThreshold) {
-        targetHeight = MIDDLE_HEIGHT;
-      } else {
-        targetHeight = MIN_HEIGHT;
+      // Optional: Spring back to min or max height
+      const stayOpen = actionHeight.value > MIN_HEIGHT + (MAX_HEIGHT - MIN_HEIGHT) / 2;
+      actionHeight.value = withTiming(
+        // actionHeight.value > MIN_HEIGHT + (MAX_HEIGHT - MIN_HEIGHT) / 2 ? MAX_HEIGHT : MIN_HEIGHT
+        stayOpen ? MAX_HEIGHT : MIN_HEIGHT
+      );
+      if (!stayOpen) {
         runOnJS(toggleVisibility)();
       }
-
-      actionHeight.value = withSpring(targetHeight);
     });
 
   const animStyle = useAnimatedStyle(() => {
@@ -93,20 +100,26 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
       height: actionHeight.value,
     };
   });
-
+  // Icon rotation animated style
   const iconAnimStyle = useAnimatedStyle(() => {
+    // Interpolate rotation based on height
     const rotation = interpolate(
       actionHeight.value,
-      [MIN_HEIGHT, MIDDLE_HEIGHT, MAX_HEIGHT],
-      [0, 0, 180]
+      [MIN_HEIGHT, MAX_HEIGHT / 2, MAX_HEIGHT], // Input range
+      [0, 0, 180] // Output range (degrees)
     );
+
     return {
       transform: [{ rotate: `${rotation}deg` }],
     };
   });
 
   return (
-    <Animated.View style={[animStyle]} className="absolute z-20 h-[35] bottom-0">
+    <Animated.View
+      style={[animStyle]}
+      className="absolute z-20 h-[35] bottom-0"
+      onLayout={() => (initialRender.current = false)}
+    >
       <GestureDetector gesture={panGesture}>
         <Pressable
           onPress={handleVisibilityChange}
@@ -125,6 +138,7 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
         style={{ borderTopRightRadius: 10, borderTopLeftRadius: 10 }}
       >
         <ActionBarButtons movie={movie} column={column} isVisible={isVisible} />
+        <ActionBarDelete movieId={movie.id} />
         <ActionInfoPanel movie={movie} />
       </MotiView>
     </Animated.View>

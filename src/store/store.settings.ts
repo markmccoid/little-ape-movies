@@ -1,5 +1,4 @@
 import { sortBy } from "lodash";
-import { SavedFilters } from "./store.settings";
 import { sortArray } from "@/components/common/DragAndSort/helperFunctions";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
@@ -245,7 +244,7 @@ const useSettingsStore = create<SettingsStore>()(
       storage: createJSONStorage(() => StorageAdapter),
       partialize: (state) => ({
         searchColumns: state.searchColumns,
-        sortSetting: state.sortSettings,
+        sortSettings: state.sortSettings,
         savedQuickSorts: state.savedQuickSorts,
       }),
       // onRehydrateStorage: (state) => {

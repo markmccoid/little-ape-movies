@@ -301,14 +301,25 @@ const useMovieStore = create<MovieStore>()(
 export const useMovieActions = () => {
   const updateShow = useMovieStore((state) => state.actions.updateShow);
   //~ toggleWatched
-  const toggleWatched = (movieId: number) => {
+  const toggleWatched = (movieId: number, action?: "toggle" | "on" | "off") => {
+    action = action ?? "toggle";
     const isWatched = useMovieStore.getState().actions.getShowById(movieId)?.watched;
-    updateShow(movieId, { watched: isWatched ? undefined : formatEpoch(Date.now()) });
+    if (action === "toggle") {
+      updateShow(movieId, { watched: isWatched ? undefined : formatEpoch(Date.now()) });
+    } else {
+      updateShow(movieId, { watched: action === "off" ? undefined : formatEpoch(Date.now()) });
+    }
   };
   //~ toggleFavorited
-  const toggleFavorited = (movieId: number) => {
+  const toggleFavorited = (movieId: number, action?: "toggle" | "on" | "off") => {
+    action = action ?? "toggle";
     const isFavorited = useMovieStore.getState().actions.getShowById(movieId)?.favorited;
     updateShow(movieId, { favorited: isFavorited ? undefined : formatEpoch(Date.now()) });
+    if (action === "toggle") {
+      updateShow(movieId, { favorited: isFavorited ? undefined : formatEpoch(Date.now()) });
+    } else {
+      updateShow(movieId, { favorited: action === "off" ? undefined : formatEpoch(Date.now()) });
+    }
   };
   const actions = { ...useMovieStore((state) => state.actions), toggleWatched, toggleFavorited };
   // return useMovieStore((state) => state.actions);

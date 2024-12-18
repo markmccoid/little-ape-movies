@@ -21,6 +21,7 @@ const MDRatings = ({ movieDetails, omdbData, storedMovie }: Props) => {
   const { colors } = useCustomTheme();
   const updateShow = useMovieActions().updateShow;
   const existsInSaved = storedMovie?.existsInSaved;
+
   const updateRating = (rating: number) => {
     if (!movieDetails?.id) return;
 

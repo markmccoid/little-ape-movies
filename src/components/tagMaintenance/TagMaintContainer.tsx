@@ -86,7 +86,7 @@ export default function TagMaintContainer() {
   return (
     <View className="flex-1">
       <DragDropEntry
-        scrollStyles={{ width: "100%", height: "30%", borderWidth: 1, borderColor: "#aaa" }}
+        scrollStyles={{ width: "100%", height: "30%" }}
         updatePositions={(positions) =>
           updateItemList(sortArray<Tag>(positions, tags, { positionField: "pos" }))
         }
@@ -128,10 +128,9 @@ const MyHandle: React.FC = () => (
     }}
   >
     <View
-      className="bg-card"
+      className="bg-card border-border"
       style={{
         borderWidth: 1,
-        borderColor: "#aaa",
         borderRadius: 10,
         marginLeft: 4,
         marginVertical: 4,

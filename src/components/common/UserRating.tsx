@@ -1,5 +1,5 @@
 import { View, Text, Dimensions } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
 import Animated, {
@@ -34,6 +34,9 @@ const UserRating = ({ updateRating, rating = 0 }: Props) => {
   const buttonOffsetx = useSharedValue(0);
   const textScale = useSharedValue(0);
   const [currRating, setCurrRating] = React.useState(rating);
+  useEffect(() => {
+    setCurrRating(rating);
+  }, [rating]);
 
   const gesture = Gesture.Pan()
     .activateAfterLongPress(300)

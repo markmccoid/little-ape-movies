@@ -31,11 +31,9 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const colorScheme = useColorScheme();
   const navigation = useNavigation();
   const movieActions = useMovieActions();
-  const movies = useMovieStore((state) => state.shows);
-  // const { storedMovie } = useMovieStore((state) => ({
-  //   storedMovie: state.actions.getShowById,
-  // });
-  const storedMovie = movieActions.getShowById(movieId);
+  // Not using the actions.getShowById because it doesn't trigger an update if shows array changes
+  const storedMovie = useMovieStore((state) => state.shows.find((el) => el.id === movieId));
+
   const existsInSaved = !!storedMovie?.existsInSaved;
   const { movieDetails, isLoading } = useMovieDetailData(movieId);
   const { data: omdbData, isLoading: omdbLoading } = useOMDBData(movieDetails?.imdbId);

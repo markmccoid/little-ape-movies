@@ -18,7 +18,7 @@ const CurrentQuickSorts = ({ setEditId }: { setEditId: (editId: string | undefin
     actions.overwriteAllQuickSorts(finalQuickSorts);
   };
   return (
-    <View className="">
+    <View className="mx-2 mt-2">
       <DragDropEntry
         scrollStyles={{
           width: "100%",

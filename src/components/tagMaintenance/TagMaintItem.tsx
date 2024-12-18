@@ -53,7 +53,7 @@ const TagMaintItem = ({ tag, id }: Props) => {
   };
   return (
     <View
-      className="flex-row justify-between items-center h-[32] my-[4] border-hairline rounded-xl bg-card mx-1"
+      className="flex-row justify-between items-center h-[32] my-[4] border-hairline border-border rounded-xl bg-card mx-1"
       // style={{ backgroundColor: isActive ? "red" : "white" }}
     >
       <View className="flex-1 pl-2">

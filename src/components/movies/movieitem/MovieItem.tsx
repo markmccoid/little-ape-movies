@@ -1,12 +1,15 @@
 import { View, Text, Image, Dimensions, Pressable, InteractionManager } from "react-native";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { useRouter } from "expo-router";
-import { ShowItemType } from "@/store/store.shows";
+import { ShowItemType, useMovieActions } from "@/store/store.shows";
 import { getMovieItemSizing } from "./movieItemHelpers";
 import MovieImage from "@/components/common/MovieImage";
 import ActionBarContainer from "./actionbar/ActionBarContainer";
 import { useCustomTheme } from "@/lib/colorThemes";
 import dayjs from "dayjs";
+import { SymbolView } from "expo-symbols";
+import { AnimatePresence, MotiView } from "moti";
+import ActionBarDelete from "./actionbar/ActionBarDelete";
 
 // const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 // const availableWidth = screenWidth - 20; // Subtract left and right margins
@@ -24,6 +27,7 @@ const MovieItem = ({ movie, hideAll, column }: Props) => {
   const { imageHeight, imageWidth, verticalMargin, extraHeight, horizontalMargin, gap } =
     getMovieItemSizing();
   const router = useRouter();
+  const movieActions = useMovieActions();
   const { colors } = useCustomTheme();
 
   const [actionBarShown, toggleActionBarShown] = useReducer((state) => !state, false);
@@ -69,8 +73,10 @@ const MovieItem = ({ movie, hideAll, column }: Props) => {
         },
         shadowOpacity: 0.53,
         shadowRadius: 3,
+        overflow: "visible",
       }}
     >
+      <ActionBarDelete movieId={movie.id} actionBarShown={actionBarShown} />
       <View
         className="relative border-hairline border-border"
         style={{
@@ -90,9 +96,6 @@ const MovieItem = ({ movie, hideAll, column }: Props) => {
         />
 
         <Pressable onPress={handleMovieSelect} onLongPress={toggleActionBarShown}>
-          <Text>
-            {dayjs.unix(movie.dateAddedEpoch).format("MM-DD-YYYY")}-{movie.rating}
-          </Text>
           <MovieImage
             posterURL={movie?.posterURL}
             imageWidth={imageWidth}
