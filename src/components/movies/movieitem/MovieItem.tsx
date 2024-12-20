@@ -1,7 +1,7 @@
 import { View, Text, Image, Dimensions, Pressable, InteractionManager } from "react-native";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { useRouter } from "expo-router";
-import { ShowItemType, useMovieActions } from "@/store/store.shows";
+import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
 import { getMovieItemSizing } from "./movieItemHelpers";
 import MovieImage from "@/components/common/MovieImage";
 import ActionBarContainer from "./actionbar/ActionBarContainer";
@@ -28,19 +28,21 @@ const MovieItem = ({ movie, hideAll, column }: Props) => {
     getMovieItemSizing();
   const router = useRouter();
   const movieActions = useMovieActions();
+  const pending = useMovieStore((state) => state.pendingChanges);
   const { colors } = useCustomTheme();
-
+  const noPending = Object.keys(pending).length === 0;
   const [actionBarShown, toggleActionBarShown] = useReducer((state) => !state, false);
-  const handleActionBarShown = () => toggleActionBarShown();
+  const handleActionBarShown = useCallback(() => toggleActionBarShown(), []);
 
-  //- when hideAll is true, close the actionBar if it is showing
+  // console.log("noPending in Movie Item", movie.title, noPending);
+  //- when hideAll is true OR there are no pending changes, close the actionBar if it is showing
   useEffect(() => {
-    if (hideAll) {
+    if (hideAll || noPending) {
       if (actionBarShown) {
         toggleActionBarShown();
       }
     }
-  }, [hideAll]);
+  }, [hideAll, noPending]);
 
   //~ --- handleMovieSelect ---
   const handleMovieSelect = () => {

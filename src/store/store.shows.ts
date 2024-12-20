@@ -1,3 +1,4 @@
+import React from "react";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { StorageAdapter } from "./dataAccess/storageAdapter";
@@ -39,12 +40,22 @@ export type Tag = {
   pos: number;
 };
 
+// When making changes using the ActionBar, we store them here until the user closes the action bar
+// This keeps the movie list from rerending and resorting on every change.
+type MovieId = number;
+type ToggleOptions = "toggle" | "on" | "off";
+export type PendingChanges = Record<
+  MovieId,
+  { watched?: ToggleOptions; favorited?: ToggleOptions; rating?: number; tags?: string[] }
+>;
+
 export interface MovieStore {
   shows: ShowItemType[];
   tagArray: Tag[];
   genreArray: string[];
   // Updated with on the providers stored on shows, updated via "UPDATE_SHOW_PROVIDERS" event bus call.
   streamingProviders: ProviderInfo[];
+  pendingChanges: PendingChanges;
   actions: {
     addShow: (show: movieSearchByTitle_Results) => Promise<void>;
     updateShow: (id: number, updatedShow: Partial<ShowItemType>) => void;
@@ -58,6 +69,10 @@ export interface MovieStore {
     tagUpdateOrder: (tags: Tag[]) => void;
     getShowsTags: (showId: number | undefined) => Pick<Tag, "id" | "name">[] | undefined;
     clearStore: () => void;
+    // Add Pending Changes to list
+    setPendingChanges: (movieId: number, updatedPendingchanges: PendingChanges[MovieId]) => void;
+    // Commit all pending changes
+    commitPendingChanges: () => void;
   };
 }
 
@@ -66,6 +81,7 @@ const movieInitialState = {
   tagArray: [],
   genreArray: [],
   streamingProviders: [],
+  pendingChanges: {},
 };
 const useMovieStore = create<MovieStore>()(
   persist(
@@ -277,6 +293,33 @@ const useMovieStore = create<MovieStore>()(
         //~ ---------------------------------
         //~ clearStore
         clearStore: () => set({ shows: [] }),
+        setPendingChanges: (movieId, updatedPendingChanges) => {
+          const allPending = get().pendingChanges;
+          set((state) => ({
+            pendingChanges: {
+              ...state.pendingChanges,
+              [movieId]: { ...allPending[movieId], ...updatedPendingChanges },
+            },
+          }));
+          // console.log("PENDING CHANGES", get().pendingChanges);
+        },
+        commitPendingChanges: () => {
+          // const allShows = [...get().shows];
+          const pendingChanges = get().pendingChanges;
+
+          // console.log("COMMITTING PENDING CHANGES", pendingChanges);
+          for (const [movieId, changes] of Object.entries(pendingChanges)) {
+            const watched = changes.watched === "off" ? undefined : formatEpoch(Date.now());
+            const favorited = changes.favorited === "off" ? undefined : formatEpoch(Date.now());
+            get().actions.updateShow(parseInt(movieId), {
+              rating: changes.rating,
+              tags: changes.tags,
+              watched,
+              favorited,
+            });
+          }
+          set({ pendingChanges: {} });
+        },
       },
     }),
     {
@@ -329,12 +372,23 @@ export const useMovieActions = () => {
 export const useGetAppliedTags = (showId: number | undefined) => {
   const { getShowsTags } = useMovieActions();
   const movies = useMovieStore((state) => state.shows);
-  const [showTags, setShowTags] = useState<Pick<Tag, "id" | "name">[] | undefined>();
-  useEffect(() => {
-    const appliedTags = getShowsTags(showId);
-    setShowTags(appliedTags);
-  }, [showId, movies]);
+
+  const showTags = React.useMemo(() => {
+    if (!showId) return undefined;
+    return getShowsTags(showId);
+  }, [showId, getShowsTags, movies]);
+
   return showTags;
+  // const { getShowsTags } = useMovieActions();
+  // const movies = useMovieStore((state) => state.shows);
+  // const [showTags, setShowTags] = useState<Pick<Tag, "id" | "name">[] | undefined>();
+
+  // useEffect(() => {
+  //   const appliedTags = getShowsTags(showId);
+  //   setShowTags(appliedTags);
+  // }, [showId, movies]);
+
+  // return showTags;
 };
 //~~ ------------------------------------------------------------
 //~~ useMovies
@@ -449,6 +503,7 @@ const doesShowExist = (allShows: number[], showToCheck: number) => {
 //- --------------------------------------
 // updateTagState
 //- --------------------------------------
+export type TagState = ReturnType<typeof updateTagState>[number];
 export const updateTagState = (tags: Tag[], appliedTagIds: string[]) => {
   // Create a Set for fast lookups of applied tags
   const appliedTagSet = new Set(appliedTagIds);

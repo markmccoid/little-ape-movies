@@ -11,9 +11,9 @@ type Props = {
   movie: ShowItemType;
   // Need to know which column for rating animation
   column: 0 | 1;
-  isVisible: boolean;
+  handleChangePending: (changeState: boolean) => void;
 };
-const ActionBarButtons = ({ movie, column, isVisible }: Props) => {
+const ActionBarButtons = ({ movie, column, handleChangePending }: Props) => {
   const movieActions = useMovieActions();
   const watched = movie?.watched;
   const favorited = movie?.favorited;
@@ -21,16 +21,11 @@ const ActionBarButtons = ({ movie, column, isVisible }: Props) => {
   const [localRating, setLocalRating] = useState(movie?.rating || 0);
   const [localWatched, setLocalWatched] = React.useState(!!watched);
   const [localFavorited, setLocalFavorited] = React.useState(!!watched);
-  const [changeFlag, setChangeFlag] = useState(false);
+
+  // console.log("Movie", movie.title, localWatched, changeFlag);
 
   useEffect(() => {
-    if (changeFlag) {
-      movieActions.updateShow(movie.id, { rating: localRating });
-      movieActions.toggleWatched(movie.id, localWatched ? "on" : "off");
-      movieActions.toggleFavorited(movie.id, localFavorited ? "on" : "off");
-    }
-  }, [isVisible]);
-  useEffect(() => {
+    // console.log("fav/watched Effect", movie.title, localWatched, changeFlag)
     if (localWatched !== !!watched) {
       setLocalWatched(!!watched);
     }
@@ -40,20 +35,24 @@ const ActionBarButtons = ({ movie, column, isVisible }: Props) => {
   }, [favorited, watched]);
 
   const handleWatched = () => {
-    setLocalWatched((prev) => !prev);
-    setChangeFlag(true);
-    setTimeout(() => movieActions.toggleWatched(movie.id), 100);
+    setLocalWatched((prevWatched) => {
+      movieActions.setPendingChanges(movie.id, { watched: prevWatched ? "off" : "on" });
+      return !prevWatched;
+    });
+    handleChangePending(true);
   };
   const handleFavorited = () => {
-    setLocalFavorited((prev) => !prev);
-    setChangeFlag(true);
-    setTimeout(() => movieActions.toggleFavorited(movie.id), 100);
+    setLocalFavorited((prevFavorited) => {
+      movieActions.setPendingChanges(movie.id, { favorited: prevFavorited ? "off" : "on" });
+      return !prevFavorited;
+    });
+    handleChangePending(true);
   };
 
   const handleUserRating = (newRating: number) => {
+    movieActions.setPendingChanges(movie.id, { rating: newRating });
     setLocalRating(newRating);
-    setChangeFlag(true);
-    // movieActions.updateShow(movie.id, { rating: newRating });
+    handleChangePending(true);
   };
   return (
     <View className="flex-row justify-between w-full mt-2 px-2">
@@ -72,4 +71,4 @@ const ActionBarButtons = ({ movie, column, isVisible }: Props) => {
   );
 };
 
-export default ActionBarButtons;
+export default React.memo(ActionBarButtons);

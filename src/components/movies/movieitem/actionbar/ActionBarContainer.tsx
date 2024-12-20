@@ -29,6 +29,8 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
   toggleVisibility,
   column,
 }) => {
+  const actions = useMovieActions();
+  const [changePending, setChangePending] = useState(false);
   const MIN_HEIGHT = 0;
   const MIDDLE_HEIGHT = 70;
   const MAX_HEIGHT = 205;
@@ -39,6 +41,11 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
   const handleVisibilityChange = () => {
     animateVisibilityChange();
     toggleVisibility();
+  };
+
+  //~
+  const handleChangePending = (changeState: boolean) => {
+    setChangePending(changeState);
   };
 
   const animateVisibilityChange = () => {
@@ -56,6 +63,9 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
       initialRender.current = false;
     } else {
       animateVisibilityChange();
+    }
+    if (changePending) {
+      actions.commitPendingChanges();
     }
   }, [isVisible]);
 
@@ -122,9 +132,9 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
         className="z-20 flex-col w-full bg-purple-300 items-start h-full border-hairline "
         style={{ borderTopRightRadius: 10, borderTopLeftRadius: 10 }}
       >
-        <ActionBarButtons movie={movie} column={column} isVisible={isVisible} />
+        <ActionBarButtons movie={movie} column={column} handleChangePending={handleChangePending} />
         <View className="h-[10]" />
-        <ActionBarTags movieId={movie.id} />
+        <ActionBarTags movieId={movie.id} handleChangePending={handleChangePending} />
         {/* <ActionInfoPanel movie={movie} /> */}
       </MotiView>
     </Animated.View>

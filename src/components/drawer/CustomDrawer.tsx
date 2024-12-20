@@ -121,7 +121,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       <View className={` pl-[20] bg-card flex-row items-center gap-3 w-full `}>
         <Pressable
           className="p-[10] ml-[-10]"
-          onPress={() => {
+          onPress={async () => {
             router.push({ pathname: "/(auth)/(drawer)/settings" });
             // Need the setTimeout so that the first push finishes before this route
             setTimeout(
