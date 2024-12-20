@@ -14,6 +14,7 @@ export const initCurrentUserStorage = (currentUser: string | undefined) => {
     });
     return storage;
   }
+
   storage = new MMKV({
     id: `${currentUser}.storage`,
   });

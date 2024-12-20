@@ -292,7 +292,7 @@ const useMovieStore = create<MovieStore>()(
         },
         //~ ---------------------------------
         //~ clearStore
-        clearStore: () => set({ shows: [] }),
+        clearStore: () => set({ shows: [], tagArray: [], genreArray: [], streamingProviders: [] }),
         setPendingChanges: (movieId, updatedPendingChanges) => {
           const allPending = get().pendingChanges;
           set((state) => ({
@@ -328,6 +328,7 @@ const useMovieStore = create<MovieStore>()(
       partialize: (state) => ({
         shows: state.shows,
         tagArray: state.tagArray,
+        genreArray: state.genreArray,
         streamingProviders: state.streamingProviders,
       }),
       onRehydrateStorage: (state) => {

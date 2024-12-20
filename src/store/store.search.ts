@@ -11,11 +11,9 @@ export type SearchType = "title" | "person";
 type SearchStore = {
   searchVal: string | undefined;
   searchType: SearchType;
-  detailTarget: string[];
   actions: {
     setSearch: (searchVal: string | undefined) => void;
     setSearchType: (searchType: SearchType) => void;
-    setTarget: (target: string[]) => void;
   };
 };
 const searchInitialState = {
@@ -25,7 +23,6 @@ const searchInitialState = {
 export const useSearchStore = create<SearchStore>((set, get) => ({
   searchVal: undefined,
   searchType: "title" as SearchType,
-  detailTarget: [],
   actions: {
     setSearch: (searchVal) =>
       set({
@@ -34,7 +31,6 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
     setSearchType: (searchType) => {
       set({ searchType });
     },
-    setTarget: (target) => set({ detailTarget: target }),
   },
 }));
 
@@ -56,6 +52,5 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
 // });
 
 eventBus.subscribe("CLEAR_SEARCH_STORES", () => {
-  console.log("Clearing search state");
   useSearchStore.setState({ ...searchInitialState });
 });

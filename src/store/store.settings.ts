@@ -73,6 +73,8 @@ interface SettingsStore {
     addUpdateQuickSort: (newQuickSort: Omit<SavedQuickSort, "index">) => void;
     overwriteAllQuickSorts: (quickSorts: SavedQuickSort[]) => void;
     deleteQuickSort: (qsId: string) => void;
+    // Used mainly on logout to clear the settings so that if a new user created, it has the defaults.
+    resetSettingsStore: () => void;
   };
 }
 
@@ -235,6 +237,9 @@ const useSettingsStore = create<SettingsStore>()(
             ...state,
             savedQuickSorts: state.savedQuickSorts.filter((el) => el.id !== qsId),
           }));
+        },
+        resetSettingsStore: () => {
+          set({ ...settingsInitialState });
         },
       },
     }),

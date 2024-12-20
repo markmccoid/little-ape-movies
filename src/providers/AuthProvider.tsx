@@ -62,7 +62,11 @@ export const AuthProvider = ({ children }: any) => {
 
   //~ LOGIN -------------------------------------------
   const handleLogin = (user: string) => {
+    // Clear the stores when creating logging in
+    // Then when the signIn happens, the rehydrate will bring back the data
     eventBus.publish("CLEAR_SEARCH_STORES");
+    useMovieStore.getState().actions.clearStore();
+    useSettingsStore.getState().actions.resetSettingsStore();
     // Stores the selected user in MMKV currentUser Storage
     signIn(user);
     // Inits the Authed storage MMKV with currenUser name
@@ -78,6 +82,9 @@ export const AuthProvider = ({ children }: any) => {
 
   //~ REGISTER User -------------------------------------------
   const handleRegister = (user: string) => {
+    // Clear the store when creating a new user
+    useMovieStore.getState().actions.clearStore();
+    useSettingsStore.getState().actions.resetSettingsStore();
     setAllUsers(addNewUser(user));
   };
 
