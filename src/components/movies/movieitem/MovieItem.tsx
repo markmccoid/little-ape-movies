@@ -1,14 +1,11 @@
-import { View, Text, Image, Dimensions, Pressable, InteractionManager } from "react-native";
-import React, { useCallback, useEffect, useReducer, useState } from "react";
+import { View, Pressable } from "react-native";
+import React, { useCallback, useEffect, useReducer } from "react";
 import { useRouter } from "expo-router";
-import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
+import useMovieStore, { ShowItemType } from "@/store/store.shows";
 import { getMovieItemSizing } from "./movieItemHelpers";
 import MovieImage from "@/components/common/MovieImage";
 import ActionBarContainer from "./actionbar/ActionBarContainer";
 import { useCustomTheme } from "@/lib/colorThemes";
-import dayjs from "dayjs";
-import { SymbolView } from "expo-symbols";
-import { AnimatePresence, MotiView } from "moti";
 import ActionBarDelete from "./actionbar/ActionBarDelete";
 
 // const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
@@ -27,7 +24,6 @@ const MovieItem = ({ movie, hideAll, column }: Props) => {
   const { imageHeight, imageWidth, verticalMargin, extraHeight, horizontalMargin, gap } =
     getMovieItemSizing();
   const router = useRouter();
-  const movieActions = useMovieActions();
   const pending = useMovieStore((state) => state.pendingChanges);
   const { colors } = useCustomTheme();
   const noPending = Object.keys(pending).length === 0;
@@ -90,6 +86,7 @@ const MovieItem = ({ movie, hideAll, column }: Props) => {
         }}
       >
         {/* ACTION BAR */}
+
         <ActionBarContainer
           movie={movie}
           isVisible={actionBarShown}

@@ -15,6 +15,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import ActionBarTags from "./ActionBarTags";
+import ActionInfoPanel from "./ActionInfoPanel";
 
 type MovieItemActionBarProps = {
   movie: ShowItemType;
@@ -33,7 +34,7 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
   const [changePending, setChangePending] = useState(false);
   const MIN_HEIGHT = 0;
   const MIDDLE_HEIGHT = 70;
-  const MAX_HEIGHT = 205;
+  const MAX_HEIGHT = 225;
   const initialRender = useRef(true);
   const actionHeight = useSharedValue(MIDDLE_HEIGHT); // Start at MIDDLE
   const startY = useSharedValue(MIN_HEIGHT); // Start at MIDDLE
@@ -65,6 +66,7 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
       animateVisibilityChange();
     }
     if (changePending) {
+      handleChangePending(false);
       actions.commitPendingChanges();
     }
   }, [isVisible]);
@@ -135,7 +137,7 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
         <ActionBarButtons movie={movie} column={column} handleChangePending={handleChangePending} />
         <View className="h-[10]" />
         <ActionBarTags movieId={movie.id} handleChangePending={handleChangePending} />
-        {/* <ActionInfoPanel movie={movie} /> */}
+        <ActionInfoPanel movie={movie} />
       </MotiView>
     </Animated.View>
   );

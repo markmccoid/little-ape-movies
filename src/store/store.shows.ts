@@ -309,14 +309,22 @@ const useMovieStore = create<MovieStore>()(
 
           // console.log("COMMITTING PENDING CHANGES", pendingChanges);
           for (const [movieId, changes] of Object.entries(pendingChanges)) {
-            const watched = changes.watched === "off" ? undefined : formatEpoch(Date.now());
-            const favorited = changes.favorited === "off" ? undefined : formatEpoch(Date.now());
-            get().actions.updateShow(parseInt(movieId), {
-              rating: changes.rating,
-              tags: changes.tags,
-              watched,
-              favorited,
-            });
+            if (changes.watched) {
+              const watched = changes.watched === "off" ? undefined : formatEpoch(Date.now());
+              get().actions.updateShow(parseInt(movieId), { watched });
+            }
+            if (changes.favorited) {
+              const favorited = changes.favorited === "off" ? undefined : formatEpoch(Date.now());
+              get().actions.updateShow(parseInt(movieId), { favorited });
+            }
+            if (changes.rating) {
+              get().actions.updateShow(parseInt(movieId), { rating: changes.rating });
+            }
+            if (changes.tags) {
+              get().actions.updateShow(parseInt(movieId), {
+                tags: changes.tags,
+              });
+            }
           }
           set({ pendingChanges: {} });
         },
@@ -373,23 +381,14 @@ export const useMovieActions = () => {
 export const useGetAppliedTags = (showId: number | undefined) => {
   const { getShowsTags } = useMovieActions();
   const movies = useMovieStore((state) => state.shows);
+  const [showTags, setShowTags] = useState<Pick<Tag, "id" | "name">[] | undefined>();
 
-  const showTags = React.useMemo(() => {
-    if (!showId) return undefined;
-    return getShowsTags(showId);
-  }, [showId, getShowsTags, movies]);
+  useEffect(() => {
+    const appliedTags = getShowsTags(showId);
+    setShowTags(appliedTags);
+  }, [showId, movies]);
 
   return showTags;
-  // const { getShowsTags } = useMovieActions();
-  // const movies = useMovieStore((state) => state.shows);
-  // const [showTags, setShowTags] = useState<Pick<Tag, "id" | "name">[] | undefined>();
-
-  // useEffect(() => {
-  //   const appliedTags = getShowsTags(showId);
-  //   setShowTags(appliedTags);
-  // }, [showId, movies]);
-
-  // return showTags;
 };
 //~~ ------------------------------------------------------------
 //~~ useMovies

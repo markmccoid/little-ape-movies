@@ -221,8 +221,9 @@ const useSettingsStore = create<SettingsStore>()(
 
           // if existing quickSort this will return the index otherwise undefined
           const qsExists = savedQS.find((el) => el.id === newQuickSort.id)?.index;
+
           // if undefined, put as last quickSort
-          const savedIndex = qsExists || savedQS.length;
+          const savedIndex = qsExists ?? savedQS.length;
           // Filter out in case we are updating
           const newQS = [
             { ...newQuickSort, index: savedIndex },

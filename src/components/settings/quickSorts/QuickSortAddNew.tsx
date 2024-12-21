@@ -69,7 +69,6 @@ const QuickSortAddNew = ({ handleHide, editId }: Props) => {
   //~ Add New Quicksort
   const addQuickSort = () => {
     if (!newQSName) return;
-
     actions.addUpdateQuickSort({ id: editId || uuid.v4(), name: newQSName, sort: newSort });
     //Clear edit id
     // close quick sort add
