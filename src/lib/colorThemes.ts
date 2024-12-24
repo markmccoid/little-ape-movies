@@ -11,6 +11,8 @@ type CustomTheme = Theme & {
     primaryForeground: string;
     secondary: string;
     secondaryForeground: string;
+    muted: string;
+    mutedForeground: string;
     button: string;
     buttontext: string;
     textInverted: string;
@@ -38,6 +40,8 @@ export const CustomLightTheme: CustomTheme = {
     primaryForeground: "#f5f9fb", // Converted from HSL(210, 20%, 98%)
     secondary: "#c3b1e6", // Converted from HSL(262, 47%, 75%)
     secondaryForeground: "#1a2230", // Converted from HSL(220.9, 39.3%, 11%)
+    muted: "#212026",
+    mutedForeground: "#D9E5F2",
     background: "#f0ebfa", // Converted from HSL(262, 50%, 95%)
     card: "#ffffff", // Converted from HSL(0, 0%, 100%)
     cardForeground: "#03061a", // Converted from HSL(224, 71.4%, 4.1%)
@@ -66,6 +70,8 @@ export const CustomDarkTheme: CustomTheme = {
     primaryForeground: "#1a1c26", // Darker, more muted off-black for readability on dark background
     secondary: "#695d7e", //  Darker secondary with slightly altered hue, feels softer.
     secondaryForeground: "#e1e5f1", // Lighter text for contrast on dark background
+    muted: "#243746",
+    mutedForeground: "#A3ADB4",
     background: "#0a0911", // Dark charcoal background, sets the base
     card: "#1c1922", // Darker gray, keeps contrast between background and card
     cardForeground: "#e9e7ec", // Light text on the darker card

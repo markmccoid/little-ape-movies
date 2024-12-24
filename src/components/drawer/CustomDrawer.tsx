@@ -1,12 +1,7 @@
 import React from "react";
 import { View, StyleSheet, SafeAreaView, Pressable, ScrollView } from "react-native";
-import {
-  DrawerContentComponentProps,
-  DrawerContentScrollView,
-  DrawerItem,
-  DrawerItemList,
-} from "@react-navigation/drawer";
-import { useNavigation } from "@react-navigation/native";
+import { DrawerContentComponentProps } from "@react-navigation/drawer";
+
 import { useAuth } from "@/providers/AuthProvider";
 import { SymbolView } from "expo-symbols";
 import { Link, usePathname, useRouter } from "expo-router";
@@ -17,8 +12,10 @@ import { CheckSquareIcon, FilterIcon } from "../common/Icons";
 import { Text } from "@/components/ui/text";
 import Constants from "expo-constants";
 import useSettingsStore, { useSettingsActions } from "@/store/store.settings";
+import { MotiPressable } from "moti/interactions";
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
+  const [disableButton, setDisableButton] = React.useState(false);
   const savedQuickSorts = useSettingsStore.getState().savedQuickSorts;
   const settingsActions = useSettingsActions();
   const { currentUser, onLogout } = useAuth();
@@ -29,6 +26,19 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
   const router = useRouter();
 
   const navigation = props.navigation;
+
+  const testAnimPush = React.useMemo(
+    () =>
+      ({ hovered, pressed }) => {
+        "worklet";
+
+        return {
+          opacity: hovered || pressed ? 0.5 : 1,
+          transform: [{ scale: pressed ? 0.95 : 1 }, { translateX: pressed ? 25 : 0 }],
+        };
+      },
+    []
+  );
   return (
     <View className="flex-1 bg-secondary">
       {/* HEADER */}
@@ -149,27 +159,37 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       >
         {savedQuickSorts?.map((sort) => {
           return (
-            <View
+            <MotiPressable
               key={sort.id}
-              className={`bg-primary border-border border-hairline py-1 px-2 rounded-l-lg my-1`}
+              // className={`bg-primary border-border border-hairline py-1 px-2 rounded-l-lg my-1`}
+              style={{
+                backgroundColor: colors.primary,
+                borderWidth: StyleSheet.hairlineWidth,
+                paddingVertical: 2,
+                paddingHorizontal: 4,
+                marginTop: 2,
+                borderTopLeftRadius: 10,
+                borderBottomLeftRadius: 10,
+              }}
+              disabled={disableButton}
+              onPress={async () => {
+                setDisableButton(true);
+                settingsActions.updateSortSettings(sort.sort);
+                router.replace("./home");
+                await new Promise((resolve) => setTimeout(() => resolve("done"), 50));
+                navigation.closeDrawer();
+                setDisableButton(false);
+              }}
+              animate={testAnimPush}
             >
-              <Pressable
-                onPress={async () => {
-                  settingsActions.updateSortSettings(sort.sort);
-                  router.replace("./home");
-                  await new Promise((resolve) => setTimeout(() => resolve("done"), 100));
-                  navigation.closeDrawer();
-                }}
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit={true}
+                className="text-primary-foreground text-lg font-semibold"
               >
-                <Text
-                  numberOfLines={1}
-                  adjustsFontSizeToFit={true}
-                  className="text-primary-foreground text-lg font-semibold"
-                >
-                  {sort.name}
-                </Text>
-              </Pressable>
-            </View>
+                {sort.name}
+              </Text>
+            </MotiPressable>
           );
         })}
       </ScrollView>

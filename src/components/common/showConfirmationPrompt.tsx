@@ -2,21 +2,25 @@ import { Alert, StyleSheet } from "react-native";
 
 const showConfirmationPrompt = (title: string, message: string) => {
   return new Promise((resolve) => {
-    Alert.alert("Confirm Delete", "Are you sure you want to delete this item?", [
-      {
-        text: "Cancel",
-        onPress: () => {
-          resolve(false);
+    Alert.alert(
+      title || "Confirm Delete",
+      message || "Are you sure you want to delete this item?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => {
+            resolve(false);
+          },
+          style: "cancel",
         },
-        style: "cancel",
-      },
-      {
-        text: "OK",
-        onPress: () => {
-          resolve(true);
+        {
+          text: "OK",
+          onPress: () => {
+            resolve(true);
+          },
         },
-      },
-    ]);
+      ]
+    );
   });
 };
 

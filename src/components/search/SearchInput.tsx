@@ -15,11 +15,12 @@ interface SearchInputProps {
   placeholder?: string;
   onChange: (value: string) => void;
   setIsFocused: (value: boolean) => void;
+  initialValue: string | undefined;
 }
 
 const SearchInput = forwardRef(
-  ({ placeholder = "Search...", onChange, setIsFocused }: SearchInputProps, ref) => {
-    const [inputValue, setInputValue] = useState("");
+  ({ placeholder = "Search...", onChange, setIsFocused, initialValue }: SearchInputProps, ref) => {
+    const [inputValue, setInputValue] = useState(initialValue || "");
     const inputRef = useRef<TextInput>(null);
 
     useImperativeHandle(ref, () => ({
@@ -31,7 +32,9 @@ const SearchInput = forwardRef(
         onChange("");
       },
     }));
-
+    React.useEffect(() => {
+      setInputValue(initialValue || "");
+    }, [initialValue]);
     const handleInputChange = (text: string) => {
       setInputValue(text);
       onChange(text);

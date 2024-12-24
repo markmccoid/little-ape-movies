@@ -5,6 +5,7 @@ import { Text } from "@/components/ui/text";
 import { useNavigation } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import { useCustomTheme } from "@/lib/colorThemes";
+import showConfirmationPrompt from "../common/showConfirmationPrompt";
 
 type Props = {
   tag: Tag;
@@ -47,9 +48,20 @@ const TagMaintItem = ({ tag, id }: Props) => {
     );
   };
 
-  const handleTagRemove = () => {
-    Alert.alert("Need to add confirmation as well as removing from existing Movies");
-    actions.tagRemove(tag.id);
+  const handleTagRemove = async () => {
+    // Alert.alert("Need to add confirmation as well as removing from existing Movies");
+
+    try {
+      const yesDelete = await showConfirmationPrompt(
+        "Delete Tag?",
+        "Deleting this Tag will remove it from all Movies. Are you sure?"
+      );
+      if (yesDelete) {
+        actions.tagRemove(tag.id);
+      }
+    } catch (error) {
+      console.error("Delete operation failed:", error);
+    }
   };
   return (
     <View
@@ -62,7 +74,7 @@ const TagMaintItem = ({ tag, id }: Props) => {
 
       <View className="flex-row">
         <Pressable
-          onPress={() => handleTagRemove()}
+          onPress={async () => handleTagRemove()}
           className="px-2 py-1 mr-1 bg-destructive rounded-lg"
         >
           <SymbolView name="trash.fill" tintColor={colors.destructiveForeground} size={20} />

@@ -69,6 +69,7 @@ export interface MovieStore {
     tagUpdateOrder: (tags: Tag[]) => void;
     getShowsTags: (showId: number | undefined) => Pick<Tag, "id" | "name">[] | undefined;
     clearStore: () => void;
+
     // Add Pending Changes to list
     setPendingChanges: (movieId: number, updatedPendingchanges: PendingChanges[MovieId]) => void;
     // Commit all pending changes
@@ -244,8 +245,14 @@ const useMovieStore = create<MovieStore>()(
         //~ tagRemove
         tagRemove: (tagId) => {
           const currTags = get().tagArray;
+          let currShows = [...get().shows];
+          // Remove the tag from all shows
+          for (let show of currShows) {
+            if (!show.tags) continue;
+            show.tags = show.tags.filter((tag) => tag !== tagId);
+          }
           const newTags = currTags.filter((currTag) => currTag.id !== tagId);
-          set({ tagArray: newTags });
+          set({ tagArray: newTags, shows: currShows });
         },
         //~ ---------------------------------
         //~ tagEdit
@@ -403,6 +410,8 @@ export const useMovies = () => {
     includeGenres,
     excludeGenres,
   } = useSettingsStore((state) => state.filterCriteria);
+  const titleSearchValue = useSettingsStore((state) => state.titleSearchValue);
+  const titleSearchScope = useSettingsStore((state) => state.titleSearchScope);
   const sortSettings = useSettingsStore((state) => state.sortSettings);
 
   const movies = useMovieStore((state) => state.shows);
@@ -410,6 +419,17 @@ export const useMovies = () => {
   let filteredMovies: ShowItemType[] = [];
   // Loop through each saved movie and see if it meets criteria to be shown
   for (const movie of movies) {
+    if (titleSearchScope === "all") {
+      if (titleSearchValue !== "" && titleSearchValue) {
+        if (movie.title.toLowerCase().includes(titleSearchValue.toLowerCase())) {
+          filteredMovies.push(movie);
+          continue;
+        }
+      }
+    }
+    if (titleSearchValue !== "" && titleSearchValue) {
+      if (!movie.title.toLowerCase().includes(titleSearchValue.toLowerCase())) continue;
+    }
     // if looking for watched movies, exclude if not watched, otherwise we don't case
     if (filterIsWatched !== "off") {
       if (

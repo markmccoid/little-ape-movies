@@ -51,6 +51,9 @@ interface SettingsStore {
     tierColor: string;
   }[];
   filterCriteria: FilterCriteria;
+  titleSearchValue: string | undefined;
+  // Search across all movies or just the ones available with the applied filtered
+  titleSearchScope: "all" | "filteronly";
   sortSettings: SortField[];
   savedFilters: SavedFilters[];
   savedQuickSorts: SavedQuickSort[];
@@ -73,6 +76,8 @@ interface SettingsStore {
     addUpdateQuickSort: (newQuickSort: Omit<SavedQuickSort, "index">) => void;
     overwriteAllQuickSorts: (quickSorts: SavedQuickSort[]) => void;
     deleteQuickSort: (qsId: string) => void;
+    setTitleSearchValue: (searchValue: string) => void;
+    setTitleSearchScope: (searchScope: "all" | "filteronly") => void;
     // Used mainly on logout to clear the settings so that if a new user created, it has the defaults.
     resetSettingsStore: () => void;
   };
@@ -94,6 +99,8 @@ const settingsInitialState = {
     },
   ],
   filterCriteria: {},
+  titleSearchValue: undefined,
+  titleSearchScope: "all" as const,
   savedQuickSorts: quickSorts,
   savedFilters: [],
   sortSettings: defaultSortSettings,
@@ -239,6 +246,12 @@ const useSettingsStore = create<SettingsStore>()(
             savedQuickSorts: state.savedQuickSorts.filter((el) => el.id !== qsId),
           }));
         },
+        setTitleSearchValue: (searchValue) => {
+          set({ titleSearchValue: searchValue });
+        },
+        setTitleSearchScope: (searchScope) => {
+          set({ titleSearchScope: searchScope });
+        },
         resetSettingsStore: () => {
           set({ ...settingsInitialState });
         },
@@ -249,7 +262,9 @@ const useSettingsStore = create<SettingsStore>()(
       storage: createJSONStorage(() => StorageAdapter),
       partialize: (state) => ({
         searchColumns: state.searchColumns,
+        filterCriteria: state.filterCriteria,
         sortSettings: state.sortSettings,
+        savedFilters: state.savedFilters,
         savedQuickSorts: state.savedQuickSorts,
       }),
       // onRehydrateStorage: (state) => {

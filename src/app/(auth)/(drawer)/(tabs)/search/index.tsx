@@ -33,6 +33,7 @@ const SearchPage = () => {
   const settingsActions = useSettingsStore((state) => state.actions);
   const { setSearch, setSearchType } = useSearchStore((state) => state.actions);
   const searchType = useSearchStore((state) => state.searchType);
+  const searchValue = useSearchStore((state) => state.searchVal);
   const { top } = useSafeAreaInsets();
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<TextInput>(null);
@@ -79,6 +80,7 @@ const SearchPage = () => {
               onChange={debouncedSetSearchText}
               setIsFocused={setIsFocused}
               ref={inputRef}
+              initialValue={searchValue}
             />
           </View>
           {/* Toggle from 3 to 2 or 2 to 3 columns being shown */}
