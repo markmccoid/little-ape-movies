@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Pressable } from "react-native";
+import { View, TouchableOpacity, Pressable, Keyboard } from "react-native";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import MovieImage from "../common/MovieImage";
 import { MovieSearchResults, useSearchStore } from "@/store/store.search";
@@ -70,10 +70,10 @@ const SearchResult = ({
   const handlePressToMovie = async () => {
     // Prevent further presses if a movie is already loading
     if (isMovieLoading) return;
-
     // Set loading state to true
     setIsMovieLoading(true);
-    console.log("MOVIE TO VIEW", `${linkPath}${movie.id}`);
+    Keyboard.dismiss();
+    // console.log("MOVIE TO VIEW", `${linkPath}${movie.id}`);
     try {
       // delay so
       await new Promise((resolve) => setTimeout(resolve, 0));

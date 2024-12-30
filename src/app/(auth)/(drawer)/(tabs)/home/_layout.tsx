@@ -4,8 +4,9 @@ import { Stack } from "expo-router";
 import { useTheme } from "@react-navigation/native";
 import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle";
 import { getCurrentUser } from "@/store/dataAccess/localStorage-users";
+import { useMovies } from "@/store/store.shows";
 const HomeLayout = () => {
-  const { colors } = useTheme();
+  const { filteredCount } = useMovies();
   const currUser = getCurrentUser();
   return (
     <Stack screenOptions={{}}>
@@ -13,7 +14,7 @@ const HomeLayout = () => {
         name="index"
         options={{
           headerShown: true,
-          title: `Movies-${currUser}`,
+          title: `${filteredCount} Movies`,
           headerLeft: () => <NestedStackDrawerToggle />,
         }}
       />

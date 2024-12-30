@@ -18,7 +18,13 @@ type FilterCriteria = {
   includeGenres?: string[];
   excludeGenres?: string[];
 };
-
+export type FilterStatus = {
+  overallStatus: "active" | "inactive";
+  tags: "active" | "inactive";
+  genres: "active" | "inactive";
+  watched: "active" | "inactive";
+  favorited: "active" | "inactive";
+};
 export type SavedFilters = {
   id: string;
   name: string;
@@ -72,6 +78,7 @@ interface SettingsStore {
       action: "add" | "remove"
     ) => void;
     clearFilters: (filter: "Tags" | "Genres" | "all") => void;
+    getFilterStatus: () => FilterStatus;
     updateSortSettings: (sortFields: SortField[]) => void;
     addUpdateQuickSort: (newQuickSort: Omit<SavedQuickSort, "index">) => void;
     overwriteAllQuickSorts: (quickSorts: SavedQuickSort[]) => void;
@@ -215,6 +222,39 @@ const useSettingsStore = create<SettingsStore>()(
           set((state) => ({
             filterCriteria: { ...state.filterCriteria, [includeFilter]: [], [excludeFilter]: [] },
           }));
+        },
+        getFilterStatus: () => {
+          const { filterCriteria } = get();
+          const filterStatus: FilterStatus = {
+            overallStatus: "inactive",
+            tags: "inactive",
+            genres: "inactive",
+            watched: "inactive",
+            favorited: "inactive",
+          };
+          if (filterCriteria.includeTags?.length || filterCriteria.excludeTags?.length) {
+            filterStatus.tags = "active";
+          }
+          if (filterCriteria.includeGenres?.length || filterCriteria.excludeGenres?.length) {
+            filterStatus.genres = "active";
+          }
+
+          // undefined is considered "off" so we need to check for that
+          if (filterCriteria.filterIsWatched !== "off" && filterCriteria.filterIsWatched) {
+            filterStatus.watched = "active";
+          }
+          if (filterCriteria.filterIsFavorited !== "off" && filterCriteria.filterIsFavorited) {
+            filterStatus.favorited = "active";
+          }
+          if (
+            filterStatus.tags === "active" ||
+            filterStatus.genres === "active" ||
+            filterStatus.watched === "active" ||
+            filterStatus.favorited === "active"
+          ) {
+            filterStatus.overallStatus = "active";
+          }
+          return filterStatus;
         },
         updateSortSettings: (sortFields) => {
           set({ sortSettings: sortFields });

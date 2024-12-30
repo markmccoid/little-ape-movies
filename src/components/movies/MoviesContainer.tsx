@@ -8,27 +8,29 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
-import useMovieStore, { ShowItemType, useMovieActions, useMovies } from "@/store/store.shows";
+import { ShowItemType, useMovies } from "@/store/store.shows";
 import MovieItem from "./movieitem/MovieItem";
 import MovieAnimatedView from "./movieitem/MovieAnimatedView";
 
 import { getMovieItemSizing } from "./movieitem/movieItemHelpers";
-import { Link, useFocusEffect, useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { Text } from "@/components/ui/text";
 import MovieSearch from "./MovieSearch";
-import useSettingsStore from "@/store/store.settings";
+import useSettingsStore, { FilterStatus } from "@/store/store.settings";
 import { useSearchStore } from "@/store/store.search";
 import { SymbolView } from "expo-symbols";
 import { useCustomTheme } from "@/lib/colorThemes";
+import { match, P } from "ts-pattern";
 
 const MoviesContainer = () => {
   // get the itemHeight for building our getItemLayout
   // If you want to change the layout, ONLY do it in th egetMovieItemSizing function
   const router = useRouter();
   const titleSearchValue = useSettingsStore((state) => state.titleSearchValue);
+  const getFilterStatus = useSettingsStore((state) => state.actions.getFilterStatus);
   const { setSearch } = useSearchStore((state) => state.actions);
   const { horizontalMargin, itemHeight } = getMovieItemSizing();
-  const movies = useMovies();
+  const { filteredMovies: movies } = useMovies();
   const { colors } = useCustomTheme();
   const flatListRef = React.useRef<FlatList>(null);
   const [hideAll, setHideAll] = useState(false);
@@ -36,6 +38,53 @@ const MoviesContainer = () => {
   const scrollY = useSharedValue(0);
   const animHeight = useSharedValue(0);
   const searchY = useSharedValue(-40);
+  // Use to determine message to show when no movies are found
+  const filterStatus = getFilterStatus();
+
+  //!! Effect used to determine what text to display when no movies are found
+  //!! In Process - using ts-pattern to determine what text to display when no movies are found
+  //!!
+  //!!
+  useEffect(() => {
+    /**
+     * checking for
+     *  "No movies match your filters/change filter?"  movieCount === 0 & filterStatus === active & searchOpen === false
+     *  "No movies in library, Search and Add a Movie" movieCount === 0 & filterStatus === inactive & searchOpen === false
+     *  "No movies found in library Search" movieCount === 0 & filterStatus === inactive & searchOpen === true
+     */
+    const filterTest: { searchOpen: boolean; filterStatus: FilterStatus; movieCount: number } = {
+      searchOpen,
+      filterStatus,
+      movieCount: movies.length,
+    };
+    const matchTest = match(filterTest)
+      .with(
+        {
+          movieCount: 0,
+          filterStatus: { overallStatus: "active" },
+          searchOpen: false,
+        },
+        (r) => <Text>No movies match your filters/change filter?</Text>
+      )
+      .with(
+        {
+          movieCount: 0,
+          filterStatus: { overallStatus: "inactive" },
+          searchOpen: false,
+        },
+        (r) => <Text>No movies in library, Search and Add a Movie</Text>
+      )
+      .with(
+        {
+          movieCount: 0,
+          searchOpen: true,
+        },
+        (r) => <Text>Movie not found in your library, Search and Add a Movie</Text>
+      )
+      .with({ filterStatus: { overallStatus: "inactive" } }, (r) => <Text>Active Inactive</Text>)
+      .otherwise(() => `Other no match`);
+    console.log("Match Test", matchTest);
+  }, [movies.length]);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -110,6 +159,7 @@ const MoviesContainer = () => {
       <Animated.View style={[hStyle]} className="w-full absolute z-20">
         <MovieSearch isVisible={searchOpen} handleSetVisible={handleSetVisible} searchY={searchY} />
       </Animated.View>
+
       {movies.length === 0 && (
         <View className="flex-1 justify-center items-center">
           <Pressable
@@ -119,7 +169,11 @@ const MoviesContainer = () => {
             }}
             className="justify-center items-center"
           >
-            <Text className="text-xl">Movie Not Found in Your Library</Text>
+            {searchOpen ? (
+              <Text className="text-xl">Movie Not Found in Your Library</Text>
+            ) : (
+              <Text className="text-xl">Search for a Movie</Text>
+            )}
             <View className="flex-row border border-border items-center px-2 py-1 rounded-lg bg-secondary">
               <Text className="text-xl font-semibold">Search?</Text>
               <SymbolView name="popcorn" size={50} tintColor={colors.primary} />
@@ -139,6 +193,7 @@ const MoviesContainer = () => {
         columnWrapperStyle={{ marginHorizontal: horizontalMargin }}
         onScroll={scrollHandler}
         getItemLayout={getItemLayout}
+        keyboardDismissMode="on-drag"
       />
       {/* <MovieSearch isVisible={showSearch} handleSetVisible={handleSetVisible} scrollY={scrollY} /> */}
     </View>

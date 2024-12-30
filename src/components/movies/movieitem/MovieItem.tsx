@@ -7,6 +7,7 @@ import MovieImage from "@/components/common/MovieImage";
 import ActionBarContainer from "./actionbar/ActionBarContainer";
 import { useCustomTheme } from "@/lib/colorThemes";
 import ActionBarDelete from "./actionbar/ActionBarDelete";
+import * as Haptics from "expo-haptics";
 
 // const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 // const availableWidth = screenWidth - 20; // Subtract left and right margins
@@ -30,6 +31,14 @@ const MovieItem = ({ movie, hideAll, column }: Props) => {
   const [actionBarShown, toggleActionBarShown] = useReducer((state) => !state, false);
   const handleActionBarShown = useCallback(() => toggleActionBarShown(), []);
 
+  const handleActionBarToggle = () => {
+    if (actionBarShown) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+    } else {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+    toggleActionBarShown();
+  };
   // console.log("noPending in Movie Item", movie.title, noPending);
   //- when hideAll is true OR there are no pending changes, close the actionBar if it is showing
   useEffect(() => {
@@ -94,7 +103,7 @@ const MovieItem = ({ movie, hideAll, column }: Props) => {
           column={column}
         />
 
-        <Pressable onPress={handleMovieSelect} onLongPress={toggleActionBarShown}>
+        <Pressable onPress={handleMovieSelect} onLongPress={handleActionBarToggle}>
           <MovieImage
             posterURL={movie?.posterURL}
             imageWidth={imageWidth}

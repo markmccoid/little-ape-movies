@@ -24,9 +24,16 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
 
   const { colors } = useCustomTheme();
   const router = useRouter();
+  const currPath = usePathname();
 
   const navigation = props.navigation;
 
+  const activePath =
+    currPath?.includes("home") || currPath?.includes("search") || currPath?.includes("tags")
+      ? "home"
+      : currPath?.includes("settings")
+      ? "settings"
+      : "unknown";
   const testAnimPush = React.useMemo(
     () =>
       ({ hovered, pressed }) => {
@@ -55,18 +62,20 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       </View>
       {/* HOME and SETTINGS Links */}
       <View className="bg-card">
-        {/* <Pressable
+        <Pressable
           onPress={async () => {
             router.replace("./home");
             await new Promise((resolve) => setTimeout(() => resolve("done"), 100));
             navigation.closeDrawer();
           }}
-          className={`px-[10] py-[5] bg-card  w-full`}
-        > */}
-        <Link href="/home" className={`m-2  mx-2`}>
+        >
+          {/* <Link href="/home" className={`m-2  mx-2 border`} replace asChild> */}
           <View
-            className="px-[10] py-[5] bg-card flex-row items-center gap-3 w-full rounded-lg"
-            style={{ margin: 10 }}
+            className="px-[5] py-[5] flex-row items-center gap-3 rounded-lg"
+            style={{
+              margin: 10,
+              backgroundColor: activePath === "home" ? colors.secondary : "transparent",
+            }}
           >
             <SymbolView
               name="house"
@@ -78,14 +87,21 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
             <Text className="text-lg ">Home</Text>
             {/* {pathname === "/home" && <CheckSquareIcon />} */}
           </View>
-        </Link>
+          {/* </Link> */}
+        </Pressable>
         {/* </Pressable> */}
 
         {/* Divider Line */}
         <View className="w-full border-b-hairline border-border" />
 
         <Link href="/settings" className="m-2  mx-2">
-          <View className={`px-[10] py-[5] bg-card flex-row items-center gap-3 w-full rounded-lg`}>
+          <View
+            className={`px-[5] py-[5] bg-card flex-row items-center gap-3 w-full rounded-lg`}
+            style={{
+              margin: 10,
+              backgroundColor: activePath === "settings" ? colors.secondary : "transparent",
+            }}
+          >
             <SymbolView
               name="gear"
               size={20}

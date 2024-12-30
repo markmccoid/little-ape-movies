@@ -3,7 +3,7 @@
     "scheme": "littleapemovies",
     "userInterfaceStyle": "automatic",
     "orientation": "default",
-    "version": "1.1.93",
+    "version": "1.1.94",
     "web": {
       "output": "static",
       "bundler": "metro"
@@ -11,6 +11,7 @@
     "icon": "./assets/images/appicon.png",
     "splash": {
       "image": "./assets/splashscreen.png",
+      "imageWidth": 1284,
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },

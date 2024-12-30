@@ -5,7 +5,7 @@ import { StorageAdapter } from "./dataAccess/storageAdapter";
 import { movieSearchByTitle_Results, ProviderInfo } from "@markmccoid/tmdb_api";
 import { eventBus } from "./eventBus";
 import { ImageColors } from "@/utils/color.utils";
-import { orderBy, reverse, sortBy, unionBy } from "lodash";
+import { filter, orderBy, reverse, sortBy, unionBy } from "lodash";
 import useSettingsStore, { SortField } from "./store.settings";
 import { useEffect, useState } from "react";
 import { formatEpoch } from "@/utils/utils";
@@ -452,28 +452,28 @@ export const useMovies = () => {
     // Include Tags
     if (Array.isArray(includeTags) && includeTags?.length > 0) {
       // EVERY includeTag is present in the movie's tags
-      if (!includeTags.every((tag) => movie.tags.includes(tag))) {
+      if (!includeTags.every((tag) => movie.tags?.includes(tag))) {
         continue;
       }
     }
     // Exclude Tags
     if (Array.isArray(excludeTags) && excludeTags?.length > 0) {
       // EVERY excludeTag is present in the movie's tags
-      if (excludeTags.some((tag) => movie.tags.includes(tag))) {
+      if (excludeTags.some((tag) => movie.tags?.includes(tag))) {
         continue;
       }
     }
 
     // Genres
     if (Array.isArray(includeGenres) && includeGenres?.length > 0) {
-      if (!includeGenres.every((genre) => movie.genres.includes(genre))) {
+      if (!includeGenres.every((genre) => movie.genres?.includes(genre))) {
         continue;
       }
     }
     // Exclude Genres
     if (Array.isArray(excludeGenres) && excludeGenres?.length > 0) {
       // EVERY excludeTag is present in the movie's tags
-      if (excludeGenres.some((genre) => movie.genres.includes(genre))) {
+      if (excludeGenres.some((genre) => movie.genres?.includes(genre))) {
         continue;
       }
     }
@@ -490,7 +490,7 @@ export const useMovies = () => {
   const { sortFields, sortDirections } = getSort(sortSettings);
 
   filteredMovies = orderBy(filteredMovies, sortFields, sortDirections);
-  return filteredMovies;
+  return { filteredMovies, filteredCount: filteredMovies.length };
 };
 
 //-- UTILS
