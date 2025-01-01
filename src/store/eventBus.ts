@@ -10,7 +10,8 @@ type Events =
   | "CLEAR_SEARCH_STORES"
   | "GET_SHOW_COLORS"
   | "UPDATE_SHOW_PROVIDERS"
-  | "GENERATE_GENRES_ARRAY";
+  | "GENERATE_GENRES_ARRAY"
+  | "INITIALIZE_APP";
 class EventBus {
   private listeners: { [event: string]: Listener[] } = {};
   // Subscribe is like "on"  This is where we setup what we are going to do

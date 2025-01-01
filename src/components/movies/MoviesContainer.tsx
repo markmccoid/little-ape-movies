@@ -21,6 +21,7 @@ import { useSearchStore } from "@/store/store.search";
 import { SymbolView } from "expo-symbols";
 import { useCustomTheme } from "@/lib/colorThemes";
 import { match, P } from "ts-pattern";
+import { FilterIcon } from "../common/Icons";
 
 const MoviesContainer = () => {
   // get the itemHeight for building our getItemLayout
@@ -40,7 +41,10 @@ const MoviesContainer = () => {
   const searchY = useSharedValue(-40);
   // Use to determine message to show when no movies are found
   const filterStatus = getFilterStatus();
-
+  const [noMoviesText, setNoMoviesText] = useState<{ text: string; action: "filter" | "search" }>({
+    text: "",
+    action: "search",
+  });
   //!! Effect used to determine what text to display when no movies are found
   //!! In Process - using ts-pattern to determine what text to display when no movies are found
   //!!
@@ -48,23 +52,30 @@ const MoviesContainer = () => {
   useEffect(() => {
     /**
      * checking for
-     *  "No movies match your filters/change filter?"  movieCount === 0 & filterStatus === active & searchOpen === false
+     *  "No movies match your filters/change filter?"  movieCount === 0 & filterStatus === active & titleSearchValue: P.union(undefined, ""),
      *  "No movies in library, Search and Add a Movie" movieCount === 0 & filterStatus === inactive & searchOpen === false
      *  "No movies found in library Search" movieCount === 0 & filterStatus === inactive & searchOpen === true
      */
-    const filterTest: { searchOpen: boolean; filterStatus: FilterStatus; movieCount: number } = {
+    const filterTest: {
+      searchOpen: boolean;
+      filterStatus: FilterStatus;
+      titleSearchValue: string | undefined;
+      movieCount: number;
+    } = {
       searchOpen,
       filterStatus,
+      titleSearchValue,
       movieCount: movies.length,
     };
+    // Using ts-pattern to determine what text to display when no movies are found
     const matchTest = match(filterTest)
       .with(
         {
           movieCount: 0,
           filterStatus: { overallStatus: "active" },
-          searchOpen: false,
+          titleSearchValue: P.union(undefined, ""),
         },
-        (r) => <Text>No movies match your filters/change filter?</Text>
+        () => ({ text: "No movies match your filters", action: "filter" })
       )
       .with(
         {
@@ -72,19 +83,26 @@ const MoviesContainer = () => {
           filterStatus: { overallStatus: "inactive" },
           searchOpen: false,
         },
-        (r) => <Text>No movies in library, Search and Add a Movie</Text>
+        () => ({ text: "No movies in library, Search and Add a Movie", action: "search" })
       )
       .with(
         {
           movieCount: 0,
           searchOpen: true,
         },
-        (r) => <Text>Movie not found in your library, Search and Add a Movie</Text>
+        () => ({
+          text: "Movie not found in your library",
+          action: "search",
+        })
       )
-      .with({ filterStatus: { overallStatus: "inactive" } }, (r) => <Text>Active Inactive</Text>)
-      .otherwise(() => `Other no match`);
-    console.log("Match Test", matchTest);
-  }, [movies.length]);
+      .with({ filterStatus: { overallStatus: "inactive" } }, () => ({
+        text: "Active Inactive",
+        action: "search",
+      }))
+      .otherwise(() => `Other no match`) as { text: string; action: "filter" | "search" };
+    //Set the state
+    setNoMoviesText(matchTest);
+  }, [movies.length, titleSearchValue]);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -164,19 +182,29 @@ const MoviesContainer = () => {
         <View className="flex-1 justify-center items-center">
           <Pressable
             onPress={() => {
-              router.push("/(auth)/(drawer)/(tabs)/search");
-              setSearch(titleSearchValue);
+              if (noMoviesText.action === "search") {
+                router.push("/(auth)/(drawer)/(tabs)/search");
+                setSearch(titleSearchValue);
+                return;
+              }
+              // send to filter route
+              router.push("/(auth)/(drawer)/(tabs)/home/filtermodal");
             }}
             className="justify-center items-center"
           >
-            {searchOpen ? (
-              <Text className="text-xl">Movie Not Found in Your Library</Text>
-            ) : (
-              <Text className="text-xl">Search for a Movie</Text>
-            )}
+            <Text className="text-xl font-semibold mb-2">{noMoviesText.text}</Text>
             <View className="flex-row border border-border items-center px-2 py-1 rounded-lg bg-secondary">
-              <Text className="text-xl font-semibold">Search?</Text>
-              <SymbolView name="popcorn" size={50} tintColor={colors.primary} />
+              {noMoviesText.action === "search" ? (
+                <View className="p-2 flex-row items-center">
+                  <SymbolView name="popcorn" size={50} tintColor={colors.primary} />
+                  <Text className="text-xl font-semibold ml-3">Search?</Text>
+                </View>
+              ) : (
+                <View className="p-2 flex-row items-center">
+                  <FilterIcon color={colors.primary} size={50} />
+                  <Text className="text-xl font-semibold ml-3">Change Filter?</Text>
+                </View>
+              )}
             </View>
           </Pressable>
         </View>

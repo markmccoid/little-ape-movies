@@ -25,9 +25,11 @@ export type FilterStatus = {
   watched: "active" | "inactive";
   favorited: "active" | "inactive";
 };
-export type SavedFilters = {
+export type SavedFilter = {
   id: string;
   name: string;
+  // determine if the filter is shown on side bar
+  favorite?: boolean;
   index: number;
   filter: FilterCriteria;
   sort: SortField[];
@@ -61,7 +63,8 @@ interface SettingsStore {
   // Search across all movies or just the ones available with the applied filtered
   titleSearchScope: "all" | "filteronly";
   sortSettings: SortField[];
-  savedFilters: SavedFilters[];
+  savedFilters: SavedFilter[];
+  defaultFilter: string;
   savedQuickSorts: SavedQuickSort[];
   actions: {
     toggleSearchColumns: () => void;
@@ -81,7 +84,14 @@ interface SettingsStore {
     getFilterStatus: () => FilterStatus;
     updateSortSettings: (sortFields: SortField[]) => void;
     addUpdateQuickSort: (newQuickSort: Omit<SavedQuickSort, "index">) => void;
+    // Used primarily when the drag/drop is used to reorder the quickSorts/savedFilters
+    // Easier to overwrite all with the new order and position indexes
     overwriteAllQuickSorts: (quickSorts: SavedQuickSort[]) => void;
+    overwriteAllSavedFilters: (saveFilters: SavedFilter[]) => void;
+    activateSavedFilter: (filterId: string) => void;
+    addUpdateSavedFilter: (newFilter: Omit<SavedFilter, "index">) => void;
+    deleteSavedFilter: (filterId: string) => void;
+    setDefaultFilter: (filterId: string) => void;
     deleteQuickSort: (qsId: string) => void;
     setTitleSearchValue: (searchValue: string) => void;
     setTitleSearchScope: (searchScope: "all" | "filteronly") => void;
@@ -110,6 +120,7 @@ const settingsInitialState = {
   titleSearchScope: "all" as const,
   savedQuickSorts: quickSorts,
   savedFilters: [],
+  defaultFilter: "",
   sortSettings: defaultSortSettings,
 };
 
@@ -259,16 +270,13 @@ const useSettingsStore = create<SettingsStore>()(
         updateSortSettings: (sortFields) => {
           set({ sortSettings: sortFields });
         },
-
         addUpdateQuickSort: (newQuickSort) => {
           // Sort based on existing indexes
           const sortedQS = sortBy(get().savedQuickSorts, "index");
           // Reindex (make sure 0 ... n)
           const savedQS = sortedQS.map((el, index) => ({ ...el, index }));
-
           // if existing quickSort this will return the index otherwise undefined
           const qsExists = savedQS.find((el) => el.id === newQuickSort.id)?.index;
-
           // if undefined, put as last quickSort
           const savedIndex = qsExists ?? savedQS.length;
           // Filter out in case we are updating
@@ -285,6 +293,43 @@ const useSettingsStore = create<SettingsStore>()(
             ...state,
             savedQuickSorts: state.savedQuickSorts.filter((el) => el.id !== qsId),
           }));
+        },
+        overwriteAllSavedFilters: (savedFilters: SavedFilter[]) => set({ savedFilters }),
+        activateSavedFilter: (filterId: string) => {
+          const filter = get().savedFilters.find((el) => el.id === filterId);
+          if (filter) {
+            set({
+              filterCriteria: filter.filter,
+              sortSettings: filter.sort,
+            });
+          }
+        },
+        addUpdateSavedFilter: (newFilter) => {
+          // Sort based on existing indexes
+          const sortedFilters = sortBy(get().savedFilters, "index");
+          // Reindex (make sure 0 ... n)
+          const savedFilters = sortedFilters.map((el, index) => ({ ...el, index }));
+
+          // if existing filter this will return the index otherwise undefined
+          const filterExists = savedFilters.find((el) => el.id === newFilter.id)?.index;
+
+          // if undefined, put as last filter
+          const savedIndex = filterExists ?? savedFilters.length;
+          // Filter out in case we are updating
+          const newFilters = [
+            { ...newFilter, index: savedIndex },
+            ...savedFilters.filter((el) => el.id !== newFilter.id),
+          ];
+          set({ savedFilters: [...sortBy(newFilters, "index")] });
+        },
+        deleteSavedFilter: (filterId: string) => {
+          set((state) => ({
+            ...state,
+            savedFilters: state.savedFilters.filter((el) => el.id !== filterId),
+          }));
+        },
+        setDefaultFilter: (filterId: string) => {
+          set({ defaultFilter: filterId });
         },
         setTitleSearchValue: (searchValue) => {
           set({ titleSearchValue: searchValue });
@@ -305,11 +350,10 @@ const useSettingsStore = create<SettingsStore>()(
         filterCriteria: state.filterCriteria,
         sortSettings: state.sortSettings,
         savedFilters: state.savedFilters,
+        defaultFilter: state.defaultFilter,
         savedQuickSorts: state.savedQuickSorts,
       }),
-      // onRehydrateStorage: (state) => {
-      //   console.log("Setting Rehydrate", state);
-      // },
+      onRehydrateStorage: (state) => {},
     }
   )
 );

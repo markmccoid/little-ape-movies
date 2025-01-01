@@ -19,6 +19,10 @@ type Props = {
   style?: ViewStyle;
 };
 
+export const SaveIcon = ({ size = 25, color, style }: Props) => {
+  return <FontAwesome name="save" size={size} color={color} style={style} />;
+};
+
 //~~ ------------------
 //~~ MOVIE ICONS
 //~~ ------------------

@@ -17,11 +17,13 @@ import { MotiPressable } from "moti/interactions";
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const [disableButton, setDisableButton] = React.useState(false);
   const savedQuickSorts = useSettingsStore.getState().savedQuickSorts;
+  const savedFilters = useSettingsStore
+    .getState()
+    .savedFilters.filter((filter) => filter?.favorite);
   const settingsActions = useSettingsActions();
   const { currentUser, onLogout } = useAuth();
   const insets = useSafeAreaInsets();
   const appVersion = Constants.expoConfig?.version;
-
   const { colors } = useCustomTheme();
   const router = useRouter();
   const currPath = usePathname();
@@ -114,12 +116,24 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         </Link>
       </View>
       {/* Saved Queries ??? */}
-      <View
-        className={`p-[10] pl-[20] bg-card flex-row items-center gap-3 w-full border-border border-t-hairline`}
+      <Pressable
+        className=""
+        onPress={async () => {
+          router.push({ pathname: "/(auth)/(drawer)/settings" });
+          // Need the setTimeout so that the first push finishes before this route
+          setTimeout(
+            () => router.push({ pathname: "/(auth)/(drawer)/settings/savedfiltersroute" }),
+            0
+          );
+        }}
       >
-        <FilterIcon size={18} color={colors.primary} />
-        <Text className="text-lg ">Saved Filters</Text>
-      </View>
+        <View
+          className={`p-[10] pl-[20] bg-card flex-row items-center gap-3 w-full border-border border-t-hairline`}
+        >
+          <FilterIcon size={18} color={colors.primary} />
+          <Text className="text-lg ">Saved Filters</Text>
+        </View>
+      </Pressable>
       <View className="flex-1">
         <ScrollView
           // {...props}
@@ -133,15 +147,41 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
             // borderWidth: 1,
           }}
         >
-          <View className={`bg-primary border-border border-hairline py-1 px-2 rounded-l-lg my-1`}>
-            <Text className="text-lg font-semibold color-primary-foreground">Saved Filters</Text>
-          </View>
-          <View className={`bg-primary border-border border-hairline py-1 px-2 rounded-l-lg my-1`}>
-            <Text className="text-lg font-semibold color-primary-foreground">Saved Filters</Text>
-          </View>
-          <View className={`bg-primary border-border border-hairline py-1 px-2 rounded-l-lg my-1`}>
-            <Text className="text-lg font-semibold color-primary-foreground">Saved Filters</Text>
-          </View>
+          {savedFilters?.map((filter) => {
+            return (
+              <MotiPressable
+                key={filter.id}
+                // className={`bg-primary border-border border-hairline py-1 px-2 rounded-l-lg my-1`}
+                style={{
+                  backgroundColor: colors.primary,
+                  borderWidth: StyleSheet.hairlineWidth,
+                  paddingVertical: 2,
+                  paddingHorizontal: 4,
+                  marginTop: 2,
+                  borderTopLeftRadius: 10,
+                  borderBottomLeftRadius: 10,
+                }}
+                disabled={disableButton}
+                onPress={async () => {
+                  setDisableButton(true);
+                  settingsActions.activateSavedFilter(filter.id);
+                  router.replace("./home");
+                  await new Promise((resolve) => setTimeout(() => resolve("done"), 50));
+                  navigation.closeDrawer();
+                  setDisableButton(false);
+                }}
+                animate={testAnimPush}
+              >
+                <Text
+                  numberOfLines={1}
+                  adjustsFontSizeToFit={true}
+                  className="text-primary-foreground text-lg font-semibold"
+                >
+                  {filter.name}
+                </Text>
+              </MotiPressable>
+            );
+          })}
         </ScrollView>
       </View>
       <View className={` pl-[20] bg-card flex-row items-center gap-3 w-full `}>

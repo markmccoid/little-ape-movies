@@ -4,6 +4,8 @@ import { movieGetWatchProviders, WatchProvidersType } from "@markmccoid/tmdb_api
 import useMovieStore, { useMovies } from "./store.shows";
 import { getImageColors } from "@/utils/color.utils";
 import { formatEpoch } from "@/utils/utils";
+import useSettingsStore, { useSettingsActions } from "./store.settings";
+import { set } from "lodash";
 
 //~~ -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //~~ Update Show Data Code
@@ -68,5 +70,15 @@ export const setupEvents = (queryClient: QueryClient) => {
       new Set(useMovieStore.getState().shows.flatMap((show) => show.genres))
     );
     useMovieStore.setState({ genreArray: genres });
+  });
+
+  eventBus.subscribe("INITIALIZE_APP", () => {
+    try {
+      const settingsActions = useSettingsStore.getState().actions;
+      const defaultFilterId = useSettingsStore.getState().defaultFilter;
+      settingsActions.activateSavedFilter(defaultFilterId);
+    } catch (e) {
+      console.log("Error in INITIALIZE_APP event", e);
+    }
   });
 };

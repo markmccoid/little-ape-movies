@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ScrollView } from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import React from "react";
 import useSettingsStore, { useSettingsActions } from "@/store/store.settings";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
@@ -41,8 +41,12 @@ const CurrentQuickSorts = ({ setEditId }: { setEditId: (editId: string | undefin
               layout={LinearTransition}
               entering={FadeIn}
               exiting={FadeOut}
-              className="flex-row border-border border-hairline w-full justify-between items-center bg-card pl-2"
-              style={{ height: ROW_HEIGHT }}
+              className="flex-row  w-full justify-between items-center bg-card pl-2"
+              style={{
+                height: ROW_HEIGHT,
+                borderWidth: StyleSheet.hairlineWidth,
+                borderColor: "#aaa",
+              }}
             >
               <Text className="text-card-foreground text-lg font-medium">{sort.name}</Text>
               <View className="flex-row h-full items-center">

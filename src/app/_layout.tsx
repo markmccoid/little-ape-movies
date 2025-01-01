@@ -49,6 +49,7 @@ const InitialLayout = () => {
     Lato_700Bold,
   });
   const { currentUser: user } = useAuth();
+
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
@@ -86,6 +87,7 @@ const InitialLayout = () => {
 
       //Setup Event Bus Events
       setupEvents(queryClient);
+      eventBus.publish("INITIALIZE_APP");
       eventBus.publish("GENERATE_GENRES_ARRAY");
       setInitialized(true);
     };
