@@ -17,6 +17,7 @@ import { SaveIcon } from "@/components/common/Icons";
 import { useCustomTheme } from "@/lib/colorThemes";
 import { SymbolView } from "expo-symbols";
 import { MotiView } from "moti";
+import SavedFilterWatchFavs from "./SavedFilterWatchFavs";
 
 // Build the initial state of the tags
 const createTagState = (
@@ -72,6 +73,12 @@ const SavedFilterAddEdit = ({ filterId, cancelAddEdit }: Props) => {
   const [genreIncludeList, setGenreIncludeList] = React.useState<string[]>([]);
   const [filterName, setFilterName] = React.useState<string>("");
   const [newSort, setNewSort] = React.useState<SortField[]>([]);
+  const [newWatchedState, setNewWatchedState] = React.useState<"off" | "include" | "exclude">(
+    "off"
+  );
+  const [newFavoritedState, setNewFavoritedState] = React.useState<"off" | "include" | "exclude">(
+    "off"
+  );
 
   useEffect(() => {
     // If filterId exists, then we are editing
@@ -95,6 +102,8 @@ const SavedFilterAddEdit = ({ filterId, cancelAddEdit }: Props) => {
         setTagIncludeList(filter.filter.includeTags || []);
         setGenreExcludeList(filter.filter.excludeGenres || []);
         setGenreIncludeList(filter.filter.includeGenres || []);
+        setNewWatchedState(filter.filter?.filterIsWatched || "off");
+        setNewFavoritedState(filter.filter?.filterIsFavorited || "off");
       }
     }
   }, [filterId]);
@@ -136,6 +145,13 @@ const SavedFilterAddEdit = ({ filterId, cancelAddEdit }: Props) => {
   const handleNewSort = (sort: SortField[]) => {
     setNewSort(sort);
   };
+
+  const handleWatched = (state: "off" | "include" | "exclude") => {
+    setNewWatchedState(state);
+  };
+  const handleFavorites = (state: "off" | "include" | "exclude") => {
+    setNewFavoritedState(state);
+  };
   //Save Filter
   const saveFilter = () => {
     if (!filterName || filterName === "") {
@@ -153,6 +169,8 @@ const SavedFilterAddEdit = ({ filterId, cancelAddEdit }: Props) => {
         includeGenres: genreIncludeList,
         excludeTags: tagExcludeList,
         includeTags: tagIncludeList,
+        filterIsFavorited: newFavoritedState,
+        filterIsWatched: newWatchedState,
       },
       sort: newSort,
     });
@@ -161,7 +179,7 @@ const SavedFilterAddEdit = ({ filterId, cancelAddEdit }: Props) => {
   };
 
   return (
-    <ScrollView className="flex flex-col mt-2">
+    <ScrollView className="flex flex-col mt-2 mb-10" contentContainerClassName="pb-14">
       <Stack.Screen
         options={{
           title: "Add/Edit Filter",
@@ -224,14 +242,21 @@ const SavedFilterAddEdit = ({ filterId, cancelAddEdit }: Props) => {
           <Text>Save</Text>
         </Button>
       </View> */}
+      <View className="bg-primary mx-2 my-2" style={{ height: StyleSheet.hairlineWidth }} />
+      {/* <Text className="px-4 font-semibold text-xl mt-2"></Text> */}
+      <SavedFilterWatchFavs
+        filterInfo={{ watched: newWatchedState, favorites: newFavoritedState }}
+        handleWatched={handleWatched}
+        handleFavorites={handleFavorites}
+      />
       <View className="bg-primary mx-2 mt-2" style={{ height: StyleSheet.hairlineWidth }} />
-      <Text className="px-4 font-semibold text-xl mt-2">Filter Tags</Text>
+      <Text className="px-4 font-semibold text-xl mt-2">Tags</Text>
       <SavedFilterTags handleTagList={handleTagList} initTags={initTags} />
       <View className="bg-primary mx-2 mt-2" style={{ height: StyleSheet.hairlineWidth }} />
-      <Text className="px-4 font-semibold text-xl mt-2">Filter Genres</Text>
+      <Text className="px-4 font-semibold text-xl mt-2">Genres</Text>
       <SavedFilterGenres handleGenreList={handleGenreList} initGenres={initGenres} />
       <View className="bg-primary mx-2 mt-2" style={{ height: StyleSheet.hairlineWidth }} />
-      <Text className="px-4 font-semibold text-xl mt-2">Filter Sort</Text>
+      <Text className="px-4 font-semibold text-xl mt-2">Sort</Text>
       <SortEditor initSort={initSort} handleNewSort={handleNewSort} />
     </ScrollView>
   );

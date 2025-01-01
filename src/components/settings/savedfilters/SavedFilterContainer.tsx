@@ -113,6 +113,8 @@ const SavedFilterContainer = () => {
               );
             })}
           </DragDropEntry>
+          <View className="border-t-hairline border-border mt-4 mx-2" />
+          <SelectDefaultFilter />
         </Animated.View>
       )}
       {showAddEdit && (
@@ -120,8 +122,6 @@ const SavedFilterContainer = () => {
           <SavedFilterAddEdit filterId={filterId} cancelAddEdit={cancelAddEditMode} />
         </Animated.View>
       )}
-      <View className="border-t-hairline border-border mt-4 mx-2" />
-      <SelectDefaultFilter />
     </View>
   );
 };

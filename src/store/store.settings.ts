@@ -22,8 +22,8 @@ export type FilterStatus = {
   overallStatus: "active" | "inactive";
   tags: "active" | "inactive";
   genres: "active" | "inactive";
-  watched: "active" | "inactive";
-  favorited: "active" | "inactive";
+  watched: InclusionState;
+  favorited: InclusionState;
 };
 export type SavedFilter = {
   id: string;
@@ -405,7 +405,7 @@ export const useRatingsTier = (rating: string | undefined, type: "imdb" | "rt" |
 // --------------
 // -- Helper functions for tri-state filters like Watched and Favorited
 // Takes in an inlcusion string or a inclusion index and returns inclusion string
-function getInclusionValue(inclusionState: InclusionState | 0 | 1 | 2) {
+export function getInclusionValue(inclusionState: InclusionState | 0 | 1 | 2) {
   // If a number then access the inclusionStates (defined globally) via index
   if (typeof inclusionState === "number" && !isNaN(inclusionState)) {
     // Access by index when inclusionState is a number

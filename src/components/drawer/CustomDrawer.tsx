@@ -73,10 +73,10 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         >
           {/* <Link href="/home" className={`m-2  mx-2 border`} replace asChild> */}
           <View
-            className="px-[5] py-[5] flex-row items-center gap-3 rounded-lg"
+            className="px-[5] py-[5] flex-row items-center gap-3"
             style={{
-              margin: 10,
-              backgroundColor: activePath === "home" ? colors.secondary : "transparent",
+              margin: 5,
+              // backgroundColor: activePath === "home" ? colors.secondary : "transparent",
             }}
           >
             <SymbolView
@@ -98,11 +98,13 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
 
         <Link href="/settings" className="m-2  mx-2">
           <View
-            className={`px-[5] py-[5] bg-card flex-row items-center gap-3 w-full rounded-lg`}
-            style={{
-              margin: 10,
-              backgroundColor: activePath === "settings" ? colors.secondary : "transparent",
-            }}
+            className={`px-[5] py-[5] bg-card flex-row items-center gap-3 w-full`}
+            style={
+              {
+                // margin: 5,
+                // backgroundColor: activePath === "settings" ? colors.secondary : "transparent",
+              }
+            }
           >
             <SymbolView
               name="gear"

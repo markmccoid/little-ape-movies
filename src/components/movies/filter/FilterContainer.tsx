@@ -38,7 +38,6 @@ const FilterContainer = () => {
     };
     navigation.setOptions(options);
   });
-  console.log("FILTER C", filterCriteria);
   return (
     <ScrollView className="pt-3">
       <View className="flex-row mx-2 gap-4">
