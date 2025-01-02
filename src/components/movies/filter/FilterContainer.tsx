@@ -4,25 +4,27 @@ import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { useNavigation } from "expo-router";
 import useSettingsStore, { getInclusionIndex, useSettingsActions } from "@/store/store.settings";
 import { Text } from "@/components/ui/text";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import FilterTags from "./FilterTags";
 import FilterGenres from "./FilterGenres";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { Eraser } from "@/lib/icons/Eraser";
 import { AnimatePresence, MotiView } from "moti";
-import { filter } from "lodash";
+import SortEditor from "@/components/settings/quickSorts/SortEditor";
+import { useShallow } from "zustand/react/shallow";
 
 const FilterContainer = () => {
   const navigation = useNavigation();
   const filterCriteria = useSettingsStore((state) => state.filterCriteria);
   const filterActions = useSettingsActions();
+  // Need useShallow because of infinite loop caused in sortEditor
+  const sort = useSettingsStore(useShallow((state) => state.sortSettings));
   const tagsActive =
     (filterCriteria?.includeTags || []).length > 0 ||
     (filterCriteria?.excludeTags || []).length > 0;
   const genresActive =
     (filterCriteria?.includeGenres || []).length > 0 ||
     (filterCriteria?.excludeGenres || []).length > 0;
+
   useLayoutEffect(() => {
     const options: NativeStackNavigationOptions = {
       title: "Set Filters",
@@ -39,38 +41,7 @@ const FilterContainer = () => {
     navigation.setOptions(options);
   });
   return (
-    <ScrollView className="pt-3">
-      <View className="flex-row mx-2 gap-4">
-        {/* <View className="flex-row">
-          <Checkbox
-            aria-labelledby="watched"
-            checked={!!filterCriteria?.filterIsWatched}
-            onCheckedChange={(checked) => {
-              filterActions.toggleIsWatched();
-            }}
-          />
-          <Label
-            className="ml-1"
-            nativeID="watched"
-            onPress={() => filterActions.toggleIsWatched()}
-          >
-            Watched
-          </Label>
-        </View>
-
-        <View className="flex-row">
-          <Checkbox
-            aria-labelledby="favorited"
-            checked={!!filterCriteria?.filterIsFavorited}
-            onCheckedChange={(checked) => {
-              filterActions.toggleIsFavorited();
-            }}
-          />
-          <Label className="ml-1" nativeID="favorited">
-            Favorited
-          </Label>
-        </View> */}
-      </View>
+    <ScrollView className="pt-3 mb-[80]" contentContainerClassName="pb-[50]">
       {/* //! Need to create a three way selector for both of these AND 
       //! update the filter code to obey the new selectors */}
       <SegmentedControl
@@ -125,6 +96,7 @@ const FilterContainer = () => {
         </AnimatePresence>
       </View>
       <FilterGenres />
+      <SortEditor initSort={sort} handleNewSort={filterActions.updateSortSettings} />
     </ScrollView>
   );
 };

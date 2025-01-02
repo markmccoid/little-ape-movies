@@ -63,17 +63,18 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         <Text>release {appVersion}</Text>
       </View>
       {/* HOME and SETTINGS Links */}
-      <View className="bg-card">
+      <View className="bg-card mb-2">
         <Pressable
           onPress={async () => {
             router.replace("./home");
             await new Promise((resolve) => setTimeout(() => resolve("done"), 100));
             navigation.closeDrawer();
           }}
+          className="mx-2"
         >
           {/* <Link href="/home" className={`m-2  mx-2 border`} replace asChild> */}
           <View
-            className="px-[5] py-[5] flex-row items-center gap-3"
+            className="py-[5] flex-row items-center gap-3"
             style={{
               margin: 5,
               // backgroundColor: activePath === "home" ? colors.secondary : "transparent",
@@ -96,7 +97,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         {/* Divider Line */}
         <View className="w-full border-b-hairline border-border" />
 
-        <Link href="/settings" className="m-2  mx-2">
+        <Link href="/settings" className="m-2">
           <View
             className={`px-[5] py-[5] bg-card flex-row items-center gap-3 w-full`}
             style={
@@ -130,7 +131,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         }}
       >
         <View
-          className={`p-[10] pl-[20] bg-card flex-row items-center gap-3 w-full border-border border-t-hairline`}
+          className={`px-3 py-[10] bg-card flex-row items-center gap-3 w-full border-border border-t-hairline`}
         >
           <FilterIcon size={18} color={colors.primary} />
           <Text className="text-lg ">Saved Filters</Text>
@@ -157,9 +158,9 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
                 style={{
                   backgroundColor: colors.primary,
                   borderWidth: StyleSheet.hairlineWidth,
-                  paddingVertical: 2,
-                  paddingHorizontal: 4,
-                  marginTop: 2,
+                  paddingVertical: 6,
+                  paddingHorizontal: 10,
+                  marginTop: 4,
                   borderTopLeftRadius: 10,
                   borderBottomLeftRadius: 10,
                 }}
@@ -186,9 +187,9 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
           })}
         </ScrollView>
       </View>
-      <View className={` pl-[20] bg-card flex-row items-center gap-3 w-full `}>
+      <View className={`px-3 bg-card flex-row items-center gap-3 w-full `}>
         <Pressable
-          className="p-[10] ml-[-10]"
+          className="p-[10] ml-[-10] flex-row items-center gap-3 w-full"
           onPress={async () => {
             router.push({ pathname: "/(auth)/(drawer)/settings" });
             // Need the setTimeout so that the first push finishes before this route
@@ -205,8 +206,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
             type="palette"
             colors={[colors.text, colors.text]}
           />
+          <Text className="text-lg ">Quick Sort</Text>
         </Pressable>
-        <Text className="text-lg ">Quick Sort</Text>
       </View>
       <ScrollView
         className="border-t-hairline border-border mt-0 flex-1"
@@ -223,9 +224,9 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
               style={{
                 backgroundColor: colors.primary,
                 borderWidth: StyleSheet.hairlineWidth,
-                paddingVertical: 2,
-                paddingHorizontal: 4,
-                marginTop: 2,
+                paddingVertical: 6,
+                paddingHorizontal: 10,
+                marginTop: 4,
                 borderTopLeftRadius: 10,
                 borderBottomLeftRadius: 10,
               }}

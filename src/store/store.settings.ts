@@ -22,8 +22,8 @@ export type FilterStatus = {
   overallStatus: "active" | "inactive";
   tags: "active" | "inactive";
   genres: "active" | "inactive";
-  watched: InclusionState;
-  favorited: InclusionState;
+  watched: "active" | "inactive";
+  favorited: "active" | "inactive";
 };
 export type SavedFilter = {
   id: string;
@@ -268,7 +268,7 @@ const useSettingsStore = create<SettingsStore>()(
           return filterStatus;
         },
         updateSortSettings: (sortFields) => {
-          set({ sortSettings: sortFields });
+          set({ sortSettings: [...sortBy(sortFields, "index")] });
         },
         addUpdateQuickSort: (newQuickSort) => {
           // Sort based on existing indexes
