@@ -1,5 +1,5 @@
 import { View, Pressable } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Sparkle } from "@/lib/icons/Sparkle";
 import { Sparkles } from "@/lib/icons/Sparkles";
 import { EyeOff } from "@/lib/icons/EyeOff";
@@ -9,6 +9,7 @@ import { ShowItemType, useMovieActions } from "@/store/store.shows";
 import { Text } from "@/components/ui/text";
 import { useCustomTheme } from "@/lib/colorThemes";
 import { AnimatePresence, MotiView } from "moti";
+import DatePicker from "react-native-date-picker";
 
 type Props = {
   storedMovie: ShowItemType | undefined;
@@ -18,15 +19,29 @@ const MDFavWatched = ({ storedMovie }: Props) => {
   const { colors } = useCustomTheme();
   const [localWatched, setLocalWatched] = useState(!!storedMovie?.watched);
   const [localFavorited, setLocalFavorited] = useState(!!storedMovie?.favorited);
+  // Date picker open state used for watched date on long press
+  const [open, setOpen] = useState(false);
+  const pickerDate = useMemo(
+    () => (storedMovie?.watched ? new Date(storedMovie?.watched * 1000) : new Date()),
+    [storedMovie?.watched]
+  );
+
   if (!storedMovie?.id) return;
 
+  // Handle watched state with regular press.  Sets to today's date
   const handleWatched = () => {
-    setLocalWatched((prev) => !!!prev);
-    setTimeout(() => actions.toggleWatched(storedMovie.id), 200);
+    setLocalWatched((prev) => !prev);
+    setTimeout(() => actions.toggleWatched(storedMovie.id, undefined, Date.now()), 200);
+  };
+  // Handle watched state with long press.  Sets to selected date
+  const handleWatchedDate = (date: Date) => {
+    setTimeout(() => actions.toggleWatched(storedMovie.id, "on", date.getTime()), 200);
+    if (localWatched) return;
+    setLocalWatched((prev) => !prev);
   };
 
   const handleFavorited = () => {
-    setLocalFavorited((prev) => !!!prev);
+    setLocalFavorited((prev) => !prev);
     setTimeout(() => actions.toggleFavorited(storedMovie.id), 200);
   };
 
@@ -38,7 +53,24 @@ const MDFavWatched = ({ storedMovie }: Props) => {
   return (
     <View className="flex-row h-[40] items-center justify-center px-3">
       <MDBackground />
-      <Pressable onPress={handleWatched} className="flex-row items-center">
+      <DatePicker
+        modal
+        open={open}
+        date={pickerDate}
+        mode="date"
+        onConfirm={(date) => {
+          setOpen(false);
+          handleWatchedDate(date);
+        }}
+        onCancel={() => {
+          setOpen(false);
+        }}
+      />
+      <Pressable
+        onPress={() => handleWatched()}
+        onLongPress={() => setOpen(true)}
+        className="flex-row items-center"
+      >
         {/* Reserve space for icons */}
         <View style={{ width: 40, height: 40, justifyContent: "center", alignItems: "center" }}>
           <AnimatePresence>

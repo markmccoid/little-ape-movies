@@ -5,13 +5,20 @@ import { Text } from "@/components/ui/text";
 import useSettingsStore, { useSettingsActions } from "@/store/store.settings";
 import SavedFilterAddEdit from "./SavedFilterAddEdit";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
-import { useNavigation } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import DragDropEntry from "@/components/common/DragAndSort/DragDropEntry";
-import { DeleteIcon, EditIcon, EmptyMDHeartIcon, MDHeartIcon } from "@/components/common/Icons";
+import {
+  DeleteIcon,
+  EditIcon,
+  EmptyMDHeartIcon,
+  HomeIcon,
+  MDHeartIcon,
+} from "@/components/common/Icons";
 import { Positions, sortArray } from "@/components/common/DragAndSort/helperFunctions";
 import { useCustomTheme } from "@/lib/colorThemes";
 import SortEditor from "../quickSorts/SortEditor";
 import SelectDefaultFilter from "../SelectDefaultFilter";
+import HomeButton from "@/components/drawer/HomeButton";
 
 const ROW_HEIGHT = 40;
 
@@ -22,7 +29,7 @@ const SavedFilterContainer = () => {
   const [showAddEdit, toggleShowAddEdit] = React.useReducer((state) => !state, false);
   const [filterId, setFilterId] = React.useState<string | undefined>(undefined);
   const navigation = useNavigation();
-
+  const router = useRouter();
   //Save Filter
   const cancelAddEditMode = () => {
     setFilterId(undefined);
@@ -30,7 +37,8 @@ const SavedFilterContainer = () => {
     navigation.setOptions({
       // Reset to defaults on unmount
       headerLeft: undefined,
-      headerRight: undefined,
+      headerRight: () => <HomeButton />,
+
       title: "Saved Filters",
     });
   };

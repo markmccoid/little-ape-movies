@@ -360,13 +360,17 @@ const useMovieStore = create<MovieStore>()(
 export const useMovieActions = () => {
   const updateShow = useMovieStore((state) => state.actions.updateShow);
   //~ toggleWatched
-  const toggleWatched = (movieId: number, action?: "toggle" | "on" | "off") => {
-    action = action ?? "toggle";
+  const toggleWatched = (
+    movieId: number,
+    action: "toggle" | "on" | "off" = "toggle",
+    dateIn: number = Date.now()
+  ) => {
+    const watchedDate = formatEpoch(dateIn);
     const isWatched = useMovieStore.getState().actions.getShowById(movieId)?.watched;
     if (action === "toggle") {
-      updateShow(movieId, { watched: isWatched ? undefined : formatEpoch(Date.now()) });
+      updateShow(movieId, { watched: isWatched ? undefined : watchedDate });
     } else {
-      updateShow(movieId, { watched: action === "off" ? undefined : formatEpoch(Date.now()) });
+      updateShow(movieId, { watched: action === "off" ? undefined : watchedDate });
     }
   };
   //~ toggleFavorited
