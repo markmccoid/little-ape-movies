@@ -137,7 +137,7 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
         <ActionBarButtons movie={movie} column={column} handleChangePending={handleChangePending} />
         <View className="h-[10]" />
         <ActionBarTags movieId={movie.id} handleChangePending={handleChangePending} />
-        <ActionInfoPanel movie={movie} />
+        {/* <ActionInfoPanel movie={movie} /> */}
       </MotiView>
     </Animated.View>
   );

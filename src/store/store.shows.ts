@@ -56,6 +56,7 @@ export interface MovieStore {
   // Updated with on the providers stored on shows, updated via "UPDATE_SHOW_PROVIDERS" event bus call.
   streamingProviders: ProviderInfo[];
   pendingChanges: PendingChanges;
+  debugView: boolean;
   actions: {
     addShow: (show: movieSearchByTitle_Results) => Promise<void>;
     updateShow: (id: number, updatedShow: Partial<ShowItemType>) => void;
@@ -74,6 +75,8 @@ export interface MovieStore {
     setPendingChanges: (movieId: number, updatedPendingchanges: PendingChanges[MovieId]) => void;
     // Commit all pending changes
     commitPendingChanges: () => void;
+    // Turn off debugging info
+    toggleDebugView: () => void;
   };
 }
 
@@ -83,6 +86,7 @@ const movieInitialState = {
   genreArray: [],
   streamingProviders: [],
   pendingChanges: {},
+  debugView: false,
 };
 const useMovieStore = create<MovieStore>()(
   persist(
@@ -335,6 +339,7 @@ const useMovieStore = create<MovieStore>()(
           }
           set({ pendingChanges: {} });
         },
+        toggleDebugView: () => set((state) => ({ debugView: !state.debugView })),
       },
     }),
     {

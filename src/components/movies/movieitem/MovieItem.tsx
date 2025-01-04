@@ -8,6 +8,7 @@ import ActionBarContainer from "./actionbar/ActionBarContainer";
 import { useCustomTheme } from "@/lib/colorThemes";
 import ActionBarDelete from "./actionbar/ActionBarDelete";
 import * as Haptics from "expo-haptics";
+import DebugOverlay from "./DebugOverlay";
 
 // const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 // const availableWidth = screenWidth - 20; // Subtract left and right margins
@@ -26,6 +27,7 @@ const MovieItem = ({ movie, hideAll, column }: Props) => {
     getMovieItemSizing();
   const router = useRouter();
   const pending = useMovieStore((state) => state.pendingChanges);
+  const debugView = useMovieStore((state) => state.debugView);
   const { colors } = useCustomTheme();
   const noPending = Object.keys(pending).length === 0;
   const [actionBarShown, toggleActionBarShown] = useReducer((state) => !state, false);
@@ -94,15 +96,15 @@ const MovieItem = ({ movie, hideAll, column }: Props) => {
           height: imageHeight,
         }}
       >
-        {/* ACTION BAR */}
+        {debugView && <DebugOverlay movie={movie} width={imageWidth} />}
 
+        {/* ACTION BAR */}
         <ActionBarContainer
           movie={movie}
           isVisible={actionBarShown}
           toggleVisibility={handleActionBarShown}
           column={column}
         />
-
         <Pressable onPress={handleMovieSelect} onLongPress={handleActionBarToggle}>
           <MovieImage
             posterURL={movie?.posterURL}

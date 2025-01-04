@@ -13,9 +13,12 @@ import { Text } from "@/components/ui/text";
 import Constants from "expo-constants";
 import useSettingsStore, { useSettingsActions } from "@/store/store.settings";
 import { MotiPressable } from "moti/interactions";
+import useMovieStore, { useMovieActions } from "@/store/store.shows";
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const [disableButton, setDisableButton] = React.useState(false);
+  const toggleDebugView = useMovieActions().toggleDebugView;
+  const debugView = useMovieStore((state) => state.debugView);
   const savedQuickSorts = useSettingsStore.getState().savedQuickSorts;
   const savedFilters = useSettingsStore
     .getState()
@@ -52,13 +55,17 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
     <View className="flex-1 bg-secondary">
       {/* HEADER */}
       <View className="flex-col p-[20] border-b border-border ">
-        <View className="flex-row items-center gap-4 " style={{ marginTop: insets.top }}>
+        <View className="flex-row items-center gap-4" style={{ marginTop: insets.top }}>
           <SymbolView
             name="person.fill"
             type="palette"
             colors={[colors.secondaryForeground, colors.secondaryForeground]}
           />
           <Text className="text-3xl font-bold">{currentUser}</Text>
+          {/* DEBUG View On/Off */}
+          <Pressable onPress={toggleDebugView}>
+            <Text>Debug: {debugView ? "On" : "Off"}</Text>
+          </Pressable>
         </View>
         <Text>release {appVersion}</Text>
       </View>
@@ -118,7 +125,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
           </View>
         </Link>
       </View>
-      {/* Saved Queries ??? */}
+      {/* Saved Filters ??? */}
       <Pressable
         className=""
         onPress={async () => {
@@ -143,7 +150,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
           className="border-t-hairline border-border mt-0 flex-1"
           contentContainerStyle={{
             paddingTop: 0,
-            marginLeft: 20,
+            marginLeft: 40,
             // paddingHorizontal: 0,
             // marginHorizontal: 0,
             // backgroundColor: "gray",
@@ -213,7 +220,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         className="border-t-hairline border-border mt-0 flex-1"
         contentContainerStyle={{
           paddingTop: 0,
-          marginLeft: 20,
+          marginLeft: 40,
         }}
       >
         {savedQuickSorts?.map((sort) => {
