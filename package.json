@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "scripts": {
-    "preinstall": "npm i --legacy-peer-deps --force",
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
