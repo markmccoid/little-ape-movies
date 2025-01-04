@@ -2,7 +2,7 @@
   "expo": {
     "scheme": "littleapemovies",
     "userInterfaceStyle": "automatic",
-    "orientation": "default",
+    "orientation": "portrait",
     "version": "1.1.97",
     "web": {
       "output": "static",
@@ -11,8 +11,8 @@
     "icon": "./assets/images/appicon.png",
     "splash": {
       "image": "./assets/splashscreen.png",
-      "imageWidth": 1284,
-      "resizeMode": "contain",
+      // "imageWidth": 1284,
+      "resizeMode": "cover",
       "backgroundColor": "#000000"
     },
     "plugins": [
@@ -36,8 +36,7 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#000",
-          "image": "./assets/splashscreen.png",
-          "imageWidth": 1284
+          "image": "./assets/splashscreen.png"
         }
       ]
     ],
