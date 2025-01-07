@@ -8,10 +8,6 @@ import useSettingsStore, { SortField, useSettingsActions } from "@/store/store.s
 import { Input } from "../../ui/input";
 import uuid from "react-native-uuid";
 import { sortBy } from "lodash";
-import DragDropEntry from "@/components/common/DragAndSort/DragDropEntry";
-import { Positions, sortArray } from "@/components/common/DragAndSort/helperFunctions";
-import { SymbolView } from "expo-symbols";
-import { MotiText, MotiView } from "moti";
 import SortEditor from "./SortEditor";
 
 const ROW_HEIGHT = 45;

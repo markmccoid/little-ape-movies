@@ -61,12 +61,22 @@ const SearchPage = () => {
   //   setSearchType(type);
   // };
 
-  const routeFocused = useIsFocused();
-  useEffect(() => {
-    if (routeFocused) {
-      setTimeout(() => inputRef.current?.focus(), 0);
-    }
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      // console.log("IN FOcus", searchValue);
+      if (!searchValue) {
+        console.log("Do it");
+        inputRef.current?.focus();
+      }
+    }, [])
+  );
+
+  // const routeFocused = useIsFocused();
+  // useEffect(() => {
+  //   if (routeFocused) {
+  //     setTimeout(() => inputRef.current?.focus(), 0);
+  //   }
+  // }, [routeFocused]);
 
   return (
     <View className="flex-1">

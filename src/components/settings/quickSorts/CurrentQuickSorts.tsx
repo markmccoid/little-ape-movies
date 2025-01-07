@@ -6,6 +6,7 @@ import { DeleteIcon, EditIcon } from "@/components/common/Icons";
 import { sortBy } from "lodash";
 import DragDropEntry from "@/components/common/DragAndSort/DragDropEntry";
 import { Positions, sortArray } from "@/components/common/DragAndSort/helperFunctions";
+import showConfirmationPrompt from "@/components/common/showConfirmationPrompt";
 
 const ROW_HEIGHT = 40;
 const CurrentQuickSorts = ({ setEditId }: { setEditId: (editId: string | undefined) => void }) => {
@@ -41,15 +42,18 @@ const CurrentQuickSorts = ({ setEditId }: { setEditId: (editId: string | undefin
               layout={LinearTransition}
               entering={FadeIn}
               exiting={FadeOut}
-              className="flex-row  w-full justify-between items-center bg-card pl-2"
+              className="flex-row w-full items-center bg-card pl-2 justify-between"
               style={{
                 height: ROW_HEIGHT,
                 borderWidth: StyleSheet.hairlineWidth,
                 borderColor: "#aaa",
               }}
             >
-              <Text className="text-card-foreground text-lg font-medium">{sort.name}</Text>
-              <View className="flex-row h-full items-center">
+              <Text className="text-card-foreground text-lg flex-1 font-medium" numberOfLines={1}>
+                {sort.name}
+              </Text>
+
+              <View className="flex-row h-full items-center w-[75]">
                 <Pressable
                   onPress={() => setEditId(sort.id)}
                   className="px-2 h-full flex-row items-center"
@@ -57,7 +61,13 @@ const CurrentQuickSorts = ({ setEditId }: { setEditId: (editId: string | undefin
                   <EditIcon size={20} />
                 </Pressable>
                 <Pressable
-                  onPress={() => actions.deleteQuickSort(sort.id)}
+                  onPress={async () => {
+                    const onDelete = await showConfirmationPrompt("Delete Quick Sort?", " ");
+                    if (!onDelete) {
+                      return;
+                    }
+                    actions.deleteQuickSort(sort.id);
+                  }}
                   className="pl-2 pr-4  h-full flex-row items-center"
                 >
                   <DeleteIcon size={20} />

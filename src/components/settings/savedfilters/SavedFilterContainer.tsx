@@ -19,6 +19,7 @@ import { useCustomTheme } from "@/lib/colorThemes";
 import SortEditor from "../quickSorts/SortEditor";
 import SelectDefaultFilter from "../SelectDefaultFilter";
 import HomeButton from "@/components/drawer/HomeButton";
+import showConfirmationPrompt from "@/components/common/showConfirmationPrompt";
 
 const ROW_HEIGHT = 40;
 
@@ -30,7 +31,7 @@ const SavedFilterContainer = () => {
   const [filterId, setFilterId] = React.useState<string | undefined>(undefined);
   const navigation = useNavigation();
   const router = useRouter();
-  //Save Filter
+
   const cancelAddEditMode = () => {
     setFilterId(undefined);
     toggleShowAddEdit();
@@ -42,10 +43,12 @@ const SavedFilterContainer = () => {
       title: "Saved Filters",
     });
   };
+
   const handleUpdatePositions = (positions: Positions) => {
     const finalQuickSorts = sortArray(positions, savedFilters, { positionField: "index" });
     filterActions.overwriteAllSavedFilters(finalQuickSorts);
   };
+
   return (
     <View className="flex-col">
       {!showAddEdit && (
@@ -84,7 +87,12 @@ const SavedFilterContainer = () => {
                   }}
                   className="flex-row w-full justify-between items-center bg-card pl-2"
                 >
-                  <Text className="text-card-foreground text-lg font-medium">{filter.name}</Text>
+                  <Text
+                    className="text-card-foreground text-lg font-medium flex-1"
+                    numberOfLines={1}
+                  >
+                    {filter.name}
+                  </Text>
                   <View className="flex-row h-full items-center">
                     <Pressable
                       onPress={() => {
@@ -111,7 +119,13 @@ const SavedFilterContainer = () => {
                       <EditIcon size={20} color={colors.cardForeground} />
                     </Pressable>
                     <Pressable
-                      onPress={() => filterActions.deleteSavedFilter(filter.id)}
+                      onPress={async () => {
+                        const onDelete = await showConfirmationPrompt("Delete Filter?", " ");
+                        if (!onDelete) {
+                          return;
+                        }
+                        filterActions.deleteSavedFilter(filter.id);
+                      }}
                       className="pl-2 pr-4  h-full flex-row items-center"
                     >
                       <DeleteIcon size={20} />

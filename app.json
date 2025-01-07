@@ -3,7 +3,7 @@
     "scheme": "littleapemovies",
     "userInterfaceStyle": "automatic",
     "orientation": "portrait",
-    "version": "1.1.97",
+    "version": "1.1.98",
     "web": {
       "output": "static",
       "bundler": "metro"
@@ -12,8 +12,9 @@
     "splash": {
       "image": "./assets/splashscreen.png",
       // "imageWidth": 1284,
-      "resizeMode": "cover",
-      "backgroundColor": "#000000"
+      "resizeMode": "contain",
+      "backgroundColor": "#000000",
+      "enableFullScreenImage_legacy": true
     },
     "plugins": [
       [
@@ -35,8 +36,12 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#000",
-          "image": "./assets/splashscreen.png"
+          "ios": {
+            // You may want to use regular full screen splash on iOS 
+            "image": "./assets/splashscreen.png", // Full screen transparent splash png
+            "enableFullScreenImage_legacy": true,
+            "resizeMode": "contain"
+          }
         }
       ]
     ],

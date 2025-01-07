@@ -43,6 +43,7 @@ const SearchInput = forwardRef(
     const handleClear = () => {
       setInputValue("");
       onChange("");
+      inputRef.current?.focus();
     };
 
     return (

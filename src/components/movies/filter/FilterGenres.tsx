@@ -23,14 +23,28 @@ const FilterGenres = () => {
   // const genres = useMovieStore((state) => state.genreArray);
   const genres = useFilterGenres();
   const actions = useSettingsActions();
-
+  const [localState, setLocalState] = useState(genres);
   // Extract the type of the `state` property within each item of `mergedTags`
+  useEffect(() => {
+    setLocalState(genres);
+  }, [genres]);
   type MergedTagState = (typeof genres)[number]["state"];
   const handleGenreSelect = (genreState: MergedTagState) => async (genre: string) => {
     // include -> exclude -> off
+    //~ Setting local genre state for all the genres.
     const newState = cycleState(genreState);
-
-    // await new Promise((resolve) => setTimeout(() => resolve("dont"), 1000));
+    setLocalState((prev) => {
+      let finalGenres = [];
+      for (let g of prev) {
+        if (g.genre === genre) {
+          g.state = newState;
+        }
+        finalGenres.push(g);
+      }
+      return finalGenres;
+    });
+    //~ need to do this to get the state to update before running the action
+    await new Promise((resolve) => setTimeout(() => resolve("dont"), 0));
     if (newState === "off") {
       actions.updateGenresFilter("exclude", genre, "remove");
       actions.updateGenresFilter("include", genre, "remove");
@@ -38,7 +52,20 @@ const FilterGenres = () => {
     }
     actions.updateGenresFilter(newState, genre, "add");
   };
-  const handleLongPress = (genreState: MergedTagState) => (genre: string) => {
+  const handleLongPress = (genreState: MergedTagState) => async (genre: string) => {
+    //~ Setting local genre state for all the genres.
+    setLocalState((prev) => {
+      let finalGenres = [];
+      const newState = genreState === "off" ? "exclude" : "include";
+      for (let g of prev) {
+        if (g.genre === genre) {
+          g.state = newState;
+        }
+        finalGenres.push(g);
+      }
+      return finalGenres;
+    });
+    await new Promise((resolve) => setTimeout(() => resolve("dont"), 0));
     // off -> exclude
     if (genreState === "off") {
       actions.updateGenresFilter("exclude", genre, "add");
@@ -51,7 +78,7 @@ const FilterGenres = () => {
   return (
     <View>
       <GenreCloudEnhanced>
-        {genres.map((genre) => {
+        {localState.map((genre) => {
           return (
             <GenreItem
               tagId={genre.genre}

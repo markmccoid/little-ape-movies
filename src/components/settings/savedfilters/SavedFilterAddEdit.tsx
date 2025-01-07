@@ -2,7 +2,6 @@ import { View, TextInput, Alert, Pressable, ScrollView, StyleSheet } from "react
 import React, { useEffect } from "react";
 import SavedFilterTags from "./SavedFilterTags";
 import SavedFilterGenres from "./SavedFilterGenres";
-import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import useSettingsStore, { SortField, useSettingsActions } from "@/store/store.settings";
 import uuid from "react-native-uuid";
@@ -153,7 +152,7 @@ const SavedFilterAddEdit = ({ filterId, cancelAddEdit }: Props) => {
     setNewFavoritedState(state);
   };
   //Save Filter
-  const saveFilter = () => {
+  const saveFilter = async () => {
     if (!filterName || filterName === "") {
       Alert.alert("Filter Name is required");
       inputRef.current?.focus();
@@ -209,7 +208,8 @@ const SavedFilterAddEdit = ({ filterId, cancelAddEdit }: Props) => {
             placeholder="Filter Name"
             className="px-2 py-2 bg-card text-card-foreground rounded-lg border-hairline border-border"
             value={filterName}
-            onChangeText={(text) => setFilterName(text)}
+            maxLength={30}
+            onChangeText={setFilterName}
             style={{ fontSize: 18 }}
           />
           {filterName !== "" && (
