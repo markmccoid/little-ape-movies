@@ -10,16 +10,17 @@ import {
   Pressable,
 } from "react-native";
 import React, { useState } from "react";
-import { useTheme } from "@react-navigation/native";
+import showConfirmationPrompt from "@/components/common/showConfirmationPrompt";
 
 // import Colors from '@/constants/Colors';
 // import { defaultStyles } from '@/constants/Styles';
 import { LinearGradient } from "expo-linear-gradient";
 import { useAuth } from "@/providers/AuthProvider";
 import { useCustomTheme } from "@/lib/colorThemes";
-import { DeleteIcon } from "../common/Icons";
+import { DeleteIcon, EditIcon } from "../common/Icons";
 import { SymbolView } from "expo-symbols";
 import { Text } from "@/components/ui/text";
+import { User } from "@/store/dataAccess/localStorage-users";
 
 const handleNewUserPrompt = (registerUser: (user: string) => void) => {
   Alert.prompt(
@@ -50,9 +51,38 @@ const handleNewUserPrompt = (registerUser: (user: string) => void) => {
 const SignIn = () => {
   const { colors } = useCustomTheme();
   const [loading, setLoading] = useState(false);
-  const { initialized, currentUser, onLogin, allUsers, onRegister, onRemoveUser } = useAuth();
+  const { initialized, currentUser, onLogin, allUsers, onRegister, onRemoveUser, onUpdateUser } =
+    useAuth();
 
-  const handleLogin = (user: string) => {
+  const handleUpdateUser = (user: User) => {
+    Alert.prompt(
+      "Enter New User Name",
+      "Edit User Name",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: (name) => {
+            if (name) {
+              try {
+                onUpdateUser(user.id, name);
+              } catch (e) {
+                Alert.alert("Error", "Error Updating User");
+              }
+            }
+          },
+        },
+      ],
+      "plain-text",
+      user.name,
+      "default"
+    );
+  };
+  const handleLogin = (user: User) => {
     try {
       setLoading(true);
       onLogin(user);
@@ -63,8 +93,18 @@ const SignIn = () => {
     }
   };
 
-  const handleRegisterUser = (user: string) => {
-    onRegister(user);
+  const handleRemoveUser = async (user: User) => {
+    const result = await showConfirmationPrompt(
+      "Delete User?",
+      "This will delete all movies associated with User and CANNOT be undone."
+    );
+    if (!result) return;
+
+    onRemoveUser(user);
+  };
+
+  const handleRegisterUser = (username: string) => {
+    onRegister(username);
   };
 
   // While we are seeing if there is a saved user to auto login
@@ -97,7 +137,8 @@ const SignIn = () => {
       <Image
         style={styles.logo}
         className="rounded-[100] border"
-        source={require("../../../assets/images/little-ape-movie-image.jpg")}
+        source={require("../../../assets/images/papericon.png")}
+        // source={require("../../../assets/images/little-ape-movie-image.jpg")}
       />
       {allUsers && (
         <ScrollView
@@ -108,15 +149,20 @@ const SignIn = () => {
             allUsers?.length > 0 &&
             allUsers.map((user) => {
               return (
-                <View key={user} className="bg-card">
-                  <View className="flex-row justify-between items-center" key={user}>
+                <View key={user.id} className="bg-card">
+                  <View className="flex-row justify-between items-center" key={user.id}>
                     <TouchableOpacity
                       className="flex-1 px-3 py-2 mr-2"
                       onPress={() => handleLogin(user)}
                     >
-                      <Text className="">{user}</Text>
+                      <Text className="">{user.name}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => onRemoveUser(user)}>
+                    <TouchableOpacity onPress={() => handleUpdateUser(user)}>
+                      <View className="border-l bg-card-inverted p-2">
+                        <EditIcon size={15} color={colors.primary} />
+                      </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => handleRemoveUser(user)}>
                       <View className="border-l bg-card-inverted p-2">
                         <DeleteIcon size={15} color={colors.deleteRed} />
                       </View>

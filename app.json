@@ -3,14 +3,14 @@
     "scheme": "littleapemovies",
     "userInterfaceStyle": "automatic",
     "orientation": "portrait",
-    "version": "1.1.98",
+    "version": "1.1.99",
     "web": {
       "output": "static",
       "bundler": "metro"
     },
-    "icon": "./assets/images/appicon.png",
+    "icon": "./assets/images/papericon.png",
     "splash": {
-      "image": "./assets/splashscreen.png",
+      "image": "./assets/papersplashscreen.png",
       // "imageWidth": 1284,
       "resizeMode": "contain",
       "backgroundColor": "#000000",

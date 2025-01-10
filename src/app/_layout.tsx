@@ -12,7 +12,8 @@ import { Lato_100Thin, Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/
 import * as SplashScreen from "expo-splash-screen";
 import * as Linking from "expo-linking";
 
-import { useColorScheme } from "react-native";
+// import { useColorScheme } from "react-native";
+import { useColorScheme } from "nativewind";
 import { ThemeProvider } from "@react-navigation/native";
 import { CustomLightTheme, CustomDarkTheme } from "../lib/colorThemes";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
@@ -143,7 +144,8 @@ const InitialLayout = () => {
 //~~ Wrap all Providers here (TanStack Query, Contexts, etc.)
 //~~ ------------------------------------------------------
 export default function RootLayout() {
-  const colorScheme = useColorScheme() || "light";
+  const colorSchemeObj = useColorScheme();
+  const colorScheme = colorSchemeObj.colorScheme || "light";
 
   return (
     <>

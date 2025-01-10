@@ -7,6 +7,8 @@ import {
   signOut,
   removeUser,
   getCurrentUser,
+  User,
+  updateUser,
 } from "@/store/dataAccess/localStorage-users";
 import { deleteUserStorage, initCurrentUserStorage } from "@/store/dataAccess/storageAdapter";
 import useMovieStore from "@/store/store.shows";
@@ -14,14 +16,15 @@ import { eventBus } from "@/store/eventBus";
 import useSettingsStore from "@/store/store.settings";
 
 type AuthProps = {
-  currentUser: string | undefined;
-  onRegister: (user: string) => void;
-  onLogin: (user: string) => void;
+  currentUser: User | undefined;
+  onRegister: (username: string) => void;
+  onLogin: (user: User) => void;
   onLogout: () => void;
-  onRemoveUser: (user: string) => void;
+  onRemoveUser: (user: User) => void;
+  onUpdateUser: (id: string, newName: string) => void;
   initialized: boolean;
-  getUsers: () => string[] | undefined;
-  allUsers: string[];
+  getUsers: () => User[] | undefined;
+  allUsers: User[];
 };
 
 const AuthContext = createContext<AuthProps | undefined>(undefined);
@@ -35,9 +38,9 @@ export function useAuth() {
 }
 
 export const AuthProvider = ({ children }: any) => {
-  const [currentUser, setCurrentUser] = useState<string>();
+  const [currentUser, setCurrentUser] = useState<User>();
   const [initialized, setInitialized] = useState(false);
-  const [allUsers, setAllUsers] = useState<string[]>([]);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
 
   // On app start, check to see if there is a current User
   // if so, initialize the currentUserStorage MMKV
@@ -49,7 +52,7 @@ export const AuthProvider = ({ children }: any) => {
     initCurrentUserStorage(currUser);
 
     // Clear store if NO user and then rehydrate
-    if (!currUser) {
+    if (!currUser?.id) {
       useMovieStore.getState().actions.clearStore();
     }
     useMovieStore.persist.rehydrate();
@@ -61,7 +64,7 @@ export const AuthProvider = ({ children }: any) => {
   }, []);
 
   //~ LOGIN -------------------------------------------
-  const handleLogin = (user: string) => {
+  const handleLogin = (user: User) => {
     // Clear the stores when creating logging in
     // Then when the signIn happens, the rehydrate will bring back the data
     eventBus.publish("CLEAR_SEARCH_STORES");
@@ -80,17 +83,23 @@ export const AuthProvider = ({ children }: any) => {
     setCurrentUser(user);
   };
 
+  //~ Update User Name -------------------------------------------
+  const handleUpdateUsername = (id: string, newName: string) => {
+    console.log("NEW NAME", newName);
+    updateUser(id, newName);
+    setAllUsers(getUsers());
+  };
   //~ REGISTER User -------------------------------------------
-  const handleRegister = (user: string) => {
+  const handleRegister = (username: string) => {
     // Clear the store when creating a new user
     useMovieStore.getState().actions.clearStore();
     useSettingsStore.getState().actions.resetSettingsStore();
-    setAllUsers(addNewUser(user));
+    setAllUsers(addNewUser(username));
   };
 
   //~ DELETE User -------------------------------------------
-  const handleRemoveUser = (user: string) => {
-    const updatedUsers = removeUser(user);
+  const handleRemoveUser = (user: User) => {
+    const updatedUsers = removeUser(user.id);
     if (updatedUsers) {
       setAllUsers(updatedUsers);
     }
@@ -105,7 +114,7 @@ export const AuthProvider = ({ children }: any) => {
   };
 
   //~ GET ALL USERS -------------------------------------------
-  const getUsers = () => {
+  const getUsers = (): User[] => {
     return getAllUsers();
   };
 
@@ -115,6 +124,7 @@ export const AuthProvider = ({ children }: any) => {
     onRegister: handleRegister,
     onLogout: handleLogout,
     onRemoveUser: handleRemoveUser,
+    onUpdateUser: handleUpdateUsername,
     currentUser: currentUser,
     getUsers: getUsers,
     allUsers,

@@ -61,7 +61,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
             type="palette"
             colors={[colors.secondaryForeground, colors.secondaryForeground]}
           />
-          <Text className="text-3xl font-bold">{currentUser}</Text>
+          <Text className="text-3xl font-bold">{currentUser?.name}</Text>
           {/* DEBUG View On/Off */}
           <Pressable onPress={toggleDebugView}>
             <Text>Debug: {debugView ? "On" : "Off"}</Text>
