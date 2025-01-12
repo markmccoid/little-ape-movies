@@ -7,12 +7,14 @@ import { sortBy } from "lodash";
 import DragDropEntry from "@/components/common/DragAndSort/DragDropEntry";
 import { Positions, sortArray } from "@/components/common/DragAndSort/helperFunctions";
 import showConfirmationPrompt from "@/components/common/showConfirmationPrompt";
+import { useCustomTheme } from "@/lib/colorThemes";
 
 const ROW_HEIGHT = 40;
 const CurrentQuickSorts = ({ setEditId }: { setEditId: (editId: string | undefined) => void }) => {
   const quickSorts = useSettingsStore((state) => state.savedQuickSorts);
   const actions = useSettingsActions();
   const sortedQS = sortBy(quickSorts, "index");
+  const { colors } = useCustomTheme();
 
   const handleUpdatePositions = (positions: Positions) => {
     const finalQuickSorts = sortArray(positions, sortedQS, { positionField: "index" });
@@ -58,7 +60,7 @@ const CurrentQuickSorts = ({ setEditId }: { setEditId: (editId: string | undefin
                   onPress={() => setEditId(sort.id)}
                   className="px-2 h-full flex-row items-center"
                 >
-                  <EditIcon size={20} />
+                  <EditIcon size={20} color={colors.cardForeground} />
                 </Pressable>
                 <Pressable
                   onPress={async () => {

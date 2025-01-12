@@ -39,6 +39,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       : currPath?.includes("settings")
       ? "settings"
       : "unknown";
+
   const testAnimPush = React.useMemo(
     () =>
       ({ hovered, pressed }) => {
@@ -73,8 +74,14 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       <View className="bg-card mb-2">
         <Pressable
           onPress={async () => {
-            router.replace("./home");
-            await new Promise((resolve) => setTimeout(() => resolve("done"), 100));
+            // For some reason if I'm in the home stack on the details page and go to "/home"
+            // it "doubles" up the home screen.  So if I detect I'm in the "home" stack I use go back
+            // otherwise, I just go to "/home". NOTE: "./home" is different and doesn't work as expected.
+            if (currPath.includes("home")) {
+              await router.back();
+            } else {
+              await router.replace("/home");
+            }
             navigation.closeDrawer();
           }}
           className="mx-2"
