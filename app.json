@@ -10,7 +10,7 @@
     },
     "icon": "./assets/images/papericon2.png",
     "splash": {
-      "image": "./assets/papersplashscreen.png",
+      "image": "./assets/papersplashscreen2.png",
       // "imageWidth": 1284,
       "resizeMode": "contain",
       "backgroundColor": "#000000",
@@ -38,7 +38,7 @@
         {
           "ios": {
             // You may want to use regular full screen splash on iOS 
-            "image": "./assets/papersplashscreen.png", // Full screen transparent splash png
+            "image": "./assets/papersplashscreen2.png", // Full screen transparent splash png
             "enableFullScreenImage_legacy": true,
             "resizeMode": "contain"
           }
