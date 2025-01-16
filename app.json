@@ -1,9 +1,10 @@
 {
   "expo": {
+    "name": "Little Ape Movies",
     "scheme": "littleapemovies",
     "userInterfaceStyle": "automatic",
     "orientation": "portrait",
-    "version": "1.2.00",
+    "version": "1.2.01",
     "web": {
       "output": "static",
       "bundler": "metro"
@@ -13,7 +14,7 @@
       "image": "./assets/papersplashscreen2.png",
       // "imageWidth": 1284,
       "resizeMode": "contain",
-      "backgroundColor": "#000000",
+      "backgroundColor": "#544D6C",
       "enableFullScreenImage_legacy": true
     },
     "plugins": [
@@ -40,13 +41,13 @@
             // You may want to use regular full screen splash on iOS 
             "image": "./assets/papersplashscreen2.png", // Full screen transparent splash png
             "enableFullScreenImage_legacy": true,
-            "resizeMode": "contain"
+            "resizeMode": "contain",
+            "backgroundColor": "#544D6C"
           }
         }
       ]
     ],
     "newArchEnabled": true,
-    "name": "little-ape-movies",
     "slug": "little-ape-movies",
     "experiments": {
       "typedRoutes": true
