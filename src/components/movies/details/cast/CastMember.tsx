@@ -50,7 +50,8 @@ const CastMember = ({ castInfo }: Props) => {
           const imdbPersonId = await getPersonIMDBId(castInfo?.personId);
           console.log(imdbPersonId);
           Linking.openURL(`imdb:///name/${imdbPersonId}`).catch((err) => {
-            Linking.openURL("https://apps.apple.com/us/app/imdb-movies-tv-shows/id342792525");
+            Linking.openURL(`https://www.imdb.com/name/${imdbPersonId}/`);
+            // Linking.openURL("https://apps.apple.com/us/app/imdb-movies-tv-shows/id342792525");
           });
         }}
       >

@@ -19,11 +19,11 @@ export const addNewUser = (newUserName: string) => {
   const existingUsers = getItem("users") as User[];
   if (!newUserName || newUserName === "") return existingUsers || [];
   const newUserId = uuid.v4();
-  let newUsers = [{ id: newUserId, name: newUserName }];
+  let newUsers = existingUsers;
   if (existingUsers) {
     // Make sure we don't duplicate user names
     if (!existingUsers.some((el) => el.name === newUserName)) {
-      newUsers = [...existingUsers, ...newUsers];
+      newUsers = [...newUsers, { id: newUserId, name: newUserName }];
     }
   }
   setItem("users", newUsers);

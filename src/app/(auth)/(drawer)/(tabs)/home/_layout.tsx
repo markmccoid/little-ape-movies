@@ -21,7 +21,7 @@ const HomeLayout = () => {
       <Stack.Screen
         name="[showId]"
         options={{ headerShown: false }}
-        getId={({ params }) => params.showId}
+        getId={({ params }) => params?.showId}
       />
       <Stack.Screen name="filtermodal" options={{ presentation: "modal", headerShown: false }} />
     </Stack>
