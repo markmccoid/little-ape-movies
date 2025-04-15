@@ -85,7 +85,6 @@ export const AuthProvider = ({ children }: any) => {
 
   //~ Update User Name -------------------------------------------
   const handleUpdateUsername = (id: string, newName: string) => {
-    console.log("NEW NAME", newName);
     updateUser(id, newName);
     setAllUsers(getUsers());
   };

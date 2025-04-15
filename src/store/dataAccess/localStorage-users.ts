@@ -16,16 +16,16 @@ export type User = {
 };
 //~~ Register/ADD New User (add to users array in storage)
 export const addNewUser = (newUserName: string) => {
-  const existingUsers = getItem("users") as User[];
+  const existingUsers = (getItem("users") as User[]) || [];
   if (!newUserName || newUserName === "") return existingUsers || [];
   const newUserId = uuid.v4();
   let newUsers = existingUsers;
-  if (existingUsers) {
-    // Make sure we don't duplicate user names
-    if (!existingUsers.some((el) => el.name === newUserName)) {
-      newUsers = [...newUsers, { id: newUserId, name: newUserName }];
-    }
+
+  // Make sure we don't duplicate user names
+  if (!existingUsers.some((el) => el.name === newUserName)) {
+    newUsers = [...newUsers, { id: newUserId, name: newUserName }];
   }
+
   setItem("users", newUsers);
   return newUsers;
 };

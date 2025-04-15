@@ -135,7 +135,6 @@ const useMovieStore = create<MovieStore>()(
               eventBus.publish("GENERATE_GENRES_ARRAY");
               eventBus.publish("UPDATE_SHOW_PROVIDERS", show.id);
               eventBus.publish("GET_SHOW_COLORS", newShow.id, newShow?.posterURL);
-              console.log("COLORS DONE");
               requestAnimationFrame(() => resolve());
             } catch (error) {
               reject(error);

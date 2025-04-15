@@ -36,7 +36,7 @@ const handleNewUserPrompt = (registerUser: (user: string) => void) => {
         text: "OK",
         onPress: (name) => {
           if (name) {
-            console.log("NAME", name);
+            console.log("RegisterUser/SignIn", name);
             registerUser(name);
           }
         },

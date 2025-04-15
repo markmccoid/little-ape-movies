@@ -65,7 +65,6 @@ const SearchPage = () => {
     useCallback(() => {
       // console.log("IN FOcus", searchValue);
       if (!searchValue) {
-        console.log("Do it");
         inputRef.current?.focus();
       }
     }, [])

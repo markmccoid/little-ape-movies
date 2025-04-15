@@ -18,7 +18,6 @@ const MovieDetailHome = () => {
   const { movieDetails, isLoading } = useMovieDetailData(parseInt(showId));
   const [shouldRender, setShouldRender] = React.useState(false);
   const navigation = useNavigation();
-  console.log("MOVIE ID HOME---", showId);
 
   useEffect(() => {
     const options: NativeStackNavigationOptions = {
