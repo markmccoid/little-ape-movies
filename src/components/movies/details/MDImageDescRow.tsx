@@ -34,7 +34,6 @@ const MDImageDescRow = ({ existsInSaved, movieDetails, storedMovie }: Props) => 
         <MDBackground />
 
         <MDDetailContextMenu
-          shareLink={movieDetails?.imdbURL ? movieDetails?.imdbURL : movieDetails?.posterURL}
           movieId={storedMovie?.id || movieDetails?.id}
           movieTitle={storedMovie?.title || movieDetails?.title}
           existsInSaved={existsInSaved}

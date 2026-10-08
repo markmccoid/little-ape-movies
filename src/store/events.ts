@@ -51,28 +51,32 @@ export const setupEvents = (queryClient: QueryClient) => {
   const updateShowProviders = createUpdateShowProviders(queryClient);
   //~~ ------------------------------
   //~~ Subscribe UPDATE_SHOW_PROVIDERS
-  eventBus.subscribe("UPDATE_SHOW_PROVIDERS", updateShowProviders);
+  const unsubscribeUpdateProviders = eventBus.subscribe(
+    "UPDATE_SHOW_PROVIDERS",
+    updateShowProviders
+  );
 
   //~~ ------------------------------
   //~~ Subscribe GET_SHOW_COLORS
-  eventBus.subscribe("GET_SHOW_COLORS", async (movieId: number, posterURL) => {
-    // console.log("EVENT BUS", movieId, posterURL)
-    const imageColors = await getImageColors(posterURL);
-    // console.log("IMAGE COL gotten");
-    useMovieStore.getState().actions.updateShow(movieId, { posterColors: imageColors });
-  });
+  const unsubscribeShowColors = eventBus.subscribe(
+    "GET_SHOW_COLORS",
+    async (movieId: number, posterURL) => {
+      const imageColors = await getImageColors(posterURL);
+      useMovieStore.getState().actions.updateShow(movieId, { posterColors: imageColors });
+    }
+  );
 
   //~~ ------------------------------
   //~~ Subscribe GENERATE_GENRES_ARRAY
   // Called on Add Show and on App intialize
-  eventBus.subscribe("GENERATE_GENRES_ARRAY", () => {
+  const unsubscribeGenres = eventBus.subscribe("GENERATE_GENRES_ARRAY", () => {
     const genres = Array.from(
       new Set(useMovieStore.getState().shows.flatMap((show) => show.genres))
     );
     useMovieStore.setState({ genreArray: genres });
   });
 
-  eventBus.subscribe("INITIALIZE_APP", () => {
+  const unsubscribeInitialize = eventBus.subscribe("INITIALIZE_APP", () => {
     try {
       const settingsActions = useSettingsStore.getState().actions;
       const defaultFilterId = useSettingsStore.getState().defaultFilter;
@@ -81,4 +85,11 @@ export const setupEvents = (queryClient: QueryClient) => {
       console.log("Error in INITIALIZE_APP event", e);
     }
   });
+
+  return () => {
+    unsubscribeUpdateProviders();
+    unsubscribeShowColors();
+    unsubscribeGenres();
+    unsubscribeInitialize();
+  };
 };

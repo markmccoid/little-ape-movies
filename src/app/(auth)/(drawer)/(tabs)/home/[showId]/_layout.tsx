@@ -1,7 +1,6 @@
 import { View, Text, Pressable } from "react-native";
 import React from "react";
 import { Stack, useNavigation, useRouter, useSegments } from "expo-router";
-// import { useNavigation } from "@react-navigation/native";
 
 import { ChevronLeft } from "@/lib/icons/ChevronLeft";
 
@@ -22,7 +21,13 @@ const ShowIdLayout = () => {
             </Pressable>
           ),
         }}
-        getId={({ params }) => params.showId}
+        getId={({ params }) => {
+          const showId = params?.showId;
+          if (typeof showId === "string" || typeof showId === "number") {
+            return String(showId);
+          }
+          return undefined;
+        }}
       />
       <Stack.Screen
         name="detailimagemodal"

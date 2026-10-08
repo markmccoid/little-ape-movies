@@ -15,7 +15,7 @@ import { ChevronLeft } from "@/lib/icons/ChevronLeft";
 import { SaveIcon } from "@/components/common/Icons";
 import { useCustomTheme } from "@/lib/colorThemes";
 import { SymbolView } from "expo-symbols";
-import { MotiView } from "moti";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import SavedFilterWatchFavs from "./SavedFilterWatchFavs";
 
 // Build the initial state of the tags
@@ -212,26 +212,22 @@ const SavedFilterAddEdit = ({ filterId, cancelAddEdit }: Props) => {
             onChangeText={setFilterName}
             style={{ fontSize: 18 }}
           />
-          {filterName !== "" && (
-            <Pressable
-              className="absolute right-2 top-0 bottom-0 justify-center"
-              onPress={() => setFilterName("")}
-            >
-              <MotiView
-                from={{ opacity: 0 }}
-                animate={{ opacity: filterName ? 1 : 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ type: "timing", duration: 500 }}
-              >
+          <Pressable
+            className="absolute right-2 top-0 bottom-0 justify-center"
+            onPress={() => setFilterName("")}
+            pointerEvents={filterName !== "" ? "auto" : "none"}
+          >
+            {filterName !== "" && (
+              <Animated.View entering={FadeIn.duration(500)} exiting={FadeOut.duration(500)}>
                 <SymbolView
                   name="x.circle.fill"
                   type="palette"
                   colors={["white", "gray"]}
                   size={17}
                 />
-              </MotiView>
-            </Pressable>
-          )}
+              </Animated.View>
+            )}
+          </Pressable>
         </View>
       </View>
       {/* <View className="flex-row justify-between mx-4 mt-2">

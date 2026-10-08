@@ -10,8 +10,7 @@ import { Alert, Pressable, Text, StyleSheet, TouchableOpacity, View } from "reac
 import useMovieStore, { Tag, useMovieActions } from "@/store/store.shows";
 
 import { PlusCircle } from "@/lib/icons/PlusCircle";
-import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
-import { useNavigation } from "expo-router";
+import { useNavigation, type NativeStackNavigationOptions } from "expo-router";
 import TagMaintItem from "./TagMaintItem";
 import DragDropEntry, { TScrollFunctions } from "@/components/common/DragAndSort/DragDropEntry";
 import DragItem from "@/components/common/DragAndSort/DragItem";
@@ -33,14 +32,14 @@ const HeaderRight = () => {
         },
         {
           text: "OK",
-          onPress: (name) => {
+          onPress: (name?: string) => {
             if (name) {
               console.log("NAME", name);
               try {
                 actions.tagAdd(name);
               } catch (e) {
                 // Checking for custom error being thrown
-                if (e.message.includes("duplicate")) {
+                if (e instanceof Error && e.message.includes("duplicate")) {
                   Alert.alert("Duplicate Tag", "Tag Already Exists, nothing added");
                 }
               }

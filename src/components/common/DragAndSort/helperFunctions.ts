@@ -44,7 +44,8 @@ export function sortArray<T>(
     const arrayItem = baseArray.find((baseItem) => {
       // idField may contain string or number, so convert to string to be sure
       // comparison returns what we expect.
-      return `${baseItem[idField]}` === `${id}`;
+      const indexedItem = baseItem as Record<string, unknown>;
+      return String(indexedItem[idField]) === `${id}`;
     });
     if (positionField) {
       return { ...arrayItem, [positionField]: index } as T;

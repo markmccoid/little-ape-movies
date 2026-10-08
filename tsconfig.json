@@ -2,6 +2,7 @@
   "compilerOptions": {
     "strict": true,
     "module": "esnext",
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "@/*": [
@@ -18,5 +19,11 @@
     "expo-env.d.ts",
     "tailwind.config.js",
     "nativewind-env.d.ts"
+  ],
+  "exclude": [
+    "src/components/common/animations/Temp.tsx",
+    "src/components/tagMaintenance/TagTest.tsx",
+    "src/components/movies/movieitem/actionbar/ActionBarContainerMINMAX.tsx",
+    "src/components/settings/quickSorts/SortEditorNOTUSED.tsx"
   ]
 }

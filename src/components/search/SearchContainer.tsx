@@ -6,7 +6,6 @@ import SearchResult from "@/components/search/SearchResult";
 import useMovieStore from "@/store/store.shows";
 import { SymbolView } from "expo-symbols";
 import useSettingsStore from "@/store/store.settings";
-import { MotiView } from "moti";
 import useImageSize from "@/hooks/useImageSize";
 import { useFocusEffect } from "expo-router";
 import Animated, {
@@ -67,7 +66,10 @@ const SearchContainer = ({ movies, fetchNextPage }: Props) => {
     [movies]
   );
 
-  const getItemLayout = (_, index: number) => ({
+  const getItemLayout = (
+    _: ArrayLike<MovieSearchResults> | null | undefined,
+    index: number
+  ) => ({
     length: imageHeight + BOTTOM_MARGIN + EXTRA_HEIGHT, // Item height plus in SearchResult there is A bottom margin and extra height added to imageHeight
     offset: (imageHeight + BOTTOM_MARGIN + EXTRA_HEIGHT) * index, // Offset for the current index
     index,

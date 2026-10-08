@@ -34,7 +34,7 @@ const handleNewUserPrompt = (registerUser: (user: string) => void) => {
       },
       {
         text: "OK",
-        onPress: (name) => {
+        onPress: (name?: string) => {
           if (name) {
             console.log("RegisterUser/SignIn", name);
             registerUser(name);
@@ -66,7 +66,7 @@ const SignIn = () => {
         },
         {
           text: "OK",
-          onPress: (name) => {
+          onPress: (name?: string) => {
             if (name) {
               try {
                 onUpdateUser(user.id, name);
@@ -82,12 +82,13 @@ const SignIn = () => {
       "default"
     );
   };
-  const handleLogin = (user: User) => {
+  const handleLogin = async (user: User) => {
     try {
       setLoading(true);
-      onLogin(user);
-    } catch (error: any) {
-      alert(error.message);
+      await onLogin(user);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Could not sign in";
+      Alert.alert("Error", message);
     } finally {
       setLoading(false);
     }
@@ -200,7 +201,11 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",

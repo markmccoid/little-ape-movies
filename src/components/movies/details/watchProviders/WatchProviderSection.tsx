@@ -9,11 +9,24 @@ import Animated, {
 import { WatchProviderOnly } from "@/store/dataHooks";
 import * as Linking from "expo-linking";
 
+export type WatchProviderEntry = {
+  provider: string;
+  logoURL: string;
+  providerId: number | string;
+  displayPriority: number;
+};
+
+export type WatchProviderSectionItem = {
+  type: WatchProviderOnly["type"];
+  title: string;
+  providers?: WatchProviderEntry[];
+};
+
 type Props = {
-  item: WatchProviderOnly;
+  item: WatchProviderSectionItem;
   index: number;
   scrollOffset: SharedValue<number>;
-  watchProviders: WatchProviderOnly[];
+  watchProviders: WatchProviderSectionItem[];
 };
 const PROVIDER_ICON_SIZE = 50;
 const ICON_MARGIN = 5;
@@ -80,8 +93,12 @@ const WatchProviderSection = ({ item, index, scrollOffset, watchProviders }: Pro
       </View>
       {item?.type === "justWatchLink" ? (
         <TouchableOpacity
-          onPress={async () => {
-            Linking.openURL(item.providers[0].providerId).catch((err) =>
+          onPress={() => {
+            const providers = item.providers;
+            if (!providers || providers.length === 0) return;
+            const providerLink = providers[0]?.providerId;
+            if (typeof providerLink !== "string") return;
+            Linking.openURL(providerLink).catch((err) =>
               console.log("Error opening WatchProvider", err)
             );
           }}

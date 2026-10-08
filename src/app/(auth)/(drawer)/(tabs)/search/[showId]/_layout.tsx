@@ -20,7 +20,13 @@ const ShowIdLayout = () => {
             </Pressable>
           ),
         }}
-        getId={({ params }) => params.showId}
+        getId={({ params }) => {
+          const showId = params?.showId;
+          if (typeof showId === "string" || typeof showId === "number") {
+            return String(showId);
+          }
+          return undefined;
+        }}
       />
       <Stack.Screen
         name="detailimagemodal"

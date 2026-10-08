@@ -8,19 +8,27 @@ import {
   StyleSheet,
 } from "react-native";
 import React, { useCallback, useState, useRef, useEffect } from "react";
-import { useFocusEffect, useGlobalSearchParams, useNavigation } from "expo-router";
-import { useIsFocused } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useGlobalSearchParams,
+  useIsFocused,
+  useNavigation,
+  type NativeStackNavigationOptions,
+} from "expo-router";
 import { SearchBarCommands } from "react-native-screens";
 import { debounce } from "lodash";
 import { SearchType, useSearchStore } from "@/store/store.search";
 import PersonSearchContainer from "@/components/search/personSearch/PersonSearchContainer";
 import MovieSearchContainer from "@/components/search/movieTitleSearch/MovieSearchContainer";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { MotiText, MotiView } from "moti";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 import { useCustomTheme } from "@/lib/colorThemes";
 import { SymbolView } from "expo-symbols";
 import useSettingsStore from "@/store/store.settings";
-import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import SearchInput from "@/components/search/SearchInput";
 import SearchInputAccessoryView from "@/components/search/SearchInputAccessoryView";
 
@@ -30,6 +38,7 @@ import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle
 const SearchPage = () => {
   const { colors } = useCustomTheme();
   const searchColumns = useSettingsStore((state) => state.searchColumns);
+  const columnRotation = useSharedValue(searchColumns === 2 ? 0 : 90);
   const settingsActions = useSettingsStore((state) => state.actions);
   const { setSearch, setSearchType } = useSearchStore((state) => state.actions);
   const searchType = useSearchStore((state) => state.searchType);
@@ -37,6 +46,18 @@ const SearchPage = () => {
   const { top } = useSafeAreaInsets();
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    columnRotation.value = withSpring(searchColumns === 2 ? 90 : 0, {
+      damping: 10,
+      mass: 1,
+      stiffness: 100,
+    });
+  }, [searchColumns]);
+
+  const columnToggleStyle = useAnimatedStyle(() => ({
+    transform: [{ rotateZ: `${columnRotation.value}deg` }],
+  }));
 
   const navigation = useNavigation();
   // Setup react navigation search bar in header
@@ -97,12 +118,9 @@ const SearchPage = () => {
             onPress={settingsActions.toggleSearchColumns}
             className="flex-row items-center pr-4 pl-2 h-full mb-2"
           >
-            <MotiView
-              from={{ transform: [{ rotateZ: searchColumns === 2 ? "0deg" : "90deg" }] }}
-              animate={{ transform: [{ rotateZ: searchColumns === 2 ? "90deg" : "0deg" }] }}
-            >
+            <Animated.View style={columnToggleStyle}>
               <GripHorizontalIcon color={colors.primary} />
-            </MotiView>
+            </Animated.View>
           </Pressable>
         </View>
         <SearchInputAccessoryView />

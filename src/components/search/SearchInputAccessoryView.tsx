@@ -6,8 +6,13 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
-import React, { useState } from "react";
-import { MotiText, MotiView } from "moti";
+import React, { useEffect, useState } from "react";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 import { SearchType, useSearchStore } from "@/store/store.search";
 
 const SearchInputAccessoryView = () => {
@@ -15,6 +20,29 @@ const SearchInputAccessoryView = () => {
   const [personWidth, setPersonWidth] = useState(0);
   const { setSearchType } = useSearchStore((state) => state.actions);
   const searchType = useSearchStore((state) => state.searchType);
+  const highlightLeft = useSharedValue(0);
+  const highlightWidth = useSharedValue(35);
+  const titleOpacity = useSharedValue(searchType === "title" ? 1 : 0.5);
+  const personOpacity = useSharedValue(searchType === "person" ? 1 : 0.5);
+
+  useEffect(() => {
+    const spring = { damping: 10, mass: 1, stiffness: 100 };
+    highlightLeft.value = withSpring(searchType === "title" ? 20 : 20 + titleWidth, spring);
+    highlightWidth.value = withSpring(searchType === "title" ? titleWidth : personWidth, spring);
+    titleOpacity.value = withTiming(searchType === "title" ? 1 : 0.5, { duration: 300 });
+    personOpacity.value = withTiming(searchType === "person" ? 1 : 0.5, { duration: 300 });
+  }, [searchType, titleWidth, personWidth]);
+
+  const highlightStyle = useAnimatedStyle(() => ({
+    left: highlightLeft.value,
+    width: highlightWidth.value,
+  }));
+  const titleLabelStyle = useAnimatedStyle(() => ({
+    opacity: titleOpacity.value,
+  }));
+  const personLabelStyle = useAnimatedStyle(() => ({
+    opacity: personOpacity.value,
+  }));
 
   const handleSearchType = (type: SearchType) => {
     setSearchType(type);
@@ -32,14 +60,10 @@ const SearchInputAccessoryView = () => {
             borderBottomWidth: StyleSheet.hairlineWidth,
           }}
         >
-          <MotiView
-            from={{ left: 0, width: 35, borderWidth: StyleSheet.hairlineWidth }}
-            animate={{
-              left: searchType === "title" ? 20 : 20 + titleWidth,
-              width: searchType === "title" ? titleWidth : personWidth,
-            }}
+          <Animated.View
             className="absolute top-[3] h-[25] rounded-lg bg-yellow-200"
-          ></MotiView>
+            style={[highlightStyle, { borderWidth: StyleSheet.hairlineWidth }]}
+          />
           <Pressable
             onPress={() => {
               handleSearchType("title");
@@ -50,17 +74,9 @@ const SearchInputAccessoryView = () => {
               setTitleWidth(width);
             }}
           >
-            <MotiText
-              from={{ opacity: searchType === "title" ? 0.5 : 1 }}
-              animate={{ opacity: searchType === "title" ? 1 : 0.5 }}
-              transition={{
-                type: "timing",
-                duration: 300,
-              }}
-              className={`text-text ${searchType === "title" ? "" : "opacity-50"}`}
-            >
+            <Animated.Text style={titleLabelStyle} className="text-text">
               Title
-            </MotiText>
+            </Animated.Text>
           </Pressable>
           <Pressable
             onPress={() => handleSearchType("person")}
@@ -70,17 +86,9 @@ const SearchInputAccessoryView = () => {
               setPersonWidth(width);
             }}
           >
-            <MotiText
-              from={{ opacity: searchType === "person" ? 0.5 : 1 }}
-              animate={{ opacity: searchType === "person" ? 1 : 0.5 }}
-              transition={{
-                type: "timing",
-                duration: 300,
-              }}
-              className={`text-text`}
-            >
+            <Animated.Text style={personLabelStyle} className="text-text">
               Person
-            </MotiText>
+            </Animated.Text>
           </Pressable>
         </View>
       </InputAccessoryView>

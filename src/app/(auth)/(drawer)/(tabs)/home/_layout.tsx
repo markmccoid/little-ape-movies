@@ -1,7 +1,6 @@
 import { View, Text } from "react-native";
 import React from "react";
-import { Stack } from "expo-router";
-import { useTheme } from "@react-navigation/native";
+import { Stack, useTheme } from "expo-router";
 import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle";
 import { getCurrentUser } from "@/store/dataAccess/localStorage-users";
 import { useMovies } from "@/store/store.shows";

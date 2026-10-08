@@ -11,7 +11,6 @@ import TagCloud, { TagItem } from "@/components/common/TagCloud/TagCloud";
 import TagCloudEnhanced, {
   TagItem as TagItemEnhanced,
 } from "@/components/common/TagCloud/TagCloudEnhanced";
-import { AnimatePresence, MotiView } from "moti";
 import { useCustomTheme } from "@/lib/colorThemes";
 import { EditIcon, TagIcon, TagPlusIcon } from "@/components/common/Icons";
 import Animated, {
@@ -23,6 +22,7 @@ import Animated, {
   LinearTransition,
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
   withTiming,
 } from "react-native-reanimated";
 import MDFavWatched from "./MDFavWatched";
@@ -43,6 +43,7 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
   const [containerHeight, setContainerHeight] = useState(0);
   const [isMeasured, setIsMeasured] = useState(false);
   const toHeight = useSharedValue(0);
+  const addRotation = useSharedValue(0);
   // Initial Render ref so that the animation doesn't play on first load
   const initialRender = useRef(true);
 
@@ -58,14 +59,31 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
     setIsMeasured(true);
   };
 
-  const handleToggleTag = (currState: "include" | "off") => (tagId: string) => {
-    if (!storedMovie?.id) return;
-    if (currState === "include") {
-      actions.updateShowTags(storedMovie?.id, tagId, "remove");
-    } else {
-      actions.updateShowTags(storedMovie?.id, tagId, "add");
-    }
-  };
+  const handleToggleTag =
+    (currState: "include" | "off") =>
+    (tagId: string): Promise<void> => {
+      if (!storedMovie?.id) return Promise.resolve();
+      if (currState === "include") {
+        actions.updateShowTags(storedMovie.id, tagId, "remove");
+      } else {
+        actions.updateShowTags(storedMovie.id, tagId, "add");
+      }
+      return Promise.resolve();
+    };
+
+  useEffect(() => {
+    addRotation.value = withSpring(showAddTag ? 90 : 0, {
+      damping: 10,
+      mass: 1,
+      stiffness: 100,
+    });
+  }, [showAddTag]);
+
+  const addRotationStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotate: `${addRotation.value}deg` }],
+    };
+  });
 
   const tagViewStyle = useAnimatedStyle(() => {
     if (!showAddTag) {
@@ -89,7 +107,7 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
             {movieTags?.map((el) => (
               <TagItemEnhanced
                 size="s"
-                onToggleTag={() => {}}
+                onToggleTag={() => Promise.resolve()}
                 state={"off"}
                 tagId={el?.id}
                 tagName={el?.name}
@@ -111,19 +129,15 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
             layout={LinearTransition.duration(300)}
             style={{ width: "auto" }}
           >
-            <MotiView from={{ rotate: "0deg" }} animate={{ rotate: showAddTag ? "90deg" : "0deg" }}>
+            <Animated.View style={addRotationStyle}>
               <TagPlusIcon size={25} color={colors.secondaryForeground} />
-            </MotiView>
+            </Animated.View>
             {appliedTags?.length === 0 && !showAddTag && (
-              <MotiView
-                from={{ opacity: 0 }}
-                animate={{ opacity: showAddTag ? 0 : 1 }}
-                transition={{ type: "timing", duration: 700 }}
-              >
+              <Animated.View entering={FadeIn.duration(700)}>
                 <Text className="ml-3 mr-2 text-secondary-foreground font-semibold text-base">
                   Add Tags
                 </Text>
-              </MotiView>
+              </Animated.View>
             )}
           </Animated.View>
         </Pressable>

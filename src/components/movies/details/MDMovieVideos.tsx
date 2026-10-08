@@ -26,7 +26,9 @@ const MDMovieVideos = ({ movieId }: Props) => {
                 style={{
                   marginHorizontal: 10,
                 }}
-                onPress={() => Linking.openURL(video.videoURL)}
+                onPress={() =>
+                  Linking.openURL(`https://www.youtube.com/watch?v=${video.key}`)
+                }
               >
                 <Text style={{ fontSize: 15, fontWeight: "bold" }}>{video.type}</Text>
                 <View

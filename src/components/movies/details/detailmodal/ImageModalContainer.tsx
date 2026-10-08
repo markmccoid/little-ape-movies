@@ -33,8 +33,12 @@ const ImageModalContainer = ({ movieId }: Props) => {
     setLargeImageURL(imageURL);
   };
   const handleUpdateImage = () => {
-    updateShow(movieId, { posterURL: largeImageURL });
+    if (!largeImageURL) return;
+    const posterURL = largeImageURL;
     router.dismiss();
+    setTimeout(() => {
+      updateShow(movieId, { posterURL });
+    }, 0);
   };
   if (isLoading || !movieImages) {
     return (

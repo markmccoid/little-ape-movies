@@ -28,13 +28,13 @@ const TagMaintItem = ({ tag, id }: Props) => {
         },
         {
           text: "OK",
-          onPress: (name) => {
+          onPress: (name?: string) => {
             if (name) {
               try {
                 actions.tagEdit(tag.id, name);
               } catch (e) {
                 // Checking for custom error being thrown
-                if (e.message.includes("duplicate")) {
+                if (e instanceof Error && e.message.includes("duplicate")) {
                   Alert.alert("Duplicate Tag", "Tag Already Exists, nothing added");
                 }
               }

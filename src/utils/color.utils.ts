@@ -74,7 +74,7 @@ export const getImageColors = async (imagedata: string): Promise<ImageColors | u
 
   // We need to go back through and update the tint colors based on the colorType
   // and then assigning lightest or darkest color
-  let newObj;
+  let newObj: ColorObj = {};
   Object.keys(colorObj).forEach((key) => {
     const colorType = colorObj[key].colorType;
     const isDark = colorType === "dark";

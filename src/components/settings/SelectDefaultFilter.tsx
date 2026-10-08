@@ -1,4 +1,4 @@
-import useSettingsStore from "@/store/store.settings";
+import useSettingsStore, { type SavedFilter } from "@/store/store.settings";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   Select,
@@ -16,7 +16,9 @@ function SelectDefaultFilter() {
   const filters = useSettingsStore((state) => state.savedFilters);
   const defaultFilterId = useSettingsStore((state) => state.defaultFilter);
   const setDefaultFilter = useSettingsStore((state) => state.actions.setDefaultFilter);
-  const defaultFilter = filters.find((filter) => filter.id === defaultFilterId) || {};
+  const defaultFilter: SavedFilter | undefined = filters.find(
+    (filter) => filter.id === defaultFilterId
+  );
   const contentInsets = {
     top: insets.top,
     bottom: insets.bottom,
@@ -26,7 +28,9 @@ function SelectDefaultFilter() {
 
   return (
     <Select
-      defaultValue={{ label: defaultFilter.name, value: defaultFilterId }}
+      defaultValue={
+        defaultFilter ? { label: defaultFilter.name, value: defaultFilterId } : undefined
+      }
       className="flex-row items-center mx-4 mt-5"
       onValueChange={(option) => setDefaultFilter(option?.value || "")}
     >

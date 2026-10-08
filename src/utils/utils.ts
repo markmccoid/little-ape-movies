@@ -67,6 +67,13 @@ const hashStringToNumber = (str: string) => {
   return Math.abs(hash);
 };
 
+function isDefaultImageKey<T extends object>(
+  images: T,
+  key: string
+): key is Extract<keyof T, string> {
+  return Object.prototype.hasOwnProperty.call(images, key);
+}
+
 export const getProfileImageIndex = (filename: string) => {
   const hash = hashStringToNumber(filename);
   const num = (hash % Object.keys(defaultProfileImages).length) + 1;
@@ -75,12 +82,20 @@ export const getProfileImageIndex = (filename: string) => {
 export const getProfileImage = (filename: string) => {
   const hash = hashStringToNumber(filename);
   const num = (hash % Object.keys(defaultProfileImages).length) + 1;
-  return defaultProfileImages[`image${num.toString().padStart(2, "0")}`];
+  const key = `image${num.toString().padStart(2, "0")}`;
+  if (isDefaultImageKey(defaultProfileImages, key)) {
+    return defaultProfileImages[key];
+  }
+  return defaultProfileImages.image01;
 };
 export const getDefaultPosterImage = (filename: string) => {
   const hash = hashStringToNumber(filename);
   const num = (hash % Object.keys(defaultMoviePosters).length) + 1;
-  return defaultMoviePosters[`image${num.toString().padStart(2, "0")}`];
+  const key = `image${num.toString().padStart(2, "0")}`;
+  if (isDefaultImageKey(defaultMoviePosters, key)) {
+    return defaultMoviePosters[key];
+  }
+  return defaultMoviePosters.image01;
 };
 
 //~  --------------------------------------

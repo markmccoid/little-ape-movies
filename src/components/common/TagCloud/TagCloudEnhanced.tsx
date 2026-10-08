@@ -1,6 +1,6 @@
 import React, { useReducer, useState } from "react";
 import { View, Text, LayoutAnimation, TouchableOpacity, Pressable } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCustomTheme } from "@/lib/colorThemes";
 import { UnTagIcon } from "../Icons";
 
@@ -94,9 +94,9 @@ export const TagItem = ({
         {localState === "exclude" ? (
           <UnTagIcon size={iconSize} color="white" style={{ paddingRight: 8 }} />
         ) : (
-          <AntDesign
+          <MaterialCommunityIcons
             style={{ paddingRight: 5 }}
-            name={localState !== "off" ? "tag" : "tago"}
+            name={localState !== "off" ? "tag" : "tag-outline"}
             size={iconSize}
           />
         )}
@@ -108,7 +108,7 @@ export const TagItem = ({
   );
 };
 
-const TagCloudEnhanced = ({ children }) => {
+const TagCloudEnhanced = ({ children }: { children: React.ReactNode }) => {
   return <View className="flex-row flex-wrap justify-center">{children}</View>;
 };
 

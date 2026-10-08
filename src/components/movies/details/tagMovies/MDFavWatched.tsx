@@ -8,8 +8,66 @@ import MDBackground from "../MDBackground";
 import { ShowItemType, useMovieActions } from "@/store/store.shows";
 import { Text } from "@/components/ui/text";
 import { useCustomTheme } from "@/lib/colorThemes";
-import { AnimatePresence, MotiView } from "moti";
+import Animated, { withSpring } from "react-native-reanimated";
 import DatePicker from "react-native-date-picker";
+
+const iconSpring = { stiffness: 200, damping: 15 };
+
+function selectedIconEntering() {
+  "worklet";
+  return {
+    initialValues: {
+      opacity: 0,
+      transform: [{ scale: 0 }],
+    },
+    animations: {
+      opacity: withSpring(1, iconSpring),
+      transform: [{ scale: withSpring(1.2, iconSpring) }],
+    },
+  };
+}
+
+function unselectedIconEntering() {
+  "worklet";
+  return {
+    initialValues: {
+      opacity: 0,
+      transform: [{ scale: 0 }],
+    },
+    animations: {
+      opacity: withSpring(1, iconSpring),
+      transform: [{ scale: withSpring(1, iconSpring) }],
+    },
+  };
+}
+
+function selectedIconExiting() {
+  "worklet";
+  return {
+    initialValues: {
+      opacity: 1,
+      transform: [{ scale: 1.2 }],
+    },
+    animations: {
+      opacity: withSpring(0, iconSpring),
+      transform: [{ scale: withSpring(0, iconSpring) }],
+    },
+  };
+}
+
+function unselectedIconExiting() {
+  "worklet";
+  return {
+    initialValues: {
+      opacity: 1,
+      transform: [{ scale: 1 }],
+    },
+    animations: {
+      opacity: withSpring(0, iconSpring),
+      transform: [{ scale: withSpring(0, iconSpring) }],
+    },
+  };
+}
 
 type Props = {
   storedMovie: ShowItemType | undefined;
@@ -73,57 +131,25 @@ const MDFavWatched = ({ storedMovie }: Props) => {
       >
         {/* Reserve space for icons */}
         <View style={{ width: 40, height: 40, justifyContent: "center", alignItems: "center" }}>
-          <AnimatePresence>
-            {localWatched ? (
-              <MotiView
-                key="eye"
-                from={{
-                  scale: 0,
-                  opacity: 0,
-                }}
-                animate={{
-                  scale: 1.2,
-                  opacity: 1,
-                }}
-                exit={{
-                  scale: 0,
-                  opacity: 0,
-                }}
-                transition={{
-                  type: "spring",
-                  stiffness: 200,
-                  damping: 15,
-                }}
-                style={{ position: "absolute" }}
-              >
-                <Eye className="color-black" fill={colors.includeGreen} size={30} strokeWidth={1} />
-              </MotiView>
-            ) : (
-              <MotiView
-                key="eye-off"
-                from={{
-                  scale: 0,
-                  opacity: 0,
-                }}
-                animate={{
-                  scale: 1,
-                  opacity: 1,
-                }}
-                exit={{
-                  scale: 0,
-                  opacity: 0,
-                }}
-                transition={{
-                  type: "spring",
-                  stiffness: 200,
-                  damping: 15,
-                }}
-                style={{ position: "absolute" }}
-              >
-                <EyeOff className="color-black" fill={"white"} size={25} strokeWidth={1} />
-              </MotiView>
-            )}
-          </AnimatePresence>
+          {localWatched ? (
+            <Animated.View
+              key="eye"
+              entering={selectedIconEntering}
+              exiting={selectedIconExiting}
+              style={{ position: "absolute" }}
+            >
+              <Eye className="color-black" fill={colors.includeGreen} size={30} strokeWidth={1} />
+            </Animated.View>
+          ) : (
+            <Animated.View
+              key="eye-off"
+              entering={unselectedIconEntering}
+              exiting={unselectedIconExiting}
+              style={{ position: "absolute" }}
+            >
+              <EyeOff className="color-black" fill={"white"} size={25} strokeWidth={1} />
+            </Animated.View>
+          )}
         </View>
         {/* Text flows normally */}
         <Text className="text-black font-semibold px-2">Watched?</Text>
@@ -133,57 +159,25 @@ const MDFavWatched = ({ storedMovie }: Props) => {
       <Pressable onPress={handleFavorited} className="flex-row items-center">
         {/* Reserve space for icons */}
         <View style={{ width: 40, height: 40, justifyContent: "center", alignItems: "center" }}>
-          <AnimatePresence>
-            {localFavorited ? (
-              <MotiView
-                key="on"
-                from={{
-                  scale: 0,
-                  opacity: 0,
-                }}
-                animate={{
-                  scale: 1.2,
-                  opacity: 1,
-                }}
-                exit={{
-                  scale: 0,
-                  opacity: 0,
-                }}
-                transition={{
-                  type: "spring",
-                  stiffness: 200,
-                  damping: 15,
-                }}
-                style={{ position: "absolute" }}
-              >
-                <Sparkles className="color-black" fill={"yellow"} size={30} strokeWidth={1} />
-              </MotiView>
-            ) : (
-              <MotiView
-                key="off"
-                from={{
-                  scale: 0,
-                  opacity: 0,
-                }}
-                animate={{
-                  scale: 1,
-                  opacity: 1,
-                }}
-                exit={{
-                  scale: 0,
-                  opacity: 0,
-                }}
-                transition={{
-                  type: "spring",
-                  stiffness: 200,
-                  damping: 15,
-                }}
-                style={{ position: "absolute" }}
-              >
-                <Sparkle className="color-black" fill="white" size={25} strokeWidth={1} />
-              </MotiView>
-            )}
-          </AnimatePresence>
+          {localFavorited ? (
+            <Animated.View
+              key="on"
+              entering={selectedIconEntering}
+              exiting={selectedIconExiting}
+              style={{ position: "absolute" }}
+            >
+              <Sparkles className="color-black" fill={"yellow"} size={30} strokeWidth={1} />
+            </Animated.View>
+          ) : (
+            <Animated.View
+              key="off"
+              entering={unselectedIconEntering}
+              exiting={unselectedIconExiting}
+              style={{ position: "absolute" }}
+            >
+              <Sparkle className="color-black" fill="white" size={25} strokeWidth={1} />
+            </Animated.View>
+          )}
         </View>
         {/* Text flows normally */}
         <Text className="text-black font-semibold px-2">Favorite?</Text>

@@ -3,7 +3,7 @@ import React from "react";
 import { SymbolView } from "expo-symbols";
 import showConfirmationPrompt from "@/components/common/showConfirmationPrompt";
 import { useMovieActions } from "@/store/store.shows";
-import { AnimatePresence, MotiView } from "moti";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { eventBus } from "@/store/eventBus";
 
 /**
@@ -34,22 +34,20 @@ const ActionBarDelete = ({ movieId, actionBarShown }: Props) => {
   };
 
   return (
-    <AnimatePresence>
+    <View pointerEvents="box-none">
       {actionBarShown && (
-        <Pressable onPress={handleDelete} style={{ zIndex: 50 }}>
-          <MotiView
-            key="trash-button" // Use a key to help AnimatePresence track changes
-            from={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 600 }}
-            className="absolute top-[0] right-[4] z-50 px-1 py-2 bg-muted rounded-full border-hairline"
-          >
+        <Animated.View
+          entering={FadeIn.duration(600)}
+          exiting={FadeOut.duration(600)}
+          className="absolute top-[0] right-[4] z-50"
+          style={{ zIndex: 50 }}
+        >
+          <Pressable onPress={handleDelete} className="px-1 py-2 bg-muted rounded-full border-hairline">
             <SymbolView name="trash.fill" tintColor={"red"} />
-          </MotiView>
-        </Pressable>
+          </Pressable>
+        </Animated.View>
       )}
-    </AnimatePresence>
+    </View>
   );
 };
 

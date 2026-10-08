@@ -345,6 +345,8 @@ const useSettingsStore = create<SettingsStore>()(
     {
       name: "settings-storage",
       storage: createJSONStorage(() => StorageAdapter),
+      // Startup awaits hydrateStores. An automatic hydrate would run before MMKV exists.
+      skipHydration: true,
       partialize: (state) => ({
         searchColumns: state.searchColumns,
         filterCriteria: state.filterCriteria,

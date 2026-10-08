@@ -3,7 +3,7 @@ import { Tabs } from "expo-router";
 import { SearchIcon, AddIcon, MovieIcon, TagIcon } from "@/components/common/Icons";
 import { Search } from "lucide-react-native";
 import { Easing } from "react-native-reanimated";
-import { TransitionPresets, TransitionSpecs } from "@react-navigation/bottom-tabs";
+import { TransitionPresets, TransitionSpecs } from "expo-router/js-tabs";
 
 export const unstable_settings = {
   // Ensure any route can link back to `/`

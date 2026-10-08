@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { Platform, View } from "react-native";
-import { MotiView, Text, AnimatePresence } from "moti";
-import { clamp } from "react-native-redash";
 import Animated, {
   runOnJS,
   useSharedValue,
@@ -11,6 +9,7 @@ import Animated, {
   scrollTo,
   SharedValue,
   AnimatedRef,
+  clamp,
 } from "react-native-reanimated";
 import { Gesture, GestureDetector, State } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
@@ -223,17 +222,15 @@ const MoveableItem = ({
       {handlePosition === "right" && (
         <View style={{ flex: 1 }}>
           {React.cloneElement(children as React.ReactElement<any>, { isMoving: moving })}
-          <AnimatePresence>
-            {isActive && enableDragIndicator && (
-              <DragIndicator
-                itemHeight={itemHeight}
-                fromLeftOrRight="left"
-                currentPosition={movingPos}
-                totalItems={numberOfItems}
-                config={dragIndicatorConfig}
-              />
-            )}
-          </AnimatePresence>
+          {isActive && enableDragIndicator && (
+            <DragIndicator
+              itemHeight={itemHeight}
+              fromLeftOrRight="left"
+              currentPosition={movingPos}
+              totalItems={numberOfItems}
+              config={dragIndicatorConfig}
+            />
+          )}
         </View>
       )}
       <GestureDetector gesture={panGesture}>
@@ -244,17 +241,15 @@ const MoveableItem = ({
       {handlePosition === "left" && (
         <View style={{ flex: 1 }}>
           {React.cloneElement(children as React.ReactElement<any>, { isMoving: false })}
-          <AnimatePresence>
-            {isActive && enableDragIndicator && (
-              <DragIndicator
-                itemHeight={itemHeight}
-                fromLeftOrRight="right"
-                currentPosition={movingPos}
-                totalItems={numberOfItems}
-                config={dragIndicatorConfig}
-              />
-            )}
-          </AnimatePresence>
+          {isActive && enableDragIndicator && (
+            <DragIndicator
+              itemHeight={itemHeight}
+              fromLeftOrRight="right"
+              currentPosition={movingPos}
+              totalItems={numberOfItems}
+              config={dragIndicatorConfig}
+            />
+          )}
         </View>
       )}
     </Animated.View>

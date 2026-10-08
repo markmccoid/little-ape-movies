@@ -19,7 +19,13 @@ const SignInLayout = () => {
       <Stack.Screen
         name="[testId]"
         options={{ title: "TestStack" }}
-        getId={({ params }) => params.testId}
+        getId={({ params }) => {
+          const testId = params?.testId;
+          if (typeof testId === "string" || typeof testId === "number") {
+            return String(testId);
+          }
+          return undefined;
+        }}
       />
     </Stack>
   );

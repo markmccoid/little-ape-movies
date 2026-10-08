@@ -1,9 +1,13 @@
-import { DefaultTheme, DarkTheme, Theme, useTheme } from "@react-navigation/native";
+import { DefaultTheme, DarkTheme, Theme, useTheme } from "expo-router";
 
 //! Custom Hook for typesafe colors
 //~ Usage - const {colors} = useCustomTheme();
+type AppThemeColors = {
+  [K in keyof CustomTheme["colors"]]: string;
+};
+
 export function useCustomTheme() {
-  return useTheme() as CustomTheme;
+  return useTheme() as Omit<CustomTheme, "colors"> & { colors: AppThemeColors };
 }
 // ---------------------------
 type CustomTheme = Theme & {

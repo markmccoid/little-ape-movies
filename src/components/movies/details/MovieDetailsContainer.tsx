@@ -9,9 +9,8 @@ import {
   InteractionManager,
 } from "react-native";
 import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
-import { Link, useRouter, useNavigation } from "expo-router";
+import { Link, useRouter, useNavigation, type NativeStackNavigationOptions } from "expo-router";
 import { MovieDetails, useMovieDetailData, useOMDBData } from "@/store/dataHooks";
-import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import useMovieStore, { useMovieActions } from "@/store/store.shows";
 import { movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
 import MDImageDescRow from "./MDImageDescRow";
@@ -22,7 +21,7 @@ import MDDeleteButton from "./MDButtonDelete";
 import MDButtonAdd from "./MDButtonAdd";
 import MDTagsAnim from "./tagMovies/MDTagsAnim";
 import HiddenContainers from "./MovieDetailsHiddenContainers";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useBottomTabBarHeight } from "expo-router/js-tabs";
 
 const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const router = useRouter();

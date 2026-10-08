@@ -27,8 +27,8 @@ const PersonSearchItem = ({ person, imageWidth }: Props) => {
       className="mb-4"
       onPress={() => {
         router.push({
-          pathname: `/(auth)/(drawer)/(tabs)/search/personmovies/${person.id}`,
-          params: { personName: person.name },
+          pathname: "/(auth)/(drawer)/(tabs)/search/personmovies/[personId]",
+          params: { personId: String(person.id), personName: person.name },
         });
       }}
     >

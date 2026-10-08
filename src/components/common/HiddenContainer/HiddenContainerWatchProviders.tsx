@@ -1,9 +1,17 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View, Image, Pressable, ViewStyle, ScrollView } from "react-native";
 import { ExpandDownIcon, CollapseUpIcon } from "@/components/common/Icons";
-import { AnimatePresence, MotiView } from "moti";
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 import { useMovieWatchProviders } from "@/store/dataHooks";
 import { useCustomTheme } from "@/lib/colorThemes";
+
+const CHEVRON_SPRING = { damping: 10, mass: 1, stiffness: 100 };
 
 /**
  * Component will take a component as a child and toggle displaying or hiding
@@ -32,12 +40,61 @@ const HiddenContainerWatchProviders: React.FC<Props> = ({
 }) => {
   const [viewContents, setViewContents] = useState(startOpen);
   const [isMounted, setIsMounted] = useState(false);
+  const didApplyMountedState = useRef(false);
+  const rotation = useSharedValue(0);
+  const panelHeight = useSharedValue(0);
+  const contentOpacity = useSharedValue(0);
+  const openSv = useSharedValue(startOpen);
+  const [contentMounted, setContentMounted] = useState(startOpen);
   const { watchProviders } = useMovieWatchProviders(movieId);
   const { colors } = useCustomTheme();
   const streamProviders = watchProviders.find((el) => el.type === "stream");
-  React.useEffect(() => {
+
+  useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!isMounted) {
+      return;
+    }
+    const isFirstMountedPass = !didApplyMountedState.current;
+    didApplyMountedState.current = true;
+    const open = viewContents;
+    openSv.value = open;
+    if (isFirstMountedPass && !open) {
+      return;
+    }
+
+    const unmountContent = () => {
+      setContentMounted(false);
+    };
+
+    rotation.value = withSpring(open ? 180 : 0, CHEVRON_SPRING);
+    panelHeight.value = withTiming(open ? height : 0, { duration: 500 }, (finished) => {
+      if (finished && !openSv.value) {
+        runOnJS(unmountContent)();
+      }
+    });
+    if (open) {
+      setContentMounted(true);
+      contentOpacity.value = withTiming(1, { duration: 300 });
+    } else {
+      contentOpacity.value = withTiming(0, { duration: 300 });
+    }
+  }, [contentOpacity, height, isMounted, openSv, panelHeight, rotation, viewContents]);
+
+  const chevronStyle = useAnimatedStyle(() => ({
+    transform: [{ rotateZ: `${rotation.value}deg` }],
+  }));
+
+  const panelHeightStyle = useAnimatedStyle(() => ({
+    height: panelHeight.value,
+  }));
+
+  const contentStyle = useAnimatedStyle(() => ({
+    opacity: contentOpacity.value,
+  }));
 
   return (
     <View
@@ -111,33 +168,17 @@ const HiddenContainerWatchProviders: React.FC<Props> = ({
           onPress={() => setViewContents((prev) => !prev)}
         >
           <View className="pr-4">
-            <MotiView
-              key="1"
-              from={{ transform: [{ rotateZ: !isMounted || viewContents ? "0deg" : "180deg" }] }}
-              animate={{
-                transform: [{ rotateZ: !isMounted || viewContents ? "180deg" : "0deg" }],
-              }}
-            >
+            <Animated.View style={chevronStyle}>
               <ExpandDownIcon size={20} />
-            </MotiView>
+            </Animated.View>
           </View>
         </Pressable>
         {/* </View> */}
       </View>
 
-      <MotiView
-        from={{ height: !isMounted || viewContents ? 0 : height }}
-        animate={{ height: !isMounted || viewContents ? height : 0 }}
-        transition={{ type: "timing", duration: 500 }}
-      >
-        <AnimatePresence>
-          {viewContents && (
-            <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} key={1}>
-              {children}
-            </MotiView>
-          )}
-        </AnimatePresence>
-      </MotiView>
+      <Animated.View style={panelHeightStyle}>
+        {contentMounted && <Animated.View style={contentStyle}>{children}</Animated.View>}
+      </Animated.View>
     </View>
   );
 };

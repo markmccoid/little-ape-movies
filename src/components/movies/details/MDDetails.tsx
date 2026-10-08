@@ -58,7 +58,9 @@ const MDDetails = ({ movieDetails, omdbData }: Props) => {
             <View className="flex-row">
               <Text style={styles.textLabel}>Budget:</Text>
               <Text style={styles.textDesc}>
-                {formatAsUSDCurrency(movieDetails?.budget, false)}
+                {typeof movieDetails?.budget === "number"
+                  ? formatAsUSDCurrency(movieDetails.budget, false)
+                  : undefined}
               </Text>
             </View>
           )}
@@ -68,7 +70,7 @@ const MDDetails = ({ movieDetails, omdbData }: Props) => {
           <Text style={styles.textLabel}>Genres:</Text>
           <View className="flex-row gap-2">
             <Text numberOfLines={2} style={styles.textDesc}>
-              {addDelimitersToArray(movieDetails?.genres, ", ")}
+              {addDelimitersToArray(movieDetails?.genres ?? [], ", ")}
             </Text>
           </View>
         </View>

@@ -1,8 +1,12 @@
 import React from "react";
-import { Stack, useGlobalSearchParams, useNavigation } from "expo-router";
+import {
+  Stack,
+  useGlobalSearchParams,
+  useNavigation,
+  type NativeStackNavigationOptions,
+} from "expo-router";
 import { usePersonMovieSearch } from "@/store/query.search";
 import SearchContainer from "@/components/search/SearchContainer";
-import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 /**
  * If a person search is performed, this is the route when a user
  * selects a person to view their movies.

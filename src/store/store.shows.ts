@@ -1,8 +1,8 @@
 import React from "react";
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import { StorageAdapter } from "./dataAccess/storageAdapter";
 import { movieSearchByTitle_Results, ProviderInfo } from "@markmccoid/tmdb_api";
+import { getCurrentUser } from "./dataAccess/localStorage-users";
+import { enqueueMovieSnapshot } from "./dataAccess/moviePersistence";
 import { eventBus } from "./eventBus";
 import { ImageColors } from "@/utils/color.utils";
 import { filter, orderBy, reverse, sortBy, unionBy } from "lodash";
@@ -88,9 +88,7 @@ const movieInitialState = {
   pendingChanges: {},
   debugView: false,
 };
-const useMovieStore = create<MovieStore>()(
-  persist(
-    (set, get) => ({
+const useMovieStore = create<MovieStore>()((set, get) => ({
       ...movieInitialState,
       actions: {
         //~ ---------------------------------
@@ -340,22 +338,26 @@ const useMovieStore = create<MovieStore>()(
         },
         toggleDebugView: () => set((state) => ({ debugView: !state.debugView })),
       },
-    }),
-    {
-      name: "movie-storage",
-      storage: createJSONStorage(() => StorageAdapter),
-      partialize: (state) => ({
-        shows: state.shows,
-        tagArray: state.tagArray,
-        genreArray: state.genreArray,
-        streamingProviders: state.streamingProviders,
-      }),
-      onRehydrateStorage: (state) => {
-        // console.log("Rehydrating", state.shows.length);
-      },
-    }
-  )
-);
+    }));
+
+useMovieStore.subscribe((state, previous) => {
+  if (
+    state.shows === previous.shows &&
+    state.tagArray === previous.tagArray &&
+    state.genreArray === previous.genreArray &&
+    state.streamingProviders === previous.streamingProviders
+  ) {
+    return;
+  }
+  const user = getCurrentUser();
+  if (!user?.id) return;
+  enqueueMovieSnapshot(user.id, {
+    shows: state.shows,
+    tagArray: state.tagArray,
+    genreArray: state.genreArray,
+    streamingProviders: state.streamingProviders,
+  });
+});
 
 //~~ ------------------------------------------------------------
 //~~ useMovieActions

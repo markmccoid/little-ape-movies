@@ -1,7 +1,6 @@
 import React, { useEffect, useReducer, useState, useRef } from "react";
 import { View, Text, TouchableOpacity, Pressable } from "react-native";
 import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
-import { AnimatePresence, MotiView } from "moti";
 import { SquareChevronUp } from "@/lib/icons/SquareChevronUp";
 import ActionBarButtons from "./ActionBarButtons";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -38,6 +37,7 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
   const initialRender = useRef(true);
   const actionHeight = useSharedValue(MIDDLE_HEIGHT); // Start at MIDDLE
   const startY = useSharedValue(MIN_HEIGHT); // Start at MIDDLE
+  const contentOpacity = useSharedValue(isVisible ? 0 : 1);
 
   const handleVisibilityChange = () => {
     animateVisibilityChange();
@@ -58,6 +58,7 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
   };
 
   useEffect(() => {
+    contentOpacity.value = withTiming(isVisible ? 1 : 0, { duration: 700 });
     if (initialRender.current) {
       actionHeight.value = withTiming(MIN_HEIGHT, { duration: 0 });
       startY.value = MIN_HEIGHT;
@@ -104,6 +105,12 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
     };
   });
 
+  const contentOpacityStyle = useAnimatedStyle(() => {
+    return {
+      opacity: contentOpacity.value,
+    };
+  });
+
   const iconAnimStyle = useAnimatedStyle(() => {
     const rotation = interpolate(
       actionHeight.value,
@@ -127,18 +134,18 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
           </Animated.View>
         </Pressable>
       </GestureDetector>
-      <MotiView
-        from={{ opacity: isVisible ? 0 : 1 }}
-        animate={{ opacity: isVisible ? 1 : 0 }}
-        transition={{ type: "timing", duration: 700 }}
+      <Animated.View
+        style={[
+          contentOpacityStyle,
+          { borderTopRightRadius: 10, borderTopLeftRadius: 10 },
+        ]}
         className="z-20 flex-col w-full bg-purple-300 items-start h-full border-hairline "
-        style={{ borderTopRightRadius: 10, borderTopLeftRadius: 10 }}
       >
         <ActionBarButtons movie={movie} column={column} handleChangePending={handleChangePending} />
         <View className="h-[10]" />
         <ActionBarTags movieId={movie.id} handleChangePending={handleChangePending} />
         {/* <ActionInfoPanel movie={movie} /> */}
-      </MotiView>
+      </Animated.View>
     </Animated.View>
   );
 };

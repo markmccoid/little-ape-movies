@@ -7,6 +7,7 @@ import {
   movieGetRecommendations,
   movieGetVideos,
   movieGetCredits,
+  type movieCredits_typedef,
   movieGetImages,
 } from "@markmccoid/tmdb_api";
 import { useQuery } from "@tanstack/react-query";
@@ -218,7 +219,8 @@ export const useMovieVideos = (movieId: number) => {
 export const useMovieCast = (movieId: number | undefined) => {
   const { data, isLoading, ...rest } = useQuery({
     queryKey: ["moviecast", movieId],
-    queryFn: async () => {
+    queryFn: async (): Promise<movieCredits_typedef["data"]["cast"]> => {
+      if (movieId === undefined) return [];
       const resp = await movieGetCredits(movieId);
       return resp.data.cast;
     },

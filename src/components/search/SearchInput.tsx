@@ -1,6 +1,6 @@
 import { SymbolView } from "expo-symbols";
-import { MotiView } from "moti";
 import React, { useState, ChangeEvent, useRef, forwardRef, useImperativeHandle } from "react";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import {
   View,
   TextInput,
@@ -62,26 +62,22 @@ const SearchInput = forwardRef(
           autoFocus
           inputAccessoryViewID="searchInputVID"
         />
-        {inputValue !== "" && (
-          <Pressable
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-2"
-            onPress={handleClear}
-          >
-            <MotiView
-              from={{ opacity: 0 }}
-              animate={{ opacity: inputValue ? 1 : 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ type: "timing", duration: 500 }}
-            >
+        <Pressable
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-2"
+          onPress={handleClear}
+          pointerEvents={inputValue !== "" ? "auto" : "none"}
+        >
+          {inputValue !== "" && (
+            <Animated.View entering={FadeIn.duration(500)} exiting={FadeOut.duration(500)}>
               <SymbolView
                 name="x.circle.fill"
                 type="palette"
                 colors={["white", "gray"]}
                 size={17}
               />
-            </MotiView>
-          </Pressable>
-        )}
+            </Animated.View>
+          )}
+        </Pressable>
       </View>
     );
   }

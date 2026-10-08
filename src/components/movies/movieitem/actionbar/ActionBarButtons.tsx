@@ -25,14 +25,14 @@ const ActionBarButtons = ({ movie, column, handleChangePending }: Props) => {
   // console.log("Movie", movie.title, localWatched, changeFlag);
 
   useEffect(() => {
-    // console.log("fav/watched Effect", movie.title, localWatched, changeFlag)
     if (localWatched !== !!watched) {
       setLocalWatched(!!watched);
     }
     if (localFavorited !== !!favorited) {
       setLocalFavorited(!!favorited);
     }
-  }, [favorited, watched]);
+    setLocalRating(movie?.rating || 0);
+  }, [favorited, watched, movie?.rating]);
 
   const handleWatched = () => {
     setLocalWatched((prevWatched) => {

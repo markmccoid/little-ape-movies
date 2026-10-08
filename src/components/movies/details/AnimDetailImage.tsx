@@ -1,5 +1,4 @@
 import useDetailImageSize from "@/hooks/useDetailImageSize";
-import { MotiImage, MotiView } from "moti";
 import React from "react";
 import Animated, {
   useAnimatedStyle,

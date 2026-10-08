@@ -19,8 +19,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { useState } from "react";
-import { MotiView, motify } from "moti";
+import { useEffect, useState } from "react";
 
 export type HabitButtonProps = {
   icon: keyof typeof Feather.glyphMap;
@@ -33,7 +32,7 @@ export type HabitButtonProps = {
   fancyAnimation?: boolean;
 };
 
-const AnimatedFeather = motify(Feather)();
+const AnimatedFeather = Animated.createAnimatedComponent(Feather);
 
 export function HabitButton({
   color,
@@ -60,6 +59,13 @@ export function HabitButton({
   const pressInAnimation = useSharedValue(0);
 
   const [isActive, setIsActive] = useState(false);
+  const backgroundColor = useSharedValue(count > 0 ? color : "#eee");
+  const iconColor = useSharedValue(count > 0 ? "#fff" : "#999");
+
+  useEffect(() => {
+    backgroundColor.value = withTiming(count > 0 ? color : "#eee", { duration: 300 });
+    iconColor.value = withTiming(count > 0 ? "#fff" : "#999", { duration: 300 });
+  }, [backgroundColor, color, count, iconColor]);
 
   const onDone = () => {
     setIsActive(false);
@@ -119,14 +125,16 @@ export function HabitButton({
       opacity: interpolate(animation.value, [0, 1], [1, 0.4]),
     };
   });
+  const backgroundStyle = useAnimatedStyle(() => ({
+    backgroundColor: backgroundColor.value,
+  }));
+  const iconColorStyle = useAnimatedStyle(() => ({
+    color: iconColor.value,
+  }));
   return (
-    <MotiView
-      animate={{
-        backgroundColor: count > 0 ? color : "#eee",
-      }}
+    <Animated.View
       style={[
         {
-          // backgroundColor: count > 0 ? color : '#eee',
           borderRadius: radius,
           width: size,
           height: size,
@@ -134,13 +142,14 @@ export function HabitButton({
           alignItems: "center",
           overflow: "hidden",
         },
+        backgroundStyle,
         containerStyle,
       ]}
     >
       {/* Indicator */}
       <Animated.View
         style={[
-          StyleSheet.absoluteFillObject,
+          StyleSheet.absoluteFill,
           {
             backgroundColor: "rgba(0,0,0,0.1)",
           },
@@ -169,17 +178,9 @@ export function HabitButton({
             >
               <AnimatedFeather
                 exiting={FadeOut}
-                style={iconStyle}
+                style={[iconStyle, iconColorStyle]}
                 name={icon}
                 size={iconSize}
-                animate={{
-                  // @ts-ignore
-                  color: count > 0 ? "#fff" : "#999",
-                }}
-                transition={{
-                  type: "timing",
-                  duration: 300,
-                }}
               />
             </Animated.View>
             {!isActive && (
@@ -250,6 +251,6 @@ export function HabitButton({
           </Animated.View>
         </TouchableWithoutFeedback>
       )}
-    </MotiView>
+    </Animated.View>
   );
 }

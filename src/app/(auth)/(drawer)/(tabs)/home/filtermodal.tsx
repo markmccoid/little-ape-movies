@@ -16,7 +16,7 @@ const FilterModal = () => {
       <View className="flex-row justify-center items-center p-2 bg-white">
         <LinearGradient
           colors={[colors.card, colors.background]}
-          style={{ ...StyleSheet.absoluteFillObject }}
+          style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }} // Start at the top-left corner
           end={{ x: 0, y: 1 }} // End at the bottom-right corner
         />

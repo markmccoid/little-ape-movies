@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, Pressable } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  type GestureResponderEvent,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 import { CollapseUpIcon, EraserIcon, ExpandDownIcon } from "@/components/common/Icons";
 import { useCustomTheme } from "@/lib/colorThemes";
 
@@ -12,6 +20,15 @@ import { useCustomTheme } from "@/lib/colorThemes";
  *
  */
 
+interface HiddenContainerProps {
+  children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+  title?: string;
+  titleInfo?: string;
+  leftIconFunction?: (event: GestureResponderEvent) => void;
+  startOpen?: boolean;
+}
+
 const HiddenContainer = ({
   children,
   style,
@@ -19,7 +36,7 @@ const HiddenContainer = ({
   titleInfo,
   leftIconFunction,
   startOpen = false,
-}) => {
+}: HiddenContainerProps) => {
   const [viewContents, setViewContents] = useState(startOpen);
   const { colors } = useCustomTheme();
   return (
@@ -99,7 +116,7 @@ const HiddenContainer = ({
           </View>
         </Pressable>
       </View>
-      {viewContents && <View style={{ ...style }}>{children}</View>}
+      {viewContents && <View style={style}>{children}</View>}
     </View>
   );
 };

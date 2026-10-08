@@ -4,8 +4,9 @@ import { Input } from "@/components/ui/input";
 import useSettingsStore from "@/store/store.settings";
 import { SymbolView } from "expo-symbols";
 import { useCustomTheme } from "@/lib/colorThemes";
-import { MotiView } from "moti";
 import Animated, {
+  FadeIn,
+  FadeOut,
   SharedValue,
   useAnimatedStyle,
   useSharedValue,
@@ -24,6 +25,33 @@ const MovieSearch = ({ isVisible, handleSetVisible, searchY }: Props) => {
   const setTitleSearchScope = useSettingsStore((state) => state.actions.setTitleSearchScope);
   const { colors } = useCustomTheme();
   const inputRef = React.useRef<TextInput>(null);
+  const allScopeOpacity = useSharedValue(titleSearchScope === "all" ? 1 : 0.4);
+  const allScopeBackground = useSharedValue(
+    titleSearchScope === "all" ? colors.primary : colors.primaryForeground
+  );
+  const filterScopeOpacity = useSharedValue(titleSearchScope === "filteronly" ? 1 : 0.4);
+  const filterScopeBackground = useSharedValue(
+    titleSearchScope === "filteronly" ? colors.primary : colors.primaryForeground
+  );
+  const scopeHighlightX = useSharedValue(titleSearchScope === "all" ? 45 : 10);
+
+  useEffect(() => {
+    const timing = { duration: 500 };
+    allScopeOpacity.value = withTiming(titleSearchScope === "all" ? 1 : 0.4, timing);
+    allScopeBackground.value = withTiming(
+      titleSearchScope === "all" ? colors.primary : colors.primaryForeground,
+      timing
+    );
+    filterScopeOpacity.value = withTiming(
+      titleSearchScope === "filteronly" ? 1 : 0.4,
+      timing
+    );
+    filterScopeBackground.value = withTiming(
+      titleSearchScope === "filteronly" ? colors.primary : colors.primaryForeground,
+      timing
+    );
+    scopeHighlightX.value = withTiming(titleSearchScope === "all" ? 10 : 45, timing);
+  }, [titleSearchScope, colors.primary, colors.primaryForeground]);
 
   useEffect(() => {
     if (!isVisible) {
@@ -38,6 +66,17 @@ const MovieSearch = ({ isVisible, handleSetVisible, searchY }: Props) => {
       opacity: searchY.value === -40 ? withTiming(0, { duration: 300 }) : 1,
     };
   });
+  const allScopeStyle = useAnimatedStyle(() => ({
+    backgroundColor: allScopeBackground.value,
+    opacity: allScopeOpacity.value,
+  }));
+  const filterScopeStyle = useAnimatedStyle(() => ({
+    backgroundColor: filterScopeBackground.value,
+    opacity: filterScopeOpacity.value,
+  }));
+  const scopeHighlightStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: scopeHighlightX.value }],
+  }));
   return (
     <Animated.View
       className="flex-row items-center absolute w-full"
@@ -70,33 +109,21 @@ const MovieSearch = ({ isVisible, handleSetVisible, searchY }: Props) => {
         autoCorrect={false}
       />
 
-      {titleSearchValue !== "" && (
-        <Pressable className="absolute right-[100]" onPress={() => setTitleSearchValue("")}>
-          <MotiView
-            from={{ opacity: 0 }}
-            animate={{ opacity: titleSearchValue ? 1 : 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ type: "timing", duration: 500 }}
-          >
+      <Pressable
+        className="absolute right-[100]"
+        onPress={() => setTitleSearchValue("")}
+        pointerEvents={titleSearchValue !== "" ? "auto" : "none"}
+      >
+        {titleSearchValue !== "" && (
+          <Animated.View entering={FadeIn.duration(500)} exiting={FadeOut.duration(500)}>
             <SymbolView name="x.circle.fill" type="palette" colors={["white", "gray"]} size={17} />
-          </MotiView>
-        </Pressable>
-      )}
+          </Animated.View>
+        )}
+      </Pressable>
 
       <View className="flex-row p-[10] relative">
         <Pressable onPress={() => setTitleSearchScope("all")} className="rounded-full mr-[10]">
-          <MotiView
-            animate={{
-              backgroundColor:
-                titleSearchScope === "all" ? colors.primary : colors.primaryForeground,
-              opacity: titleSearchScope === "all" ? 1 : 0.4,
-            }}
-            transition={{
-              type: "timing",
-              duration: 500, // Adjust duration as needed
-            }}
-            className="rounded-full"
-          >
+          <Animated.View style={allScopeStyle} className="rounded-full">
             <SymbolView
               size={25}
               name="magnifyingglass.circle"
@@ -104,21 +131,10 @@ const MovieSearch = ({ isVisible, handleSetVisible, searchY }: Props) => {
                 titleSearchScope === "all" ? colors.primaryForeground : colors.secondaryForeground
               }
             />
-          </MotiView>
+          </Animated.View>
         </Pressable>
         <Pressable onPress={() => setTitleSearchScope("filteronly")} className=" rounded-full">
-          <MotiView
-            animate={{
-              backgroundColor:
-                titleSearchScope === "filteronly" ? colors.primary : colors.primaryForeground,
-              opacity: titleSearchScope === "filteronly" ? 1 : 0.4,
-            }}
-            transition={{
-              type: "timing",
-              duration: 500, // Adjust duration as needed
-            }}
-            className="rounded-full"
-          >
+          <Animated.View style={filterScopeStyle} className="rounded-full">
             <SymbolView
               size={25}
               name="line.3.horizontal.decrease.circle"
@@ -128,12 +144,10 @@ const MovieSearch = ({ isVisible, handleSetVisible, searchY }: Props) => {
                   : colors.secondaryForeground
               }
             />
-          </MotiView>
+          </Animated.View>
         </Pressable>
-        <MotiView
-          from={{ translateX: titleSearchScope === "all" ? 45 : 10 }}
-          animate={{ translateX: titleSearchScope === "all" ? 10 : 45 }}
-          transition={{ type: "timing", duration: 500 }}
+        <Animated.View
+          style={scopeHighlightStyle}
           className="absolute w-[25] h-1 bg-primary bottom-[5] left-0"
         />
       </View>

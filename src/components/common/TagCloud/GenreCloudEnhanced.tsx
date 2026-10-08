@@ -80,7 +80,7 @@ export const GenreItem = ({
   );
 };
 
-const TagCloudEnhanced = ({ children }) => {
+const TagCloudEnhanced = ({ children }: { children: React.ReactNode }) => {
   return <View className="flex-row flex-wrap justify-center">{children}</View>;
 };
 

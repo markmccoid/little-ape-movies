@@ -2,7 +2,7 @@ import { View, Text, Switch, Pressable, TextInput } from "react-native";
 import React, { useEffect, useState } from "react";
 import { defaultSortSettings } from "@/store/sortSettings";
 import { Button } from "../../ui/button";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { useCustomTheme } from "@/lib/colorThemes";
 import useSettingsStore, { SortField, useSettingsActions } from "@/store/store.settings";
 import { Input } from "../../ui/input";
@@ -11,9 +11,59 @@ import { sortBy } from "lodash";
 import DragDropEntry from "@/components/common/DragAndSort/DragDropEntry";
 import { Positions, sortArray } from "@/components/common/DragAndSort/helperFunctions";
 import { SymbolView } from "expo-symbols";
-import { MotiText, MotiView } from "moti";
 
 const ROW_HEIGHT = 45;
+
+type SortDirection = "asc" | "desc";
+
+type SortDirectionLabelProps = {
+  active: boolean;
+  direction: SortDirection;
+};
+
+const SortDirectionLabel: React.FC<SortDirectionLabelProps> = ({ active, direction }) => {
+  const opacity = useSharedValue(0);
+
+  useEffect(() => {
+    opacity.value = withTiming(active ? 1 : 0.25, { duration: 750 });
+  }, [active, direction, opacity]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
+  return (
+    <Animated.Text
+      className={active ? "text-card-foreground" : "text-muted-foreground"}
+      style={animatedStyle}
+    >
+      {direction === "asc" ? "Low to High" : "High to Low"}
+    </Animated.Text>
+  );
+};
+
+type SortDirectionArrowProps = {
+  direction: SortDirection;
+  tintColor: string;
+};
+
+const SortDirectionArrow: React.FC<SortDirectionArrowProps> = ({ direction, tintColor }) => {
+  const rotation = useSharedValue(direction === "asc" ? 180 : 0);
+
+  useEffect(() => {
+    rotation.value = withTiming(direction === "asc" ? 0 : 180, { duration: 600 });
+  }, [direction, rotation]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
+
+  return (
+    <Animated.View className="rounded-full" style={animatedStyle}>
+      <SymbolView name="arrowshape.down" tintColor={tintColor} />
+    </Animated.View>
+  );
+};
 
 type Props = {
   handleNewSort: (newSort: SortField[]) => void;
@@ -139,49 +189,19 @@ const SortEditor = ({ handleNewSort, initSort }: Props) => {
                 }
                 className={`flex-row items-center  ${sort.active ? "opacity-100" : "opacity-35"}`}
               >
-                <MotiView>
-                  {sort.sortDirection === "asc" ? (
-                    <MotiText
-                      className={`${
-                        sort.active ? "text-card-foreground" : "text-muted-foreground opacity-25"
-                      }`}
-                      key={1}
-                      from={{ opacity: 0 }}
-                      animate={{ opacity: sort.active ? 1 : 0.25 }}
-                      transition={{ type: "timing", duration: 750 }}
-                    >
-                      Low to High
-                    </MotiText>
-                  ) : (
-                    <MotiText
-                      className={`${
-                        sort.active ? "text-card-foreground" : "text-muted-foreground opacity-0"
-                      }`}
-                      key={2}
-                      from={{ opacity: 0 }}
-                      animate={{ opacity: sort.active ? 1 : 0.25 }}
-                      transition={{ type: "timing", duration: 750 }}
-                    >
-                      High to Low
-                    </MotiText>
-                  )}
-                </MotiView>
+                <View>
+                  <SortDirectionLabel
+                    key={sort.sortDirection}
+                    active={sort.active}
+                    direction={sort.sortDirection}
+                  />
+                </View>
 
                 <View className="w-[35] items-center">
-                  <MotiView
-                    from={{
-                      rotate: sort.sortDirection === "asc" ? "180deg" : "0deg",
-                      // backgroundColor: sort.sortDirection === "asc" ? "red" : "white",
-                    }}
-                    animate={{
-                      rotate: sort.sortDirection === "asc" ? "0deg" : "180deg",
-                      // backgroundColor: sort.sortDirection === "asc" ? "white" : "red",
-                    }}
-                    transition={{ type: "timing", duration: 600 }}
-                    className="rounded-full"
-                  >
-                    <SymbolView name="arrowshape.down" tintColor={colors.includeGreen} />
-                  </MotiView>
+                  <SortDirectionArrow
+                    direction={sort.sortDirection}
+                    tintColor={colors.includeGreen}
+                  />
                 </View>
               </Pressable>
             </View>

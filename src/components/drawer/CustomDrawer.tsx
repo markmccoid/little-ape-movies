@@ -1,6 +1,12 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { View, StyleSheet, SafeAreaView, Pressable, ScrollView } from "react-native";
-import { DrawerContentComponentProps } from "@react-navigation/drawer";
+import { type DrawerContentComponentProps } from "expo-router/drawer";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 
 import { useAuth } from "@/providers/AuthProvider";
 import { SymbolView } from "expo-symbols";
@@ -12,8 +18,84 @@ import { CheckSquareIcon, FilterIcon } from "../common/Icons";
 import { Text } from "@/components/ui/text";
 import Constants from "expo-constants";
 import useSettingsStore, { useSettingsActions } from "@/store/store.settings";
-import { MotiPressable } from "moti/interactions";
 import useMovieStore, { useMovieActions } from "@/store/store.shows";
+
+const PRESS_SPRING = { damping: 10, mass: 1, stiffness: 100 };
+
+type DrawerActionButtonProps = {
+  disabled: boolean;
+  onPress: () => void;
+  backgroundColor: string;
+  label: string;
+};
+
+const DrawerActionVisual: React.FC<{
+  pressed: boolean;
+  backgroundColor: string;
+  label: string;
+}> = ({ pressed, backgroundColor, label }) => {
+  const opacity = useSharedValue(1);
+  const scale = useSharedValue(1);
+  const translateX = useSharedValue(0);
+  const didSyncPress = useRef(false);
+
+  useEffect(() => {
+    if (!didSyncPress.current) {
+      didSyncPress.current = true;
+      if (!pressed) {
+        return;
+      }
+    }
+    opacity.value = withTiming(pressed ? 0.5 : 1, { duration: 300 });
+    scale.value = withSpring(pressed ? 0.95 : 1, PRESS_SPRING);
+    translateX.value = withSpring(pressed ? 25 : 0, PRESS_SPRING);
+  }, [opacity, pressed, scale, translateX]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ scale: scale.value }, { translateX: translateX.value }],
+  }));
+
+  return (
+    <Animated.View
+      style={[
+        {
+          backgroundColor,
+          borderWidth: StyleSheet.hairlineWidth,
+          paddingVertical: 6,
+          paddingHorizontal: 10,
+          marginTop: 4,
+          borderTopLeftRadius: 10,
+          borderBottomLeftRadius: 10,
+        },
+        animatedStyle,
+      ]}
+    >
+      <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit={true}
+        className="text-primary-foreground text-lg font-semibold"
+      >
+        {label}
+      </Text>
+    </Animated.View>
+  );
+};
+
+const DrawerActionButton: React.FC<DrawerActionButtonProps> = ({
+  disabled,
+  onPress,
+  backgroundColor,
+  label,
+}) => {
+  return (
+    <Pressable disabled={disabled} onPress={onPress}>
+      {({ pressed }) => (
+        <DrawerActionVisual pressed={pressed} backgroundColor={backgroundColor} label={label} />
+      )}
+    </Pressable>
+  );
+};
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const [disableButton, setDisableButton] = React.useState(false);
@@ -40,18 +122,6 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       ? "settings"
       : "unknown";
 
-  const testAnimPush = React.useMemo(
-    () =>
-      ({ hovered, pressed }) => {
-        "worklet";
-
-        return {
-          opacity: hovered || pressed ? 0.5 : 1,
-          transform: [{ scale: pressed ? 0.95 : 1 }, { translateX: pressed ? 25 : 0 }],
-        };
-      },
-    []
-  );
   return (
     <View className="flex-1 bg-secondary">
       {/* HEADER */}
@@ -166,19 +236,11 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         >
           {savedFilters?.map((filter) => {
             return (
-              <MotiPressable
+              <DrawerActionButton
                 key={filter.id}
-                // className={`bg-primary border-border border-hairline py-1 px-2 rounded-l-lg my-1`}
-                style={{
-                  backgroundColor: colors.primary,
-                  borderWidth: StyleSheet.hairlineWidth,
-                  paddingVertical: 6,
-                  paddingHorizontal: 10,
-                  marginTop: 4,
-                  borderTopLeftRadius: 10,
-                  borderBottomLeftRadius: 10,
-                }}
+                backgroundColor={colors.primary}
                 disabled={disableButton}
+                label={filter.name}
                 onPress={async () => {
                   setDisableButton(true);
                   settingsActions.activateSavedFilter(filter.id);
@@ -187,16 +249,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
                   navigation.closeDrawer();
                   setDisableButton(false);
                 }}
-                animate={testAnimPush}
-              >
-                <Text
-                  numberOfLines={1}
-                  adjustsFontSizeToFit={true}
-                  className="text-primary-foreground text-lg font-semibold"
-                >
-                  {filter.name}
-                </Text>
-              </MotiPressable>
+              />
             );
           })}
         </ScrollView>
@@ -232,19 +285,11 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       >
         {savedQuickSorts?.map((sort) => {
           return (
-            <MotiPressable
+            <DrawerActionButton
               key={sort.id}
-              // className={`bg-primary border-border border-hairline py-1 px-2 rounded-l-lg my-1`}
-              style={{
-                backgroundColor: colors.primary,
-                borderWidth: StyleSheet.hairlineWidth,
-                paddingVertical: 6,
-                paddingHorizontal: 10,
-                marginTop: 4,
-                borderTopLeftRadius: 10,
-                borderBottomLeftRadius: 10,
-              }}
+              backgroundColor={colors.primary}
               disabled={disableButton}
+              label={sort.name}
               onPress={async () => {
                 setDisableButton(true);
                 settingsActions.updateSortSettings(sort.sort);
@@ -253,16 +298,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
                 navigation.closeDrawer();
                 setDisableButton(false);
               }}
-              animate={testAnimPush}
-            >
-              <Text
-                numberOfLines={1}
-                adjustsFontSizeToFit={true}
-                className="text-primary-foreground text-lg font-semibold"
-              >
-                {sort.name}
-              </Text>
-            </MotiPressable>
+            />
           );
         })}
       </ScrollView>

@@ -1,14 +1,13 @@
 import { View, Pressable, ScrollView } from "react-native";
 import React, { useLayoutEffect, useState } from "react";
-import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
-import { useNavigation } from "expo-router";
+import { useNavigation, type NativeStackNavigationOptions } from "expo-router";
 import useSettingsStore, { getInclusionIndex, useSettingsActions } from "@/store/store.settings";
 import { Text } from "@/components/ui/text";
 import FilterTags from "./FilterTags";
 import FilterGenres from "./FilterGenres";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { Eraser } from "@/lib/icons/Eraser";
-import { AnimatePresence, MotiView } from "moti";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import SortEditor from "@/components/settings/quickSorts/SortEditor";
 import { useShallow } from "zustand/react/shallow";
 
@@ -69,15 +68,13 @@ const FilterContainer = () => {
         <Text className="px-2 py-1 text-xl font-semibold text-primary-foreground">
           Filter By Tags
         </Text>
-        <AnimatePresence>
-          {tagsActive && (
-            <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <Pressable onPress={() => filterActions.clearFilters("Tags")} className="px-2 py-1">
-                <Eraser className="text-primary-foreground" size={20} />
-              </Pressable>
-            </MotiView>
-          )}
-        </AnimatePresence>
+        {tagsActive && (
+          <Animated.View entering={FadeIn.duration(300)} exiting={FadeOut.duration(300)}>
+            <Pressable onPress={() => filterActions.clearFilters("Tags")} className="px-2 py-1">
+              <Eraser className="text-primary-foreground" size={20} />
+            </Pressable>
+          </Animated.View>
+        )}
       </View>
       <FilterTags />
       {/* Genre Selection */}
@@ -85,15 +82,13 @@ const FilterContainer = () => {
         <Text className="px-2 py-1 text-xl font-semibold text-primary-foreground">
           Filter By Genres
         </Text>
-        <AnimatePresence>
-          {genresActive && (
-            <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <Pressable onPress={() => filterActions.clearFilters("Genres")} className="px-2 py-1">
-                <Eraser className="text-primary-foreground" size={20} />
-              </Pressable>
-            </MotiView>
-          )}
-        </AnimatePresence>
+        {genresActive && (
+          <Animated.View entering={FadeIn.duration(300)} exiting={FadeOut.duration(300)}>
+            <Pressable onPress={() => filterActions.clearFilters("Genres")} className="px-2 py-1">
+              <Eraser className="text-primary-foreground" size={20} />
+            </Pressable>
+          </Animated.View>
+        )}
       </View>
       <FilterGenres />
       <SortEditor initSort={sort} handleNewSort={filterActions.updateSortSettings} />

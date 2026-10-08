@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { View } from "react-native";
 import React from "react";
 
 const MDBackground = () => {
@@ -15,7 +15,10 @@ const MDBackground = () => {
         },
         shadowOpacity: 0.4,
         shadowRadius: 2,
-        ...StyleSheet.absoluteFillObject,
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
         position: "absolute",
       }}
     />

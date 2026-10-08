@@ -1,28 +1,27 @@
-import axios from "axios";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import {
   addNewUser,
   getAllUsers,
-  signIn,
   signOut,
   removeUser,
-  getCurrentUser,
   User,
   updateUser,
 } from "@/store/dataAccess/localStorage-users";
+import { deleteUserMovies } from "@/store/dataAccess/movieDatabase";
 import { deleteUserStorage, initCurrentUserStorage } from "@/store/dataAccess/storageAdapter";
-import useMovieStore from "@/store/store.shows";
 import { eventBus } from "@/store/eventBus";
-import useSettingsStore from "@/store/store.settings";
+import { hydrateCurrentUserStores, hydrateLoggedInUserStores } from "@/store/hydrateStores";
 
 type AuthProps = {
   currentUser: User | undefined;
   onRegister: (username: string) => void;
-  onLogin: (user: User) => void;
+  onLogin: (user: User) => Promise<void>;
   onLogout: () => void;
   onRemoveUser: (user: User) => void;
   onUpdateUser: (id: string, newName: string) => void;
   initialized: boolean;
+  startupError: string | undefined;
+  retryStartup: () => void;
   getUsers: () => User[] | undefined;
   allUsers: User[];
 };
@@ -37,88 +36,91 @@ export function useAuth() {
   return context;
 }
 
-export const AuthProvider = ({ children }: any) => {
+const startupErrorMessage = (error: unknown) => {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  return "Saved movies could not be loaded.";
+};
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User>();
   const [initialized, setInitialized] = useState(false);
+  const [startupError, setStartupError] = useState<string>();
+  const [startupAttempt, setStartupAttempt] = useState(0);
   const [allUsers, setAllUsers] = useState<User[]>([]);
 
-  // On app start, check to see if there is a current User
-  // if so, initialize the currentUserStorage MMKV
-
   useEffect(() => {
-    const currUser = getCurrentUser();
-    eventBus.publish("CLEAR_SEARCH_STORES");
-    // This sets storageAdapter for Zustand Persist Middleware
-    initCurrentUserStorage(currUser);
+    let cancelled = false;
 
-    // Clear store if NO user and then rehydrate
-    if (!currUser?.id) {
-      useMovieStore.getState().actions.clearStore();
-    }
-    useMovieStore.persist.rehydrate();
-    useSettingsStore.persist.rehydrate();
+    const loadCurrentUser = async () => {
+      try {
+        const storedUser = await hydrateCurrentUserStores();
+        if (cancelled) return;
+        setCurrentUser(storedUser);
+        setAllUsers(getAllUsers() ?? []);
+        setStartupError(undefined);
+        setInitialized(true);
+      } catch (error: unknown) {
+        if (cancelled) return;
+        setInitialized(false);
+        setStartupError(startupErrorMessage(error));
+      }
+    };
 
-    setCurrentUser(currUser);
-    setAllUsers(getUsers());
-    setInitialized(true);
-  }, []);
+    void loadCurrentUser();
 
-  //~ LOGIN -------------------------------------------
-  const handleLogin = (user: User) => {
-    // Clear the stores when creating logging in
-    // Then when the signIn happens, the rehydrate will bring back the data
-    eventBus.publish("CLEAR_SEARCH_STORES");
-    useMovieStore.getState().actions.clearStore();
-    useSettingsStore.getState().actions.resetSettingsStore();
-    // Stores the selected user in MMKV currentUser Storage
-    signIn(user);
-    // Inits the Authed storage MMKV with currenUser name
-    initCurrentUserStorage(user);
-    if (!user) {
-      useMovieStore.getState().actions.clearStore();
-    }
-    useMovieStore.persist.rehydrate();
-    useSettingsStore.persist.rehydrate();
-    // Current user exposed in the Auth Context
-    setCurrentUser(user);
+    return () => {
+      cancelled = true;
+    };
+  }, [startupAttempt]);
+
+  const retryStartup = () => {
+    setStartupError(undefined);
+    setInitialized(false);
+    setStartupAttempt((attempt) => attempt + 1);
   };
 
-  //~ Update User Name -------------------------------------------
+  const handleLogin = async (user: User) => {
+    await hydrateLoggedInUserStores(user);
+    setCurrentUser(user);
+    setAllUsers(getAllUsers() ?? []);
+  };
+
   const handleUpdateUsername = (id: string, newName: string) => {
     updateUser(id, newName);
-    setAllUsers(getUsers());
+    setAllUsers(getAllUsers() ?? []);
   };
-  //~ REGISTER User -------------------------------------------
+
   const handleRegister = (username: string) => {
-    // Clear the store when creating a new user
-    useMovieStore.getState().actions.clearStore();
-    useSettingsStore.getState().actions.resetSettingsStore();
+    initCurrentUserStorage(undefined);
     setAllUsers(addNewUser(username));
   };
 
-  //~ DELETE User -------------------------------------------
   const handleRemoveUser = (user: User) => {
     const updatedUsers = removeUser(user.id);
     if (updatedUsers) {
       setAllUsers(updatedUsers);
     }
     deleteUserStorage(user);
+    deleteUserMovies(user.id);
   };
 
-  //~ LOGOUT -------------------------------------------
   const handleLogout = () => {
     signOut();
     initCurrentUserStorage(undefined);
+    eventBus.publish("CLEAR_SEARCH_STORES");
     setCurrentUser(undefined);
   };
 
-  //~ GET ALL USERS -------------------------------------------
   const getUsers = (): User[] => {
     return getAllUsers();
   };
 
   const value: AuthProps = {
     initialized,
+    startupError,
+    retryStartup,
     onLogin: handleLogin,
     onRegister: handleRegister,
     onLogout: handleLogout,
@@ -129,6 +131,5 @@ export const AuthProvider = ({ children }: any) => {
     allUsers,
   };
 
-  //~ RETURN PROVIDER -------------------------------------------
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

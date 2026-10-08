@@ -11,12 +11,12 @@ import {
   Ionicons,
   Entypo,
 } from "@expo/vector-icons";
-import { ViewStyle } from "react-native";
+import { ColorValue, StyleProp, TextStyle } from "react-native";
 
 type Props = {
   size?: number;
-  color?: string;
-  style?: ViewStyle;
+  color?: ColorValue;
+  style?: StyleProp<TextStyle>;
 };
 
 export const SaveIcon = ({ size = 25, color, style }: Props) => {
@@ -77,7 +77,7 @@ export const DragHandleIcon = ({ size = 25, color, style }: Props) => {
   return <MaterialIcons name="drag-handle" size={size} color={color} style={style} />;
 };
 export const ToTopIcon = ({ size = 25, color, style }: Props) => {
-  return <AntDesign name="totop" size={size} color={color} style={style} />;
+  return <AntDesign name="to-top" size={size} color={color} style={style} />;
 };
 export const EnterKeyIcon = ({ size = 25, color, style }: Props) => {
   return <Ionicons name="return-down-back" size={size} color={color} style={style} />;
@@ -143,13 +143,13 @@ export const DeleteIcon = ({ size = 25, color = "#b20a2c", style }: Props) => {
 export const EraserIcon = ({ size = 25, color, style }: Props) => {
   return <MaterialCommunityIcons name="eraser" size={size} color={color} style={style} />;
 };
-export const ExpandDownIcon = ({ size, color = undefined, style = undefined }) => {
+export const ExpandDownIcon = ({ size, color, style }: Props) => {
   return (
     <MaterialCommunityIcons name="arrow-expand-down" color={color} size={size} style={style} />
   );
 };
 
-export const CollapseUpIcon = ({ size, color = undefined, style = undefined }) => {
+export const CollapseUpIcon = ({ size, color, style }: Props) => {
   return (
     <MaterialCommunityIcons name="arrow-collapse-up" color={color} size={size} style={style} />
   );
@@ -241,7 +241,7 @@ export const ForwardIcon = ({ size = 25, color, style }: Props) => {
 };
 
 export const OpenIcon = ({ size = 25, color, style }: Props) => {
-  return <AntDesign name="upcircleo" color={color} size={size} style={style} />;
+  return <AntDesign name="up-circle" color={color} size={size} style={style} />;
 };
 export const OpenInNewIcon = ({ size = 25, color, style }: Props) => {
   return <MaterialIcons name="open-in-new" color={color} size={size} style={style} />;

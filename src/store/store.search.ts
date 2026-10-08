@@ -16,7 +16,10 @@ type SearchStore = {
     setSearchType: (searchType: SearchType) => void;
   };
 };
-const searchInitialState = {
+const searchInitialState: {
+  searchVal: string | undefined;
+  searchType: SearchType;
+} = {
   searchVal: undefined,
   searchType: "title",
 };

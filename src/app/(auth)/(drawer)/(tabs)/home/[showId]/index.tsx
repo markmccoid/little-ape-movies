@@ -1,13 +1,11 @@
 import React, { useEffect } from "react";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation, type NativeStackNavigationOptions } from "expo-router";
 import MovieDetailsContainer from "@/components/movies/details/MovieDetailsContainer";
 import { View, Text, Image, Dimensions, ScrollView } from "react-native";
 import { useMovieActions } from "@/store/store.shows";
 import { LinearGradient } from "expo-linear-gradient";
 import MDImageDescRow from "@/components/movies/details/MDImageDescRow";
 import { useMovieDetailData } from "@/store/dataHooks";
-import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
-
 const { width, height: screenHeight } = Dimensions.get("window");
 
 const MovieDetailHome = () => {

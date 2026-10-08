@@ -1,7 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from "react";
-import { View } from "react-native";
-import { MotiView, Text } from "moti";
+import { Text, View } from "react-native";
+import Animated, {
+  withDelay,
+  withSpring,
+  withTiming,
+  type EntryExitAnimationFunction,
+} from "react-native-reanimated";
 
 export type DragIndicatorConfig = {
   translateXDistance: number;
@@ -26,6 +31,71 @@ const defaultDragConfig = {
   indicatorBackgroundColor: "#eee",
   indicatorBorderRadius: 10,
 };
+
+const indicatorSpring = {
+  damping: 10,
+  mass: 1,
+  stiffness: 100,
+};
+
+const positionScaleEntering: EntryExitAnimationFunction = () => {
+  "worklet";
+  return {
+    initialValues: {
+      transform: [{ scale: 2.25 }],
+    },
+    animations: {
+      transform: [{ scale: withTiming(1.5, { duration: 500 }) }],
+    },
+  };
+};
+
+function createIndicatorEntering(
+  restingTranslateX: number,
+  hiddenTranslateX: number
+): EntryExitAnimationFunction {
+  return () => {
+    "worklet";
+    return {
+      initialValues: {
+        opacity: 0.5,
+        transform: [{ translateX: hiddenTranslateX }],
+      },
+      animations: {
+        opacity: withDelay(100, withSpring(1, indicatorSpring)),
+        transform: [
+          {
+            translateX: withDelay(100, withSpring(restingTranslateX, indicatorSpring)),
+          },
+        ],
+      },
+    };
+  };
+}
+
+function createIndicatorExiting(
+  restingTranslateX: number,
+  hiddenTranslateX: number
+): EntryExitAnimationFunction {
+  return () => {
+    "worklet";
+    return {
+      initialValues: {
+        opacity: 1,
+        transform: [{ translateX: restingTranslateX }],
+      },
+      animations: {
+        opacity: withDelay(500, withSpring(0.5, indicatorSpring)),
+        transform: [
+          {
+            translateX: withDelay(500, withSpring(hiddenTranslateX, indicatorSpring)),
+          },
+        ],
+      },
+    };
+  };
+}
+
 /**.
  * Currently this single component encapsulates the drag indicator.
  * It is used in the MoveableItem.tsx.
@@ -51,15 +121,17 @@ const DefaultDragIndicator: React.FC<DragIndicatorProps> = ({
     indicatorBorderColor,
     indicatorBorderRadius,
   } = { ...defaultDragConfig, ...config };
+  const hiddenTranslateX = 100 * direction;
+  const restingTranslateX = translateXDistance * direction * -1;
 
   return (
-    <MotiView
+    <Animated.View
+      entering={createIndicatorEntering(restingTranslateX, hiddenTranslateX)}
+      exiting={createIndicatorExiting(restingTranslateX, hiddenTranslateX)}
       style={{
         position: "absolute",
         [fromLeftOrRight]: 0,
-        backgroundColor: indicatorBackgroundColor
-          ? indicatorBackgroundColor
-          : "#eee",
+        backgroundColor: indicatorBackgroundColor ? indicatorBackgroundColor : "#eee",
         justifyContent: "center",
         borderWidth: indicatorBorderWidth,
         borderColor: indicatorBorderColor,
@@ -67,35 +139,9 @@ const DefaultDragIndicator: React.FC<DragIndicatorProps> = ({
         height: itemHeight / 1.5,
         borderRadius: indicatorBorderRadius,
       }}
-      from={{
-        opacity: 0.5,
-        translateX: 100 * direction,
-        // scale: 0.5,
-      }}
-      animate={{
-        opacity: 1,
-        translateX: translateXDistance! * direction * -1,
-        // scale: 1,
-      }}
-      exit={{
-        opacity: 0.5,
-        translateX: 100 * direction,
-        // scale: 0.5,
-      }}
-      transition={{
-        type: "spring",
-        delay: 100,
-      }}
-      exitTransition={{
-        type: "spring",
-        delay: 500,
-      }}
     >
-      <DragIndicatorDisplay
-        currentPosition={currentPosition}
-        totalItems={totalItems}
-      />
-    </MotiView>
+      <DragIndicatorDisplay currentPosition={currentPosition} totalItems={totalItems} />
+    </Animated.View>
   );
 };
 
@@ -113,16 +159,12 @@ const DragIndicatorDisplay: React.FC<{
         paddingLeft: 20,
       }}
     >
-      <MotiView
-        from={{ scale: 2.25 }}
-        animate={{ scale: 1.5 }}
-        transition={{ type: "timing", duration: 500 }}
+      <Animated.View
         key={currentPosition}
+        entering={positionScaleEntering}
       >
-        <Text style={{ color: "green", paddingRight: 3 }}>
-          {currentPosition}
-        </Text>
-      </MotiView>
+        <Text style={{ color: "green", paddingRight: 3 }}>{currentPosition}</Text>
+      </Animated.View>
       <Text> of {totalItems} </Text>
     </View>
   );
