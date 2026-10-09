@@ -1,48 +1,52 @@
-import { View, Text, Pressable, TouchableOpacity, ScrollView } from "react-native";
 import React from "react";
-import { Link, useRouter } from "expo-router";
-import { useMovieActions } from "@/store/store.shows";
-import { useAuth } from "@/providers/AuthProvider";
-import { SymbolView } from "expo-symbols";
-import { useCustomTheme } from "@/lib/colorThemes";
+import { useRouter } from "expo-router";
+import { Button, Form, Host, HStack, Image, Section, Spacer, Text } from "@expo/ui/swift-ui";
+import { buttonStyle, font, foregroundStyle } from "@expo/ui/swift-ui/modifiers";
+import { useColorScheme } from "@/lib/useColorScheme";
 
-const SettingsContainer = () => {
-  const actions = useMovieActions();
-  const { currentUser: user, onLogout } = useAuth();
+const rowLabel = [
+  foregroundStyle({ type: "hierarchical", style: "primary" }),
+  font({ size: 17 }),
+];
+
+const SettingsContainer: React.FC = () => {
   const router = useRouter();
-  const { colors } = useCustomTheme();
+  const { colorScheme } = useColorScheme();
+
+  const openSavedFilters = () => {
+    router.push({ pathname: "/(auth)/(drawer)/settings/savedfiltersroute" });
+  };
+
+  const openQuickSorts = () => {
+    router.push({ pathname: "/(auth)/(drawer)/settings/quicksortroute" });
+  };
+
   return (
-    <View className="flex-1 bg-gray-100">
-      <ScrollView className="">
-        <TouchableOpacity
-          onPress={() => router.push({ pathname: "/(auth)/(drawer)/settings/savedfiltersroute" })}
-          className="bg-card py-4 px-6 border-b-hairline border-border flex-row justify-between items-center"
-        >
-          <Text className="text-lg text-card-foreground">Saved Filters</Text>
-          <SymbolView name="chevron.right" size={18} weight="semibold" tintColor={colors.primary} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => router.push({ pathname: "/(auth)/(drawer)/settings/quicksortroute" })}
-          className="bg-card py-4 px-6 border-b-hairline border-border flex-row justify-between items-center"
-        >
-          <Text className="text-lg text-card-foreground">Quick Sort</Text>
-          <SymbolView name="chevron.right" size={18} weight="semibold" tintColor={colors.primary} />
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
+    <Host
+      style={{ flex: 1 }}
+      useViewportSizeMeasurement
+      colorScheme={colorScheme === "light" ? "light" : "dark"}
+    >
+      <Form>
+        <Section>
+          <Button onPress={openSavedFilters} modifiers={[buttonStyle("plain")]}>
+            <HStack>
+              <Text modifiers={rowLabel}>Saved Filters</Text>
+              <Spacer />
+              <Image systemName="chevron.right" size={14} color="secondary" />
+            </HStack>
+          </Button>
+          <Button onPress={openQuickSorts} modifiers={[buttonStyle("plain")]}>
+            <HStack>
+              <Text modifiers={rowLabel}>Quick Sort</Text>
+              <Spacer />
+              <Image systemName="chevron.right" size={14} color="secondary" />
+            </HStack>
+          </Button>
+        </Section>
+      </Form>
+    </Host>
   );
 };
 
 export default SettingsContainer;
-
-{
-  /* <Link href="/(auth)/(drawer)/settings/settingone">
-        <Text>Setting Page 1</Text>
-      </Link>
-      <Pressable onPress={actions.clearStore}>
-        <Text>Clear ALL movies</Text>
-      </Pressable>
-      <Pressable onPress={() => onLogout()}>
-        <Text>Log Out</Text>
-      </Pressable> */
-}

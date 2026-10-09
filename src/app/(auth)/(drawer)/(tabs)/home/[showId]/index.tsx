@@ -13,7 +13,7 @@ const MovieDetailHome = () => {
   const movieActions = useMovieActions();
   const storedMovie = movieActions.getShowById(parseInt(showId));
 
-  const { movieDetails, isLoading } = useMovieDetailData(parseInt(showId));
+  const { movieDetails, isLoading, isError } = useMovieDetailData(parseInt(showId));
   const [shouldRender, setShouldRender] = React.useState(false);
   const navigation = useNavigation();
 
@@ -42,6 +42,7 @@ const MovieDetailHome = () => {
           movieDetails={movieDetails}
           storedMovie={storedMovie}
           existsInSaved={!!storedMovie?.existsInSaved}
+          detailsFailed={isError}
         />
       </View>
 

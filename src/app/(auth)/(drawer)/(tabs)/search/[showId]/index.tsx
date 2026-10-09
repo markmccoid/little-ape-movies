@@ -14,7 +14,7 @@ const MovieDetailSearch = () => {
   const movieActions = useMovieActions();
   const storedMovie = movieActions.getShowById(parseInt(showId));
 
-  const { movieDetails, isLoading } = useMovieDetailData(parseInt(showId));
+  const { movieDetails, isLoading, isError } = useMovieDetailData(parseInt(showId));
   const [shouldRender, setShouldRender] = React.useState(false);
   const navigation = useNavigation();
 
@@ -41,6 +41,7 @@ const MovieDetailSearch = () => {
           movieDetails={movieDetails}
           storedMovie={storedMovie}
           existsInSaved={!!storedMovie?.existsInSaved}
+          detailsFailed={isError}
         />
       </View>
       {shouldRender && <MovieDetailsContainer movieId={parseInt(showId, 10)} />}

@@ -1,8 +1,9 @@
-import { View, Text, Image, ScrollView, FlatList, TouchableOpacity } from "react-native";
+import { ActivityIndicator, View, Text, Image, ScrollView, FlatList, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { useMovieWatchProviders, WatchProviderOnly } from "@/store/dataHooks";
 import WatchProviderSection, { WatchProviderSectionItem } from "./WatchProviderSection";
 import { ProviderInfo } from "@markmccoid/tmdb_api";
+import FetchNotice from "@/components/common/FetchNotice";
 import Animated, {
   Extrapolation,
   interpolate,
@@ -25,13 +26,20 @@ interface WatchProviderSection {
 const MDWatchProviders = ({ movieId }: Props) => {
   if (!movieId) return null;
 
-  const { watchProviders, justWatchLink, isLoading } = useMovieWatchProviders(movieId);
+  const { watchProviders, justWatchLink, isLoading, isError } = useMovieWatchProviders(movieId);
   const scrollOffset = useSharedValue(0);
   const onScroll = useAnimatedScrollHandler((event) => {
     scrollOffset.value = event.contentOffset.x;
   });
 
-  if (isLoading) return null;
+  if (isLoading) {
+    return (
+      <View className="py-4 items-center">
+        <ActivityIndicator />
+      </View>
+    );
+  }
+  if (isError) return <FetchNotice message="Couldn't load where to watch." />;
   const watchProviderCount = watchProviders.reduce((total, section) => {
     const providers = section.providers;
     if (!providers) return total;

@@ -1,12 +1,14 @@
-import { View, Text, Image, TouchableOpacity, FlatList } from "react-native";
 import React from "react";
 import { useTitleSearch } from "@/store/query.search";
-import { MovieSearchResults, useSearchStore } from "@/store/store.search";
-import useMovieStore from "@/store/store.shows";
 import SearchContainer from "../SearchContainer";
+import FetchNotice from "@/components/common/FetchNotice";
 
 const MovieSearchContainer = () => {
-  const { movies, isLoading, fetchNextPage } = useTitleSearch();
+  const { movies, isLoading, isError, fetchNextPage } = useTitleSearch();
+
+  if (isError && movies.length === 0 && !isLoading) {
+    return <FetchNotice message="Couldn't load movies." />;
+  }
 
   return <SearchContainer movies={movies} fetchNextPage={fetchNextPage} />;
 };

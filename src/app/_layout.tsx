@@ -16,8 +16,11 @@ import * as Linking from "expo-linking";
 import { useColorScheme } from "nativewind";
 import { CustomLightTheme, CustomDarkTheme } from "../lib/colorThemes";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/store/queryClient";
 import { initTMDB } from "@markmccoid/tmdb_api";
+import axios from "axios";
+import NetInfo from "@react-native-community/netinfo";
 import { setupEvents } from "../store/events";
 
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
@@ -29,36 +32,13 @@ configureReanimatedLogger({
   strict: true, // Reanimated runs in strict mode by default
 });
 
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 10 * 60000, // n * 1 minute
-    },
-  },
-});
+const REQUEST_TIMEOUT_MS = 8000;
+
+// TMDB and OMDB use this axios instance. Without a timeout, airplane mode
+// leaves the socket open and queries stay in a loading state.
+axios.defaults.timeout = REQUEST_TIMEOUT_MS;
 
 SplashScreen.preventAutoHideAsync();
-
-const TMDB_INIT_TIMEOUT_MS = 20000;
-
-const withTimeout = <T,>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string) => {
-  return new Promise<T>((resolve, reject) => {
-    const timeoutId = setTimeout(() => {
-      reject(new Error(timeoutMessage));
-    }, timeoutMs);
-
-    promise.then(
-      (value) => {
-        clearTimeout(timeoutId);
-        resolve(value);
-      },
-      (error: unknown) => {
-        clearTimeout(timeoutId);
-        reject(error);
-      }
-    );
-  });
-};
 
 const startupErrorMessage = (error: unknown) => {
   if (error instanceof Error && error.message) {
@@ -123,8 +103,9 @@ const InitialLayout = () => {
     };
   }, [router, appReady, storesHydrated]);
 
-  // TMDB setup runs only after movie and settings rehydration. A failed or
-  // hung init surfaces an error instead of leaving the splash screen up.
+  // TMDB setup runs only after movie and settings rehydration. The config
+  // request can fail offline; the library keeps default image URLs and genres
+  // so saved movies still open.
   useEffect(() => {
     if (!storesHydrated) return;
 
@@ -135,11 +116,14 @@ const InitialLayout = () => {
       try {
         const tmdbKey = process.env.EXPO_PUBLIC_TMDB_API_KEY;
         if (!tmdbKey) throw new Error("TMDB API Key not defined");
-        await withTimeout(
-          initTMDB(tmdbKey),
-          TMDB_INIT_TIMEOUT_MS,
-          "Starting the app took too long. Check your connection and try again."
-        );
+        const net = await NetInfo.fetch();
+        const offline = net.isConnected === false || net.isInternetReachable === false;
+        if (offline) axios.defaults.timeout = 1000;
+        try {
+          await initTMDB(tmdbKey);
+        } finally {
+          axios.defaults.timeout = REQUEST_TIMEOUT_MS;
+        }
         if (cancelled) return;
 
         const unsubscribe = setupEvents(queryClient);

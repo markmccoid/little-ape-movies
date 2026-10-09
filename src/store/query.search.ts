@@ -16,7 +16,6 @@ import { useEffect, useRef, useState } from "react";
 import { MovieSearchResults, useSearchStore } from "@/store/store.search";
 import React from "react";
 import { tagSavedMovies } from "./store.utils";
-import useMovieStore from "./store.shows";
 import { eventBus } from "./eventBus";
 import {
   InfiniteData,
@@ -41,7 +40,7 @@ export const useTitleSearch = () => {
   const actions = useSearchStore((state) => state.actions);
 
   //~~ USEINFINITEQUERY TITLE Movie Search Value Hook
-  const { data, isLoading, fetchNextPage } = useInfiniteQuery({
+  const { data, isLoading, isError, fetchNextPage } = useInfiniteQuery({
     queryKey: ["moviesearch", searchVal],
     queryFn: async ({ pageParam }) => {
       if (!searchVal) {
@@ -69,7 +68,7 @@ export const useTitleSearch = () => {
   //  !! Pub/Sub tagging of data
   useEffect(() => {
     const handleExternalEvent = () => {
-      const taggedMovies = tagSavedMovies(moviesRef.current, useMovieStore.getState().shows);
+      const taggedMovies = tagSavedMovies(moviesRef.current);
       setMovies(taggedMovies);
     };
     // Subscribe to the Tag result event
@@ -86,7 +85,7 @@ export const useTitleSearch = () => {
         .flatMap((page) => page?.data.results)
         .filter((el) => el) as MovieSearchResults[]) || [];
     // Tag with existsInSaved key
-    const taggedMovies = tagSavedMovies(moviesHold, useMovieStore.getState().shows);
+    const taggedMovies = tagSavedMovies(moviesHold);
     setMovies(taggedMovies);
     // Need to store a ref so it can be used in the eventBus callback
     moviesRef.current = taggedMovies;
@@ -99,7 +98,7 @@ export const useTitleSearch = () => {
   //     .filter((el) => el) as MovieSearchResults[];
   // }, [data]);
 
-  return { movies, isLoading, fetchNextPage };
+  return { movies, isLoading, isError, fetchNextPage };
 };
 
 export const usePersonSearch = () => {
@@ -108,12 +107,11 @@ export const usePersonSearch = () => {
   const [persons, setPersons] = useState<SearchForPerson_Results[]>([]);
 
   //~~ USEINFINITEQUERY Person Movie Search Value Hook
-  const { data, isLoading, fetchNextPage } = useInfiniteQuery({
+  const { data, isLoading, isError, fetchNextPage } = useInfiniteQuery({
     queryKey: ["personSearch", searchVal],
     queryFn: async ({ pageParam }) => {
       console.log("searchval person", searchVal);
-      if (!searchVal) return undefined;
-      return searchForPersonId(searchVal, pageParam);
+      return searchForPersonId(searchVal ?? "", pageParam);
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
@@ -128,7 +126,7 @@ export const usePersonSearch = () => {
       }
       return firstPageParam - 1;
     },
-    enabled: searchType === "person",
+    enabled: searchType === "person" && !!searchVal,
     // enabled: !!searchVal && !!(totalPages >= currentPage) && !!(lastProcessedPage < currentPage),
   });
 
@@ -144,7 +142,7 @@ export const usePersonSearch = () => {
     setPersons(personHold);
   }, [data]);
 
-  return { persons, isLoading, fetchNextPage };
+  return { persons, isLoading, isError, fetchNextPage };
 };
 
 export const usePersonMovieSearch = (personId: number) => {
@@ -154,7 +152,7 @@ export const usePersonMovieSearch = (personId: number) => {
   const moviesRef = useRef(movies);
 
   //~~ USEQUERY TITLE Movie Search Value Hook
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["personMovieSearch", personId],
     queryFn: () => movieGetPersonCredits(personId),
     enabled: personId > 0,
@@ -164,7 +162,7 @@ export const usePersonMovieSearch = (personId: number) => {
   //!! Pub/Sub tagging of data
   useEffect(() => {
     const handleExternalEvent = () => {
-      const taggedMovies = tagSavedMovies(moviesRef.current, useMovieStore.getState().shows);
+      const taggedMovies = tagSavedMovies(moviesRef.current);
       setMovies(taggedMovies);
     };
     // Subscribe to the Tag result event
@@ -202,7 +200,7 @@ export const usePersonMovieSearch = (personId: number) => {
     // }));
 
     // Tag with existsInSaved key
-    const taggedMovies = tagSavedMovies(castMovies, useMovieStore.getState().shows);
+    const taggedMovies = tagSavedMovies(castMovies);
     setMovies(taggedMovies);
     // Need to store a ref so it can be used in the eventBus callback
     moviesRef.current = taggedMovies;
@@ -214,7 +212,7 @@ export const usePersonMovieSearch = (personId: number) => {
   //     .flatMap((page) => page?.data.results)
   //     .filter((el) => el) as MovieSearchResults[];
   // }, [data]);
-  return { movies, isLoading };
+  return { movies, isLoading, isError };
 };
 
 export const usePersonDetails = (personId: number) => {

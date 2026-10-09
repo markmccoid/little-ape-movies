@@ -1,9 +1,10 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { ActivityIndicator, View, Text, ScrollView, TouchableOpacity } from "react-native";
 import React from "react";
 import { useMovieVideos } from "@/store/dataHooks";
 import * as Linking from "expo-linking";
 import { YouTubePlayIcon } from "@/components/common/Icons";
 import MovieImage from "@/components/common/MovieImage";
+import FetchNotice from "@/components/common/FetchNotice";
 
 const THUMBNAIL_WIDTH = 120 * 1.77;
 const THUMBNAIL_HEIGHT = 120;
@@ -13,7 +14,16 @@ type Props = {
 };
 const MDMovieVideos = ({ movieId }: Props) => {
   if (!movieId) return null;
-  const { data: videoData, isLoading } = useMovieVideos(movieId);
+  const { data: videoData, isLoading, isError } = useMovieVideos(movieId);
+
+  if (isLoading) {
+    return (
+      <View className="py-4 items-center">
+        <ActivityIndicator />
+      </View>
+    );
+  }
+  if (isError) return <FetchNotice message="Couldn't load videos." />;
 
   return (
     <View style={{ flexDirection: "row" }}>

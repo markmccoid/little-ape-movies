@@ -1,13 +1,15 @@
 import { movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
-import { MovieSearchResults } from "./store.search";
-import { ShowItemType } from "./store.shows";
+import type { MovieSearchResults } from "./store.search";
+import { getCurrentUser } from "./dataAccess/localStorage-users";
+import { getSavedShowIds } from "./dataAccess/moviePersistence";
 
 export const tagSavedMovies = (
-  searchResults: movieSearchByTitle_Results[],
-  savedMovies: ShowItemType[]
+  searchResults: movieSearchByTitle_Results[]
 ): MovieSearchResults[] => {
+  const userId = getCurrentUser()?.id;
+  const savedIds = userId ? getSavedShowIds(userId) : new Set<number>();
   return searchResults.map((movie) => ({
     ...movie,
-    existsInSaved: savedMovies.some((savedMovie) => savedMovie.id === movie.id),
+    existsInSaved: savedIds.has(movie.id),
   }));
 };

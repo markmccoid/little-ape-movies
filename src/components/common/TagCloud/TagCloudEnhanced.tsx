@@ -12,6 +12,7 @@ type Props = {
   tagName: string;
   size: string;
   type: "boolean" | "threestate";
+  immediate?: boolean;
 };
 const cycleState = (state: Props["state"], type: Props["type"]): Props["state"] => {
   switch (state) {
@@ -36,6 +37,7 @@ export const TagItem = ({
   tagName,
   size = "s",
   type = "threestate",
+  immediate = false,
 }: Props) => {
   const { colors } = useCustomTheme();
   const [localState, setLocalState] = useState(state);
@@ -60,14 +62,20 @@ export const TagItem = ({
     setIsProcessing(true);
     setLocalState(cycleState(localState, type));
 
-    setTimeout(() => {
+    const runToggle = () => {
       try {
-        onToggleTag(tagId);
+        void onToggleTag(tagId);
       } catch (error) {
         console.log("Error setting Genre Tag");
         setLocalState(prevState);
       }
-    }, 0);
+    };
+
+    if (immediate) {
+      runToggle();
+    } else {
+      setTimeout(runToggle, 0);
+    }
     setTimeout(() => setIsProcessing(false), 0);
   };
 

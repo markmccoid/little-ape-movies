@@ -6,17 +6,22 @@ import { SearchForPerson_Results } from "@markmccoid/tmdb_api";
 import { Link } from "expo-router";
 import useSettingsStore from "@/store/store.settings";
 import PersonSearchItem from "./PersonSearchItem";
+import FetchNotice from "@/components/common/FetchNotice";
 // import { useSearchResults } from '@/store/query.search'
 const { width, height } = Dimensions.get("window");
 
 const PersonSearchContainer = () => {
-  const { persons, isLoading, fetchNextPage } = usePersonSearch();
+  const { persons, isLoading, isError, fetchNextPage } = usePersonSearch();
   const numColumns = useSettingsStore((state) => state.searchColumns);
   const imageWidth = (width - 40) / numColumns;
   const searchColumns = useSettingsStore((state) => state.searchColumns);
   const renderPerson = ({ item: person }: { item: SearchForPerson_Results }) => (
     <PersonSearchItem person={person} imageWidth={imageWidth} />
   );
+  if (isError && persons.length === 0 && !isLoading) {
+    return <FetchNotice message="Couldn't load people." />;
+  }
+
   return (
     <View className="flex-1">
       <FlatList

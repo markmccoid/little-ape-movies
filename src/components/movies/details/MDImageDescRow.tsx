@@ -11,14 +11,16 @@ import MDBackground from "./MDBackground";
 import { useCustomTheme } from "@/lib/colorThemes";
 import { Favorited } from "./tagMovies/FavoriteIcons";
 import { Watched } from "./tagMovies/WatchedIcons";
+import FetchNotice from "@/components/common/FetchNotice";
 
 type Props = {
   existsInSaved: boolean;
   movieDetails: MovieDetails | undefined;
   storedMovie: ShowItemType | undefined;
+  detailsFailed: boolean;
 };
 
-const MDImageDescRow = ({ existsInSaved, movieDetails, storedMovie }: Props) => {
+const MDImageDescRow = ({ existsInSaved, movieDetails, storedMovie, detailsFailed }: Props) => {
   const posterURL = storedMovie?.posterURL || movieDetails?.posterURL;
   const actions = useMovieActions();
   const { colors } = useCustomTheme();
@@ -72,6 +74,8 @@ const MDImageDescRow = ({ existsInSaved, movieDetails, storedMovie }: Props) => 
         <View className="flex-1" key={2}>
           {movieDetails?.id ? (
             <Overview overview={movieDetails?.overview} />
+          ) : detailsFailed ? (
+            <FetchNotice message="Couldn't load movie details." />
           ) : (
             <View className="flex-1 justify-center items-center">
               <ActivityIndicator size="large" />

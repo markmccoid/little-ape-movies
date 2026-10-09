@@ -34,7 +34,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const storedMovie = useMovieStore((state) => state.shows.find((el) => el.id === movieId));
 
   const existsInSaved = !!storedMovie?.existsInSaved;
-  const { movieDetails, isLoading } = useMovieDetailData(movieId);
+  const { movieDetails, isLoading, isError } = useMovieDetailData(movieId);
   const { data: omdbData, isLoading: omdbLoading } = useOMDBData(movieDetails?.imdbId);
   //!! We need have local state so that we only update component AFTER
   //!! it has received focus (see isFocused page)
@@ -126,6 +126,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
             movieDetails={movieDetails as MovieDetails}
             storedMovie={storedMovie}
             existsInSaved={existsInSaved}
+            detailsFailed={isError}
           />
         </View>
 
@@ -139,6 +140,8 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
             movieDetails={movieDetails}
             omdbData={omdbData}
             existsInSaved={existsInSaved}
+            detailsLoading={isLoading}
+            omdbLoading={omdbLoading}
           />
         </View>
 
@@ -148,7 +151,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
           </View>
         )}
         {/* shouldRender is set inside requestAnimationFrame */}
-        {shouldRender && <HiddenContainers movieId={movieDetails?.id || 0} />}
+        {shouldRender && <HiddenContainers movieId={movieId} />}
       </ScrollView>
     </View>
   );

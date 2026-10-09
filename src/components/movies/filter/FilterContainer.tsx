@@ -1,11 +1,14 @@
 import { View, Pressable, ScrollView } from "react-native";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect } from "react";
 import { useNavigation, type NativeStackNavigationOptions } from "expo-router";
-import useSettingsStore, { getInclusionIndex, useSettingsActions } from "@/store/store.settings";
+import useSettingsStore, { useSettingsActions } from "@/store/store.settings";
 import { Text } from "@/components/ui/text";
 import FilterTags from "./FilterTags";
 import FilterGenres from "./FilterGenres";
-import SegmentedControl from "@react-native-segmented-control/segmented-control";
+import InclusionPicker, {
+  favoriteInclusionOptions,
+  watchedInclusionOptions,
+} from "@/components/common/InclusionPicker";
 import { Eraser } from "@/lib/icons/Eraser";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import SortEditor from "@/components/settings/quickSorts/SortEditor";
@@ -41,28 +44,23 @@ const FilterContainer = () => {
   });
   return (
     <ScrollView className="pt-3 mb-[80]" contentContainerClassName="pb-[50]">
-      {/* //! Need to create a three way selector for both of these AND 
-      //! update the filter code to obey the new selectors */}
-      <SegmentedControl
-        className="w-[100]"
-        values={["Ignore", "Watched", "Unwatched"]}
-        selectedIndex={getInclusionIndex(filterCriteria?.filterIsWatched)}
-        onChange={(event) => {
-          console.log("W Changed", event.nativeEvent.selectedSegmentIndex);
-          const state = event.nativeEvent.selectedSegmentIndex;
-          filterActions.setIsWatchedState(state as 0 | 1 | 2);
-        }}
-      />
+      <View className="mx-2">
+        <InclusionPicker
+          label="Watched"
+          options={watchedInclusionOptions}
+          value={filterCriteria?.filterIsWatched}
+          onChange={filterActions.setIsWatchedState}
+        />
+      </View>
       <View className="h-2" />
-      <SegmentedControl
-        className="w-[100]"
-        values={["Ignore", "Favorites", "Exclude Favs"]}
-        selectedIndex={getInclusionIndex(filterCriteria?.filterIsFavorited)}
-        onChange={(event) => {
-          const state = event.nativeEvent.selectedSegmentIndex;
-          filterActions.setIsFavoritedState(state as 0 | 1 | 2);
-        }}
-      />
+      <View className="mx-2">
+        <InclusionPicker
+          label="Favorites"
+          options={favoriteInclusionOptions}
+          value={filterCriteria?.filterIsFavorited}
+          onChange={filterActions.setIsFavoritedState}
+        />
+      </View>
       {/* Tag Selection */}
       <View className="mx-1 mt-4 bg-primary rounded-lg flex-row items-center justify-between">
         <Text className="px-2 py-1 text-xl font-semibold text-primary-foreground">

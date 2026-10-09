@@ -1,12 +1,7 @@
 import { View, ScrollView, Pressable, StyleSheet, LayoutChangeEvent } from "react-native";
 import React, { useEffect, useLayoutEffect, useReducer, useRef, useState } from "react";
 import { Text } from "@/components/ui/text";
-import useMovieStore, {
-  ShowItemType,
-  updateTagState,
-  useGetAppliedTags,
-  useMovieActions,
-} from "@/store/store.shows";
+import useMovieStore, { ShowItemType, updateTagState } from "@/store/store.shows";
 import TagCloud, { TagItem } from "@/components/common/TagCloud/TagCloud";
 import TagCloudEnhanced, {
   TagItem as TagItemEnhanced,
@@ -35,11 +30,44 @@ type Props = {
 const MDTags = ({ storedMovie, existsInSaved }: Props) => {
   const { colors } = useCustomTheme();
   const [showAddTag, toggleAddTag] = useReducer((state) => !state, false);
-  const actions = useMovieActions();
   const tags = useMovieStore((state) => state.tagArray);
-  const appliedTags = useGetAppliedTags(storedMovie?.id);
+  const storeTagIds = useMovieStore((state) => {
+    if (storedMovie?.id == null) return undefined;
+    return state.shows.find((show) => show.id === storedMovie.id)?.tags;
+  });
+  const [optimisticTagIds, setOptimisticTagIds] = useState<string[] | null>(null);
+  const pendingWrite = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingTags = useRef<{ movieId: number; tags: string[] } | null>(null);
+  const displayedTagIds = optimisticTagIds ?? storeTagIds ?? [];
+  const movieTags = updateTagState(tags, displayedTagIds);
+  const appliedTags = tags.flatMap((tag) =>
+    displayedTagIds.includes(tag.id) ? [{ id: tag.id, name: tag.name }] : []
+  );
 
-  const movieTags = updateTagState(tags, storedMovie?.tags || []);
+  const flushPendingTags = () => {
+    const pending = pendingTags.current;
+    pendingTags.current = null;
+    if (!pending) return;
+    useMovieStore.getState().actions.updateShow(pending.movieId, { tags: pending.tags });
+  };
+
+  useEffect(() => {
+    return () => {
+      if (!pendingWrite.current) return;
+      clearTimeout(pendingWrite.current);
+      pendingWrite.current = null;
+      flushPendingTags();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (optimisticTagIds == null || pendingWrite.current) return;
+    const storeIds = storeTagIds ?? [];
+    const same =
+      optimisticTagIds.length === storeIds.length &&
+      optimisticTagIds.every((id) => storeIds.includes(id));
+    if (same) setOptimisticTagIds(null);
+  }, [optimisticTagIds, storeTagIds]);
   const [containerHeight, setContainerHeight] = useState(0);
   const [isMeasured, setIsMeasured] = useState(false);
   const toHeight = useSharedValue(0);
@@ -63,11 +91,19 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
     (currState: "include" | "off") =>
     (tagId: string): Promise<void> => {
       if (!storedMovie?.id) return Promise.resolve();
-      if (currState === "include") {
-        actions.updateShowTags(storedMovie.id, tagId, "remove");
-      } else {
-        actions.updateShowTags(storedMovie.id, tagId, "add");
-      }
+      const movieId = storedMovie.id;
+      const current = optimisticTagIds ?? storeTagIds ?? [];
+      const next =
+        currState === "include"
+          ? current.filter((id) => id !== tagId)
+          : Array.from(new Set([...current, tagId]));
+      setOptimisticTagIds(next);
+      pendingTags.current = { movieId, tags: next };
+      if (pendingWrite.current) clearTimeout(pendingWrite.current);
+      pendingWrite.current = setTimeout(() => {
+        pendingWrite.current = null;
+        flushPendingTags();
+      }, 0);
       return Promise.resolve();
     };
 
@@ -190,6 +226,7 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
                 tagName={el?.name}
                 key={el?.id}
                 type="boolean"
+                immediate
               />
             ))}
           </TagCloudEnhanced>

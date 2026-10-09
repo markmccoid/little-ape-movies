@@ -1,8 +1,9 @@
-import { View, Text, ScrollView } from "react-native";
+import { ActivityIndicator, View, ScrollView } from "react-native";
 import React from "react";
 import { useMovieRecommendations } from "@/store/dataHooks";
 import SearchResult from "@/components/search/SearchResult";
 import useMovieStore from "@/store/store.shows";
+import FetchNotice from "@/components/common/FetchNotice";
 
 type Props = {
   movieId: number | undefined;
@@ -10,9 +11,16 @@ type Props = {
 const MDMovieRecommendations = ({ movieId }: Props) => {
   if (!movieId) return null;
 
-  const { data, isLoading } = useMovieRecommendations(movieId);
+  const { data, isLoading, isError } = useMovieRecommendations(movieId);
   const movieActions = useMovieStore((state) => state.actions);
-  if (isLoading) return null;
+  if (isLoading) {
+    return (
+      <View className="py-4 items-center">
+        <ActivityIndicator />
+      </View>
+    );
+  }
+  if (isError) return <FetchNotice message="Couldn't load recommendations." />;
   return (
     <ScrollView horizontal style={{ paddingLeft: 10, marginTop: 5 }}>
       {data &&

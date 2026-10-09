@@ -1,43 +1,41 @@
-import { View, Text } from "react-native";
-import React, { useEffect, useState } from "react";
-import SegmentedControl from "@react-native-segmented-control/segmented-control";
-import useSettingsStore, {
-  getInclusionIndex,
-  getInclusionValue,
-  useSettingsActions,
-} from "@/store/store.settings";
-type Props = {
-  filterInfo: { watched: "off" | "include" | "exclude"; favorites: "off" | "include" | "exclude" };
-  handleFavorites: (state: "off" | "include" | "exclude") => void;
-  handleWatched: (state: "off" | "include" | "exclude") => void;
-};
-const SavedFilterWatchFavs = ({ filterInfo, handleFavorites, handleWatched }: Props) => {
-  const [currFilter, setCurrFilter] = useState<Props["filterInfo"]>();
+import { View } from "react-native";
+import React from "react";
+import InclusionPicker, {
+  favoriteInclusionOptions,
+  watchedInclusionOptions,
+} from "@/components/common/InclusionPicker";
+import { InclusionState } from "@/store/store.settings";
 
-  useEffect(() => {
-    setCurrFilter(filterInfo);
-  }, [filterInfo]);
+interface SavedFilterWatchFavsProps {
+  filterInfo: { watched: InclusionState; favorites: InclusionState };
+  handleFavorites: (state: InclusionState) => void;
+  handleWatched: (state: InclusionState) => void;
+}
+
+const SavedFilterWatchFavs: React.FC<SavedFilterWatchFavsProps> = ({
+  filterInfo,
+  handleFavorites,
+  handleWatched,
+}) => {
   return (
     <View>
-      <SegmentedControl
-        className="w-[100]"
-        values={["Ignore", "Watched", "Unwatched"]}
-        selectedIndex={getInclusionIndex(currFilter?.watched)}
-        onChange={(event) => {
-          const state = event.nativeEvent.selectedSegmentIndex;
-          handleWatched(getInclusionValue(state as 0 | 1 | 2));
-        }}
-      />
+      <View className="mx-2">
+        <InclusionPicker
+          label="Watched"
+          options={watchedInclusionOptions}
+          value={filterInfo.watched}
+          onChange={handleWatched}
+        />
+      </View>
       <View className="h-2" />
-      <SegmentedControl
-        className="w-[100]"
-        values={["Ignore", "Favorites", "Exclude Favs"]}
-        selectedIndex={getInclusionIndex(currFilter?.favorites)}
-        onChange={(event) => {
-          const state = event.nativeEvent.selectedSegmentIndex;
-          handleFavorites(getInclusionValue(state as 0 | 1 | 2));
-        }}
-      />
+      <View className="mx-2">
+        <InclusionPicker
+          label="Favorites"
+          options={favoriteInclusionOptions}
+          value={filterInfo.favorites}
+          onChange={handleFavorites}
+        />
+      </View>
     </View>
   );
 };

@@ -1,5 +1,5 @@
 import { View, Pressable } from "react-native";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Sparkle } from "@/lib/icons/Sparkle";
 import { Sparkles } from "@/lib/icons/Sparkles";
 import { EyeOff } from "@/lib/icons/EyeOff";
@@ -8,8 +8,9 @@ import MDBackground from "../MDBackground";
 import { ShowItemType, useMovieActions } from "@/store/store.shows";
 import { Text } from "@/components/ui/text";
 import { useCustomTheme } from "@/lib/colorThemes";
+import { useColorScheme } from "@/lib/useColorScheme";
 import Animated, { withSpring } from "react-native-reanimated";
-import DatePicker from "react-native-date-picker";
+import WatchedDateSheet from "./WatchedDateSheet";
 
 const iconSpring = { stiffness: 200, damping: 15 };
 
@@ -75,14 +76,16 @@ type Props = {
 const MDFavWatched = ({ storedMovie }: Props) => {
   const actions = useMovieActions();
   const { colors } = useCustomTheme();
+  const { colorScheme } = useColorScheme();
   const [localWatched, setLocalWatched] = useState(!!storedMovie?.watched);
   const [localFavorited, setLocalFavorited] = useState(!!storedMovie?.favorited);
-  // Date picker open state used for watched date on long press
   const [open, setOpen] = useState(false);
-  const pickerDate = useMemo(
-    () => (storedMovie?.watched ? new Date(storedMovie?.watched * 1000) : new Date()),
-    [storedMovie?.watched]
-  );
+  const [draftDate, setDraftDate] = useState(() => new Date());
+
+  useEffect(() => {
+    setLocalFavorited(!!storedMovie?.favorited);
+    setLocalWatched(!!storedMovie?.watched);
+  }, [storedMovie?.favorited, storedMovie?.watched]);
 
   if (!storedMovie?.id) return;
 
@@ -91,11 +94,24 @@ const MDFavWatched = ({ storedMovie }: Props) => {
     setLocalWatched((prev) => !prev);
     setTimeout(() => actions.toggleWatched(storedMovie.id, undefined, Date.now()), 200);
   };
-  // Handle watched state with long press.  Sets to selected date
   const handleWatchedDate = (date: Date) => {
     setTimeout(() => actions.toggleWatched(storedMovie.id, "on", date.getTime()), 200);
     if (localWatched) return;
     setLocalWatched((prev) => !prev);
+  };
+
+  const openWatchedDate = () => {
+    setDraftDate(storedMovie.watched ? new Date(storedMovie.watched * 1000) : new Date());
+    setOpen(true);
+  };
+
+  const closeWatchedDate = () => {
+    setOpen(false);
+  };
+
+  const confirmWatchedDate = () => {
+    handleWatchedDate(draftDate);
+    setOpen(false);
   };
 
   const handleFavorited = () => {
@@ -103,30 +119,20 @@ const MDFavWatched = ({ storedMovie }: Props) => {
     setTimeout(() => actions.toggleFavorited(storedMovie.id), 200);
   };
 
-  useEffect(() => {
-    setLocalFavorited(!!storedMovie?.favorited);
-    setLocalWatched(!!storedMovie?.watched);
-  }, [storedMovie?.favorited, storedMovie?.watched]);
-
   return (
     <View className="flex-row h-[40] items-center justify-center px-3">
       <MDBackground />
-      <DatePicker
-        modal
+      <WatchedDateSheet
         open={open}
-        date={pickerDate}
-        mode="date"
-        onConfirm={(date) => {
-          setOpen(false);
-          handleWatchedDate(date);
-        }}
-        onCancel={() => {
-          setOpen(false);
-        }}
+        date={draftDate}
+        colorScheme={colorScheme === "light" ? "light" : "dark"}
+        onCancel={closeWatchedDate}
+        onConfirm={confirmWatchedDate}
+        onDateChange={setDraftDate}
       />
       <Pressable
-        onPress={() => handleWatched()}
-        onLongPress={() => setOpen(true)}
+        onPress={handleWatched}
+        onLongPress={openWatchedDate}
         className="flex-row items-center"
       >
         {/* Reserve space for icons */}

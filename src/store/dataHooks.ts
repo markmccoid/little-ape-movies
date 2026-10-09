@@ -1,4 +1,3 @@
-import useMovieStore from "./store.shows";
 import {
   movieGetDetails,
   movieDetails_typedef,
@@ -12,9 +11,9 @@ import {
 } from "@markmccoid/tmdb_api";
 import { useQuery } from "@tanstack/react-query";
 import { reverse, sortBy } from "lodash";
-import { useEffect, useState } from "react";
-import { tagSavedMovies } from "./store.utils";
 import axios from "axios";
+import { getCurrentUser } from "./dataAccess/localStorage-users";
+import { getSavedShowIds } from "./dataAccess/moviePersistence";
 
 //~ --------------------------------------------------------------------------------
 //~ useOMDBData HELPERS
@@ -95,7 +94,7 @@ const getOMDBData = async (imdbId: string) => {
     return undefined;
   } catch (error) {
     console.error("Error fetching movie data:", error);
-    return undefined;
+    throw error;
   }
 };
 
@@ -188,10 +187,11 @@ export const useMovieRecommendations = (movieId: number) => {
     staleTime: 600000,
   });
 
-  // Tag the data
+  const userId = getCurrentUser()?.id;
+  const savedIds = userId ? getSavedShowIds(userId) : new Set<number>();
   const finalData = (data || []).map((movie) => ({
     ...movie,
-    existsInSaved: useMovieStore.getState().shows.some((savedMovie) => savedMovie.id === movie.id),
+    existsInSaved: savedIds.has(movie.id),
   }));
   return { data: finalData, isLoading, ...rest };
 };

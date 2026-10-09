@@ -27,6 +27,7 @@ const createUpdateShowProviders = (queryClient: QueryClient) => async (showId: n
     });
   } catch (e) {
     console.log("Error in WatchProvider Event");
+    return;
   }
   // Store the streaming provider as a lookup array on the store.  No dupes will be created
   useMovieStore.getState().actions.updateStreamingProviders(wproviders?.stream);
@@ -62,6 +63,7 @@ export const setupEvents = (queryClient: QueryClient) => {
     "GET_SHOW_COLORS",
     async (movieId: number, posterURL) => {
       const imageColors = await getImageColors(posterURL);
+      if (!imageColors) return;
       useMovieStore.getState().actions.updateShow(movieId, { posterColors: imageColors });
     }
   );

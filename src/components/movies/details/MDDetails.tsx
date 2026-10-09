@@ -11,8 +11,10 @@ type Props = {
   existsInSaved: boolean;
   movieDetails: MovieDetails | undefined;
   omdbData: OMDBData | undefined;
+  detailsLoading: boolean;
+  omdbLoading: boolean;
 };
-const MDDetails = ({ movieDetails, omdbData }: Props) => {
+const MDDetails = ({ movieDetails, omdbData, detailsLoading, omdbLoading }: Props) => {
   return (
     <View className="">
       <MDBackground />
@@ -24,11 +26,11 @@ const MDDetails = ({ movieDetails, omdbData }: Props) => {
             <Text style={styles.textLabel}>Released:</Text>
             {movieDetails?.id ? (
               <Text style={styles.textDesc}>{movieDetails?.releaseDate?.formatted}</Text>
-            ) : (
+            ) : detailsLoading ? (
               <View className="flex-1 justify-center">
                 <Skeleton className=" h-3" />
               </View>
-            )}
+            ) : null}
           </View>
 
           <View className="flex-row">
@@ -37,21 +39,21 @@ const MDDetails = ({ movieDetails, omdbData }: Props) => {
               <Text style={styles.textDesc}>
                 {movieDetails?.runtime && formatTime(movieDetails.runtime).verbose}
               </Text>
-            ) : (
+            ) : detailsLoading ? (
               <View className="flex-1 justify-center">
                 <Skeleton className=" h-3" />
               </View>
-            )}
+            ) : null}
             <Text style={styles.textLabel} className="ml-1">
               Rated:
             </Text>
             {omdbData?.rated ? (
               <Text className="font-semibold ml-1">({omdbData?.rated})</Text>
-            ) : (
+            ) : omdbLoading ? (
               <View className="flex-1 justify-center">
                 <Skeleton className=" h-3" />
               </View>
-            )}
+            ) : null}
           </View>
 
           {movieDetails?.budget !== 0 && (

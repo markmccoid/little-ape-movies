@@ -415,11 +415,4 @@ export function getInclusionValue(inclusionState: InclusionState | 0 | 1 | 2) {
   }
   return inclusionState as InclusionState;
 }
-// takes an inclusion string and returns the appropriate index.  Useful for segmented control settings.
-// 0 = "off" , 1 = "includes", 2 = "exclude"
-export const getInclusionIndex = (inclusionState: InclusionState | undefined) => {
-  const inclusionIndex = inclusionStates.findIndex((el) => el === inclusionState);
-  if (inclusionIndex === -1) return 0;
-  return inclusionIndex;
-};
 export default useSettingsStore;
