@@ -1,9 +1,9 @@
 import useSettingsStore from "@/store/store.settings";
-import useMovieStore, { Tag } from "@/store/store.shows";
+import { Tag, useTags } from "@/store/store.shows";
 import React, { useEffect, useState } from "react";
 
 const useFilterTags = () => {
-  const allTags = useMovieStore((state) => state.tagArray);
+  const allTags = useTags();
   const includeTags = useSettingsStore((state) => state.filterCriteria.includeTags);
   const excludeTags = useSettingsStore((state) => state.filterCriteria.excludeTags);
   const [mergedTags, setMergedTags] = useState(() =>

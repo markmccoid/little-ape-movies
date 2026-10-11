@@ -1,26 +1,46 @@
 import { QueryClient } from "@tanstack/react-query";
 import { eventBus } from "./eventBus";
 import { movieGetWatchProviders, WatchProvidersType } from "@markmccoid/tmdb_api";
-import useMovieStore, { useMovies } from "./store.shows";
 import { getImageColors } from "@/utils/color.utils";
 import { formatEpoch } from "@/utils/utils";
-import useSettingsStore, { useSettingsActions } from "./store.settings";
-import { set } from "lodash";
+import { getCurrentUser } from "./dataAccess/localStorage-users";
+import {
+  listStreamingProviders,
+  saveStreamingProviders,
+  setShowGenres,
+  updateShowFields,
+  withMovieTransaction,
+} from "./dataAccess/movieDatabase";
+import { unionBy } from "lodash";
+import useSettingsStore from "./store.settings";
+import { queryClient } from "./queryClient";
+import type { ShowItemType } from "./movieTypes";
 
-//~~ -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//~~ Update Show Data Code
-//~~ Updates WatchProvides
-//~~ -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+const libraryKey = (userId: string) => ["library", userId] as const;
+
+const saveShowPatch = (showId: number, patch: Partial<ShowItemType>) => {
+  const userId = getCurrentUser()?.id;
+  if (!userId) return;
+  const { tags: _tags, genres, id: _id, ...fields } = patch;
+  withMovieTransaction(() => {
+    updateShowFields(userId, showId, fields);
+    if (genres) setShowGenres(userId, showId, genres);
+  });
+  queryClient.setQueryData<ShowItemType | null>(["library", userId, "show", showId], (current) =>
+    current ? { ...current, ...patch } : current
+  );
+  queryClient.invalidateQueries({ queryKey: libraryKey(userId) });
+};
+
 const utilFetchMovieWatchProviders = async (showId: number) => {
   const tempData = await movieGetWatchProviders(showId.toString());
   return tempData.data.results.US as WatchProvidersType;
 };
-//
-const createUpdateShowProviders = (queryClient: QueryClient) => async (showId: number) => {
-  // let wproviders = queryClient.getQueryData(["watchProviders", showId]);
+
+const createUpdateShowProviders = (client: QueryClient) => async (showId: number) => {
   let wproviders: WatchProvidersType | undefined = undefined;
   try {
-    wproviders = await queryClient.fetchQuery({
+    wproviders = await client.fetchQuery({
       queryKey: ["watchProviders", showId],
       queryFn: async () => await utilFetchMovieWatchProviders(showId),
       staleTime: 300000,
@@ -29,53 +49,39 @@ const createUpdateShowProviders = (queryClient: QueryClient) => async (showId: n
     console.log("Error in WatchProvider Event");
     return;
   }
-  // Store the streaming provider as a lookup array on the store.  No dupes will be created
-  useMovieStore.getState().actions.updateStreamingProviders(wproviders?.stream);
-  // Update the movie record with the streaming providers
-  useMovieStore.getState().actions.updateShow(showId, {
+  const userId = getCurrentUser()?.id;
+  if (userId && wproviders?.stream) {
+    const merged = unionBy(listStreamingProviders(userId), wproviders.stream, "providerId");
+    saveStreamingProviders(userId, merged);
+  }
+  saveShowPatch(showId, {
     streaming: {
       dateAddedEpoch: formatEpoch(Date.now()),
       providers: wproviders?.stream ? wproviders.stream.map((el) => el.providerId) : [],
     },
   });
 };
-//~~ -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//~~ Update Show Data Code END
-//~~ -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-//!! -------------------------------------------------------
-//!! setUpEvents
-//!! This is called in root _layout.tsx
-//!! -------------------------------------------------------
-export const setupEvents = (queryClient: QueryClient) => {
-  //- Create updateShowProviders function (needs queryClient)
-  const updateShowProviders = createUpdateShowProviders(queryClient);
-  //~~ ------------------------------
-  //~~ Subscribe UPDATE_SHOW_PROVIDERS
+export const setupEvents = (client: QueryClient) => {
+  const updateShowProviders = createUpdateShowProviders(client);
   const unsubscribeUpdateProviders = eventBus.subscribe(
     "UPDATE_SHOW_PROVIDERS",
     updateShowProviders
   );
 
-  //~~ ------------------------------
-  //~~ Subscribe GET_SHOW_COLORS
   const unsubscribeShowColors = eventBus.subscribe(
     "GET_SHOW_COLORS",
     async (movieId: number, posterURL) => {
       const imageColors = await getImageColors(posterURL);
       if (!imageColors) return;
-      useMovieStore.getState().actions.updateShow(movieId, { posterColors: imageColors });
+      saveShowPatch(movieId, { posterColors: imageColors });
     }
   );
 
-  //~~ ------------------------------
-  //~~ Subscribe GENERATE_GENRES_ARRAY
-  // Called on Add Show and on App intialize
   const unsubscribeGenres = eventBus.subscribe("GENERATE_GENRES_ARRAY", () => {
-    const genres = Array.from(
-      new Set(useMovieStore.getState().shows.flatMap((show) => show.genres))
-    );
-    useMovieStore.setState({ genreArray: genres });
+    const userId = getCurrentUser()?.id;
+    if (!userId) return;
+    queryClient.invalidateQueries({ queryKey: ["library", userId, "genres"] });
   });
 
   const unsubscribeInitialize = eventBus.subscribe("INITIALIZE_APP", () => {

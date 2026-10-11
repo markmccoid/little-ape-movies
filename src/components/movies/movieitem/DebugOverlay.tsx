@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import React from "react";
-import useMovieStore, { ShowItemType } from "@/store/store.shows";
+import { ShowItemType, useTags } from "@/store/store.shows";
 import dayjs from "dayjs";
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
   width: number;
 };
 const DebugOverlay = ({ movie, width }: Props) => {
-  const tagsArray = useMovieStore((state) => state.tagArray);
+  const tagsArray = useTags();
   const tags = tagsArray.filter((tag) => movie.tags.includes(tag.id)).map((el) => el.name);
 
   return (

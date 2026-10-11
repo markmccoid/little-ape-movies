@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useLocalSearchParams, useNavigation, type NativeStackNavigationOptions } from "expo-router";
 import MovieDetailsContainer from "@/components/movies/details/MovieDetailsContainer";
 import { View, Text, Image, Dimensions, ScrollView } from "react-native";
-import { useMovieActions } from "@/store/store.shows";
+import { useShow } from "@/store/store.shows";
 import { LinearGradient } from "expo-linear-gradient";
 import MDImageDescRow from "@/components/movies/details/MDImageDescRow";
 import { useMovieDetailData } from "@/store/dataHooks";
@@ -10,8 +10,8 @@ const { width, height: screenHeight } = Dimensions.get("window");
 
 const MovieDetailHome = () => {
   const { showId } = useLocalSearchParams<{ showId: string }>();
-  const movieActions = useMovieActions();
-  const storedMovie = movieActions.getShowById(parseInt(showId));
+  const { data: savedMovie } = useShow(parseInt(showId));
+  const storedMovie = savedMovie ?? undefined;
 
   const { movieDetails, isLoading, isError } = useMovieDetailData(parseInt(showId));
   const [shouldRender, setShouldRender] = React.useState(false);

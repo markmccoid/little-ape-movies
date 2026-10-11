@@ -27,11 +27,11 @@ const MovieSearch = ({ isVisible, handleSetVisible, searchY }: Props) => {
   const inputRef = React.useRef<TextInput>(null);
   const allScopeOpacity = useSharedValue(titleSearchScope === "all" ? 1 : 0.4);
   const allScopeBackground = useSharedValue(
-    titleSearchScope === "all" ? colors.primary : colors.primaryForeground
+    titleSearchScope === "all" ? colors.primary : colors.primaryForeground,
   );
   const filterScopeOpacity = useSharedValue(titleSearchScope === "filteronly" ? 1 : 0.4);
   const filterScopeBackground = useSharedValue(
-    titleSearchScope === "filteronly" ? colors.primary : colors.primaryForeground
+    titleSearchScope === "filteronly" ? colors.primary : colors.primaryForeground,
   );
   const scopeHighlightX = useSharedValue(titleSearchScope === "all" ? 45 : 10);
 
@@ -40,15 +40,12 @@ const MovieSearch = ({ isVisible, handleSetVisible, searchY }: Props) => {
     allScopeOpacity.value = withTiming(titleSearchScope === "all" ? 1 : 0.4, timing);
     allScopeBackground.value = withTiming(
       titleSearchScope === "all" ? colors.primary : colors.primaryForeground,
-      timing
+      timing,
     );
-    filterScopeOpacity.value = withTiming(
-      titleSearchScope === "filteronly" ? 1 : 0.4,
-      timing
-    );
+    filterScopeOpacity.value = withTiming(titleSearchScope === "filteronly" ? 1 : 0.4, timing);
     filterScopeBackground.value = withTiming(
       titleSearchScope === "filteronly" ? colors.primary : colors.primaryForeground,
-      timing
+      timing,
     );
     scopeHighlightX.value = withTiming(titleSearchScope === "all" ? 10 : 45, timing);
   }, [titleSearchScope, colors.primary, colors.primaryForeground]);
@@ -113,6 +110,7 @@ const MovieSearch = ({ isVisible, handleSetVisible, searchY }: Props) => {
         className="absolute right-[100]"
         onPress={() => setTitleSearchValue("")}
         pointerEvents={titleSearchValue !== "" ? "auto" : "none"}
+        hitSlop={15}
       >
         {titleSearchValue !== "" && (
           <Animated.View entering={FadeIn.duration(500)} exiting={FadeOut.duration(500)}>

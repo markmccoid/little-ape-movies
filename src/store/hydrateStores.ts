@@ -1,26 +1,10 @@
 import { eventBus } from "./eventBus";
 import { getCurrentUser, signIn, User } from "./dataAccess/localStorage-users";
 import { initCurrentUserStorage } from "./dataAccess/storageAdapter";
-import {
-  emptyMovieSnapshot,
-  loadMovieSnapshot,
-  migrateAllMovieStorage,
-  migrateUserMovieStorage,
-  MovieSnapshot,
-} from "./dataAccess/movieDatabase";
-import { setMoviePersistenceEnabled } from "./dataAccess/moviePersistence";
+import { migrateAllMovieStorage, migrateUserMovieStorage } from "./dataAccess/movieDatabase";
 import useSettingsStore from "./store.settings";
-import useMovieStore from "./store.shows";
-
-const applyMovieSnapshot = (snapshot: MovieSnapshot) => {
-  useMovieStore.setState({
-    shows: snapshot.shows,
-    tagArray: snapshot.tagArray,
-    genreArray: snapshot.genreArray,
-    streamingProviders: snapshot.streamingProviders,
-    pendingChanges: {},
-  });
-};
+import useMovieUiStore from "./store.movieUi";
+import { queryClient } from "./queryClient";
 
 const rehydrateSettings = async () => {
   await useSettingsStore.persist.rehydrate();
@@ -29,39 +13,31 @@ const rehydrateSettings = async () => {
   }
 };
 
-// Writes the in-memory movie and settings state. Call this only while storage
-// points at the logged-out placeholder, and while movie persistence is paused,
-// so a user switch cannot wipe the previous account.
+// Call this only while storage points at the logged-out placeholder, so a user
+// switch cannot wipe the previous account's settings.
 const clearVolatileState = () => {
-  useMovieStore.getState().actions.clearStore();
-  useMovieStore.setState({ pendingChanges: {} });
+  useMovieUiStore.getState().clearPendingChanges();
   useSettingsStore.getState().actions.resetSettingsStore();
+  queryClient.removeQueries({ queryKey: ["library"] });
 };
 
 export const hydrateCurrentUserStores = async (): Promise<User | undefined> => {
   const currentUser = getCurrentUser();
   initCurrentUserStorage(currentUser);
-  setMoviePersistenceEnabled(false);
   migrateAllMovieStorage(currentUser?.id);
-  const snapshot = currentUser ? loadMovieSnapshot(currentUser.id) : emptyMovieSnapshot();
-  applyMovieSnapshot(snapshot);
   await rehydrateSettings();
-  setMoviePersistenceEnabled(Boolean(currentUser?.id));
   eventBus.publish("CLEAR_SEARCH_STORES");
   return currentUser;
 };
 
 export const hydrateLoggedInUserStores = async (user: User) => {
-  setMoviePersistenceEnabled(false);
   signIn(user);
   initCurrentUserStorage(undefined);
   clearVolatileState();
   initCurrentUserStorage(user);
   migrateUserMovieStorage(user.id);
   await rehydrateSettings();
-  applyMovieSnapshot(loadMovieSnapshot(user.id));
-  setMoviePersistenceEnabled(true);
+  queryClient.removeQueries({ queryKey: ["library"] });
   eventBus.publish("CLEAR_SEARCH_STORES");
   eventBus.publish("INITIALIZE_APP");
-  eventBus.publish("GENERATE_GENRES_ARRAY");
 };

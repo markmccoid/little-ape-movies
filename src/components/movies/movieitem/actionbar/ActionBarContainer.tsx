@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer, useState, useRef } from "react";
 import { View, Text, TouchableOpacity, Pressable } from "react-native";
-import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
+import { ShowItemType, useMovieActions } from "@/store/store.shows";
 import { SquareChevronUp } from "@/lib/icons/SquareChevronUp";
 import ActionBarButtons from "./ActionBarButtons";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -143,7 +143,11 @@ const ActionBarContainer: React.FC<MovieItemActionBarProps> = ({
       >
         <ActionBarButtons movie={movie} column={column} handleChangePending={handleChangePending} />
         <View className="h-[10]" />
-        <ActionBarTags movieId={movie.id} handleChangePending={handleChangePending} />
+        <ActionBarTags
+          movieId={movie.id}
+          savedTagIds={movie.tags ?? []}
+          handleChangePending={handleChangePending}
+        />
         {/* <ActionInfoPanel movie={movie} /> */}
       </Animated.View>
     </Animated.View>

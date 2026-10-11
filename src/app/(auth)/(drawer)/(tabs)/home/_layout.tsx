@@ -5,7 +5,7 @@ import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle
 import { getCurrentUser } from "@/store/dataAccess/localStorage-users";
 import { useMovies } from "@/store/store.shows";
 const HomeLayout = () => {
-  const { filteredCount } = useMovies();
+  const { filteredCount, isLoading } = useMovies();
   const currUser = getCurrentUser();
   return (
     <Stack screenOptions={{}}>
@@ -13,7 +13,7 @@ const HomeLayout = () => {
         name="index"
         options={{
           headerShown: true,
-          title: `${filteredCount} Movies`,
+          title: isLoading ? "Movies" : `${filteredCount} Movies`,
           headerLeft: () => <NestedStackDrawerToggle />,
         }}
       />

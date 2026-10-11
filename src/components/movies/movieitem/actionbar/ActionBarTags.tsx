@@ -1,86 +1,32 @@
-import { View, Text, Pressable, ScrollView } from "react-native";
-import React, { useEffect, useRef } from "react";
-import useMovieStore, {
-  Tag,
-  TagState,
-  updateTagState,
-  useGetAppliedTags,
-  useMovieActions,
-} from "@/store/store.shows";
+import { ScrollView } from "react-native";
+import React, { useRef, useState } from "react";
+import { useMovieActions, useTags } from "@/store/store.shows";
 import TagCloudEnhanced, { TagItem } from "@/components/common/TagCloud/TagCloudEnhanced";
 
 type Props = {
   movieId: number;
+  savedTagIds: string[];
   handleChangePending: (changeState: boolean) => void;
 };
-const ActionBarTags = ({ movieId, handleChangePending }: Props) => {
+const ActionBarTags = ({ movieId, savedTagIds, handleChangePending }: Props) => {
   const movieActions = useMovieActions();
-  const tags = useMovieStore((state) => state.tagArray);
-  // const movies = useMovieStore((state) => state.shows);
-  const appliedTags = useGetAppliedTags(movieId) || [];
-  const prevAppliedTagsRef = useRef<Pick<Tag, "id" | "name">[] | undefined>(undefined);
-  // returns an array of tags with an applied property
-  const [newTagList, setNewTagList] = React.useState<TagState[] | []>([]);
-  const [newAppliedTags, setNewAppliedTags] = React.useState<string[]>([]);
+  const tags = useTags();
+  const savedKey = savedTagIds.join("\0");
+  const [draftTagIds, setDraftTagIds] = useState<string[] | null>(null);
+  const [draftBaseKey, setDraftBaseKey] = useState(savedKey);
+  const selectedIdsRef = useRef(savedTagIds);
 
-  // Runs when appliedTags or tags change -> these are the values in the Store (truth)
-  // This keeps us up to date when a new Tag is added OR when a tag is added in the detail screen.
-  useEffect(() => {
-    const prevTags = prevAppliedTagsRef.current;
-    const newTags = appliedTags;
+  if (draftBaseKey !== savedKey) {
+    setDraftBaseKey(savedKey);
+    setDraftTagIds(null);
+  }
 
-    if (!prevTags) {
-      prevAppliedTagsRef.current = newTags;
-      const mergeAppliedTags = [...new Set([...newTags.map((el: any) => el.id)])];
-      const updatedTagList = tags.map((tag) => ({
-        ...tag,
-        applied: mergeAppliedTags.includes(tag.id),
-      }));
-
-      setNewTagList(updatedTagList);
-      setNewAppliedTags(mergeAppliedTags);
-      return;
-    }
-
-    if (newTags.length !== prevTags.length) {
-      prevAppliedTagsRef.current = newTags;
-      const mergeAppliedTags = [...new Set([...newTags.map((el: any) => el.id)])];
-      const updatedTagList = tags.map((tag) => ({
-        ...tag,
-        applied: mergeAppliedTags.includes(tag.id),
-      }));
-
-      setNewTagList(updatedTagList);
-      setNewAppliedTags(mergeAppliedTags);
-      return;
-    }
-
-    const hasChanges = newTags.some((tag: any, index: number) => tag !== prevTags[index]);
-
-    if (hasChanges) {
-      prevAppliedTagsRef.current = newTags;
-      const mergeAppliedTags = [...new Set([...newTags.map((el: any) => el.id)])];
-      const updatedTagList = tags.map((tag) => ({
-        ...tag,
-        applied: mergeAppliedTags.includes(tag.id),
-      }));
-
-      setNewTagList(updatedTagList);
-      setNewAppliedTags(mergeAppliedTags);
-    }
-    // console.log("in Tags");
-    // const prevTags = prevTagsRef.current;
-    // const newTags = appliedTags;
-
-    // const mergeAppliedTags = [...new Set([...appliedTags.map((el) => el.id)])];
-    // const updatedTagList = tags.map((tag) => ({
-    //   ...tag,
-    //   applied: mergeAppliedTags.includes(tag.id),
-    // }));
-
-    // setNewTagList(updatedTagList);
-    // setNewAppliedTags(mergeAppliedTags);
-  }, [tags, appliedTags]);
+  const selectedIds = draftBaseKey === savedKey ? (draftTagIds ?? savedTagIds) : savedTagIds;
+  selectedIdsRef.current = selectedIds;
+  const tagList = tags.map((tag) => ({
+    ...tag,
+    applied: selectedIds.includes(tag.id),
+  }));
 
   // The TagCloudEnhanced component expects "include", "off" or "exclude" as the states in onToggleTag
   // When the list is rendered, it calls this function and based on the active flag choose "include" or "off"
@@ -89,16 +35,14 @@ const ActionBarTags = ({ movieId, handleChangePending }: Props) => {
   const handleToggleTag = (currState: "include" | "off") => async (tagId: string) => {
     if (!movieId) return;
     handleChangePending(true);
-    if (currState === "include") {
-      movieActions.setPendingChanges(movieId, {
-        tags: newAppliedTags.filter((el) => el !== tagId),
-      });
-      console.log("EXCLUDE TAG", newAppliedTags);
-      setNewAppliedTags((prev) => prev.filter((el) => el !== tagId));
-    } else {
-      movieActions.setPendingChanges(movieId, { tags: [...newAppliedTags, tagId] });
-      setNewAppliedTags((prev) => Array.from(new Set([...prev, tagId])));
-    }
+    const current = selectedIdsRef.current;
+    const next =
+      currState === "include"
+        ? current.filter((id) => id !== tagId)
+        : Array.from(new Set([...current, tagId]));
+    selectedIdsRef.current = next;
+    setDraftTagIds(next);
+    movieActions.setPendingChanges(movieId, { tags: next });
   };
 
   return (
@@ -107,7 +51,7 @@ const ActionBarTags = ({ movieId, handleChangePending }: Props) => {
       contentContainerClassName="pb-10"
     >
       <TagCloudEnhanced>
-        {newTagList?.map((el) => (
+        {tagList.map((el) => (
           <TagItem
             size="xs"
             onToggleTag={handleToggleTag(el.applied ? "include" : "off")}

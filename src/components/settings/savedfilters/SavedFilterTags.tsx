@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import React from "react";
-import useMovieStore, { Tag } from "@/store/store.shows";
+import { Tag, useTags } from "@/store/store.shows";
 
 import TagCloudEnhanced, {
   TagItem as TagItemEnhanced,
@@ -30,7 +30,7 @@ type Props = {
 };
 // Component that displays the tags in a cloud format
 const SavedFilterTags = ({ handleTagList, initTags }: Props) => {
-  const tags = useMovieStore((state) => state.tagArray);
+  const tags = useTags();
   const [tagState, setTagState] = React.useState<TagState[]>(mergeTags(tags, initTags));
 
   // Update the tagState when the initTags change

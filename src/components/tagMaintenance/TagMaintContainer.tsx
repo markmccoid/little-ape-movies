@@ -7,7 +7,7 @@ import React, {
   useState,
 } from "react";
 import { Alert, Pressable, Text, StyleSheet, TouchableOpacity, View } from "react-native";
-import useMovieStore, { Tag, useMovieActions } from "@/store/store.shows";
+import { Tag, useMovieActions, useTags } from "@/store/store.shows";
 
 import { PlusCircle } from "@/lib/icons/PlusCircle";
 import { useNavigation, type NativeStackNavigationOptions } from "expo-router";
@@ -61,7 +61,7 @@ const HeaderRight = () => {
 };
 
 export default function TagMaintContainer() {
-  const tags = useMovieStore((state) => state.tagArray);
+  const tags = useTags();
   const navigation = useNavigation();
   const actions = useMovieActions();
   const [localTags, setLocalTags] = useState<Tag[]>();

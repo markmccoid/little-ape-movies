@@ -6,7 +6,7 @@ import RottenTomatoes from "./ratings/RottenTomatoes";
 import IMDBRating from "./ratings/IMDBRating";
 import Metascore from "./ratings/Metascore";
 import UserRating from "../../common/UserRating";
-import useMovieStore, { ShowItemType, useMovieActions } from "@/store/store.shows";
+import { ShowItemType, useMovieActions } from "@/store/store.shows";
 import { IMDBIcon } from "@/components/common/Icons";
 import { useCustomTheme } from "@/lib/colorThemes";
 import { Button } from "@/components/ui/button";

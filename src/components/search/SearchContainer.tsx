@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useReducer, useRef, useState } from "rea
 import { FetchNextPageFn } from "@/store/query.search";
 import { MovieSearchResults, useSearchStore } from "@/store/store.search";
 import SearchResult from "@/components/search/SearchResult";
-import useMovieStore from "@/store/store.shows";
+import { useMovieActions } from "@/store/store.shows";
 import { SymbolView } from "expo-symbols";
 import useSettingsStore from "@/store/store.settings";
 import useImageSize from "@/hooks/useImageSize";
@@ -31,7 +31,7 @@ const EXTRA_HEIGHT = 20;
 const SearchContainer = ({ movies, fetchNextPage }: Props) => {
   const numColumns = useSettingsStore((state) => state.searchColumns);
   const { imageHeight, imageWidth } = useImageSize(numColumns);
-  const movieActions = useMovieStore((state) => state.actions);
+  const movieActions = useMovieActions();
   const fetchNextPageFunc = fetchNextPage ? fetchNextPage : () => {};
   const flatListRef = useRef<FlatList>(null);
   const [isMovieLoading, setIsMovieLoading] = useState(false);

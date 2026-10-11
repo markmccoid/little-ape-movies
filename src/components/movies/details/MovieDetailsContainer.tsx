@@ -11,7 +11,7 @@ import {
 import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Link, useRouter, useNavigation, type NativeStackNavigationOptions } from "expo-router";
 import { MovieDetails, useMovieDetailData, useOMDBData } from "@/store/dataHooks";
-import useMovieStore, { useMovieActions } from "@/store/store.shows";
+import { useMovieActions, useShow } from "@/store/store.shows";
 import { movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
 import MDImageDescRow from "./MDImageDescRow";
 import MDDetails from "./MDDetails";
@@ -30,8 +30,8 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
   const colorScheme = useColorScheme();
   const navigation = useNavigation();
   const movieActions = useMovieActions();
-  // Not using the actions.getShowById because it doesn't trigger an update if shows array changes
-  const storedMovie = useMovieStore((state) => state.shows.find((el) => el.id === movieId));
+  const { data: savedMovie } = useShow(movieId);
+  const storedMovie = savedMovie ?? undefined;
 
   const existsInSaved = !!storedMovie?.existsInSaved;
   const { movieDetails, isLoading, isError } = useMovieDetailData(movieId);

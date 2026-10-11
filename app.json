@@ -4,7 +4,7 @@
     "scheme": "littleapemovies",
     "userInterfaceStyle": "automatic",
     "orientation": "portrait",
-    "version": "1.2.02",
+    "version": "1.2.1",
     "web": {
       "output": "static",
       "bundler": "metro"
@@ -55,7 +55,10 @@
       "package": "com.markmccoid.littleapemovies"
     },
     "ios": {
-      "bundleIdentifier": "com.markmccoid.littleapemovies"
+      "bundleIdentifier": "com.markmccoid.littleapemovies",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "extra": {
       "router": {

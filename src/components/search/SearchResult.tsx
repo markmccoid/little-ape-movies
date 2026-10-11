@@ -1,8 +1,8 @@
 import { View, TouchableOpacity, Pressable, Keyboard } from "react-native";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import MovieImage from "../common/MovieImage";
+import { movieSearchByTitle_Results } from "@markmccoid/tmdb_api";
 import { MovieSearchResults, useSearchStore } from "@/store/store.search";
-import { MovieStore } from "@/store/store.shows";
 import { AddCircleIcon, AddIcon, CheckCircleIcon } from "../common/Icons";
 import { useCustomTheme } from "@/lib/colorThemes";
 import { Link, router, useFocusEffect, usePathname, useSegments } from "expo-router";
@@ -16,8 +16,8 @@ type Props = {
   spacing: { bottomMargin: number; extraHeight: number };
   isMovieLoading: boolean;
   setIsMovieLoading: (arg: boolean) => void;
-  onAddMovie: MovieStore["actions"]["addShow"];
-  onRemoveMovie: MovieStore["actions"]["removeShow"];
+  onAddMovie: (movie: movieSearchByTitle_Results) => Promise<void>;
+  onRemoveMovie: (id: number) => Promise<void>;
 };
 const SearchResult = ({
   movie,

@@ -31,7 +31,7 @@ const MoviesContainer = () => {
   const getFilterStatus = useSettingsStore((state) => state.actions.getFilterStatus);
   const { setSearch } = useSearchStore((state) => state.actions);
   const { horizontalMargin, itemHeight } = getMovieItemSizing();
-  const { filteredMovies: movies } = useMovies();
+  const { filteredMovies: movies, isLoading: moviesLoading } = useMovies();
   const { colors } = useCustomTheme();
   const flatListRef = React.useRef<FlatList>(null);
   const [hideAll, setHideAll] = useState(false);
@@ -178,7 +178,7 @@ const MoviesContainer = () => {
         <MovieSearch isVisible={searchOpen} handleSetVisible={handleSetVisible} searchY={searchY} />
       </Animated.View>
 
-      {movies.length === 0 && (
+      {movies.length === 0 && !moviesLoading && (
         <View className="flex-1 justify-center items-center">
           <Pressable
             onPress={() => {

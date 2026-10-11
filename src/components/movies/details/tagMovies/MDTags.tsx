@@ -1,12 +1,11 @@
 import { View, Text, ScrollView, Pressable, StyleSheet, LayoutChangeEvent } from "react-native";
 import React, { useEffect, useReducer, useRef, useState } from "react";
-import useMovieStore, {
-  MovieStore,
+import {
   ShowItemType,
-  Tag,
   updateTagState,
   useGetAppliedTags,
   useMovieActions,
+  useTags,
 } from "@/store/store.shows";
 import TagCloud, { TagItem } from "@/components/common/TagCloud/TagCloud";
 import TagCloudEnhanced, {
@@ -50,7 +49,7 @@ const MDTags = ({ storedMovie, existsInSaved }: Props) => {
   const { colors } = useCustomTheme();
   const [showAddTag, toggleAddTag] = useReducer((state) => !state, false);
   const actions = useMovieActions();
-  const tags = useMovieStore((state) => state.tagArray);
+  const tags = useTags();
   const appliedTags = useGetAppliedTags(storedMovie?.id);
   const movieTags = updateTagState(tags, storedMovie?.tags || []);
 

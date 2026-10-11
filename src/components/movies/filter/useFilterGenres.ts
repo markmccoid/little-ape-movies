@@ -1,9 +1,9 @@
 import useSettingsStore from "@/store/store.settings";
-import useMovieStore, { Tag } from "@/store/store.shows";
+import { useGenres } from "@/store/store.shows";
 import React, { useEffect, useState } from "react";
 
 const useFilterGenres = () => {
-  const allGenres = useMovieStore((state) => state.genreArray);
+  const allGenres = useGenres();
   const includeGenres = useSettingsStore((state) => state.filterCriteria.includeGenres);
   const excludeGenres = useSettingsStore((state) => state.filterCriteria.excludeGenres);
   const [mergedGenres, setMergedGenres] = useState(() =>

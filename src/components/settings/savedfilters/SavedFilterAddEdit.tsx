@@ -5,7 +5,7 @@ import SavedFilterGenres from "./SavedFilterGenres";
 import { Text } from "@/components/ui/text";
 import useSettingsStore, { SortField, useSettingsActions } from "@/store/store.settings";
 import uuid from "react-native-uuid";
-import useMovieStore, { Tag } from "@/store/store.shows";
+import { Tag, useGenres, useTags } from "@/store/store.shows";
 import { GenreState } from "./SavedFilterGenres";
 import { TagState } from "./SavedFilterTags";
 
@@ -57,8 +57,8 @@ type Props = {
 const SavedFilterAddEdit = ({ filterId, cancelAddEdit }: Props) => {
   const addUpdateSavedFilter = useSettingsActions().addUpdateSavedFilter;
   const savedFilters = useSettingsStore((state) => state.savedFilters);
-  const allTags = useMovieStore((state) => state.tagArray);
-  const allGenres = useMovieStore((state) => state.genreArray);
+  const allTags = useTags();
+  const allGenres = useGenres();
   const [initTags, setInitTags] = React.useState<TagState[]>([]);
   const [initGenres, setInitGenres] = React.useState<GenreState[]>([]);
   const [initSort, setInitSort] = React.useState<SortField[]>(

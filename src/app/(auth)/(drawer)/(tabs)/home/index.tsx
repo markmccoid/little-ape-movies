@@ -6,8 +6,6 @@ import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle
 import MoviesContainer from "@/components/movies/MoviesContainer";
 import { getCurrentUser } from "@/store/dataAccess/localStorage-users";
 import { useCustomTheme } from "@/lib/colorThemes";
-import { useSearchStore } from "@/store/store.search";
-import useMovieStore from "@/store/store.shows";
 import useSettingsStore, { useSettingsActions } from "@/store/store.settings";
 
 const HomeIndex = () => {

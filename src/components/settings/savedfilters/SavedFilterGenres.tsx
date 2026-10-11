@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import React from "react";
-import useMovieStore, { Tag } from "@/store/store.shows";
+import { useGenres } from "@/store/store.shows";
 
 import GenreCloudEnhanced, { GenreItem } from "@/components/common/TagCloud/GenreCloudEnhanced";
 import { useSettingsActions } from "@/store/store.settings";
@@ -33,7 +33,7 @@ type Props = {
   initGenres: GenreState[];
 };
 const SavedFilterGenres = ({ handleGenreList, initGenres }: Props) => {
-  const allGenres = useMovieStore((state) => state.genreArray);
+  const allGenres = useGenres();
   const [genreState, setGenreState] = React.useState<GenreState[]>(
     buildGenreState(allGenres, initGenres)
   );
