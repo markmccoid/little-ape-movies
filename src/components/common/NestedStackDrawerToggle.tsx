@@ -12,7 +12,7 @@ const NestedStackDrawerToggle = ({
 }) => {
   const { colors } = useTheme();
   return (
-    <View className={`ml-[-16] ${className}`} style={{ ...style }}>
+    <View className={`items-center justify-center ${className ?? ""}`} style={style}>
       <DrawerToggleButton tintColor={colors.primary} />
     </View>
   );

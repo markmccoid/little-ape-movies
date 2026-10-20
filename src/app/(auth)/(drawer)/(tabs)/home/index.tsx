@@ -48,7 +48,7 @@ const HomeIndex = () => {
                   </Text>
                 </View>
               )}
-              <Link href="./home/filtermodal" className="py-1 px-2 mr-[-7]" asChild>
+              <Link href="./home/filtermodal" className="items-center justify-center py-1 px-2" asChild>
                 <Pressable onLongPress={() => clearFilters("all")}>
                   <FilterIcon color={colors.primary} />
                 </Pressable>

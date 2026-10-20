@@ -44,7 +44,7 @@ const MDDeleteButton = ({ movieId, removeShow }: Props) => {
         <TouchableOpacity
           disabled={isProcessing}
           onPress={handleDelete}
-          className={`flex flex-row items-center px-2 mr-[-10] pl-1 ${
+          className={`items-center justify-center py-1 px-2 ${
             isProcessing ? "opacity-50" : ""
           }`}
         >
