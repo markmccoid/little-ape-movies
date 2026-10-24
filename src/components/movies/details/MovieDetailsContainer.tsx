@@ -6,7 +6,6 @@ import {
   Text,
   Pressable,
   TouchableOpacity,
-  InteractionManager,
 } from "react-native";
 import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Link, useRouter, useNavigation, type NativeStackNavigationOptions } from "expo-router";
@@ -88,12 +87,12 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
 
   //~ Update streaming providers
   useEffect(() => {
-    if (existsInSaved) {
-      InteractionManager.runAfterInteractions(() =>
-        eventBus.publish("UPDATE_SHOW_PROVIDERS", storedMovie?.id)
-      );
-    }
-  }, [existsInSaved]);
+    if (!existsInSaved || storedMovie?.id == null) return;
+    const idleId = requestIdleCallback(() => {
+      eventBus.publish("UPDATE_SHOW_PROVIDERS", storedMovie.id);
+    });
+    return () => cancelIdleCallback(idleId);
+  }, [existsInSaved, storedMovie?.id]);
 
   return (
     <View className="flex-1">
@@ -118,6 +117,7 @@ const MovieDetailsContainer = ({ movieId }: { movieId: number }) => {
           flexGrow: 1,
           marginBottom: tabBarHeight,
         }}
+        contentInsetAdjustmentBehavior="never"
         contentContainerStyle={{ paddingBottom: tabBarHeight + 15 }}
       >
         {/* IMAGE and DESC */}

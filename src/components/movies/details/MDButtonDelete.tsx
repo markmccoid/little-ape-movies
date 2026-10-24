@@ -1,5 +1,5 @@
 import React, { startTransition, useState } from "react";
-import { TouchableOpacity, ActivityIndicator, View, Text, InteractionManager } from "react-native";
+import { TouchableOpacity, ActivityIndicator, View, Text } from "react-native";
 import showConfirmationPrompt from "@/components/common/showConfirmationPrompt";
 import { useCustomTheme } from "@/lib/colorThemes";
 import { SymbolView } from "expo-symbols";
@@ -32,7 +32,7 @@ const MDDeleteButton = ({ movieId, removeShow }: Props) => {
       setIsProcessing(false);
       // If we are deep in a stack go back to starting point
       router.dismissAll();
-      InteractionManager.runAfterInteractions(() => eventBus.publish("TAG_SEARCH_RESULTS"));
+      requestIdleCallback(() => eventBus.publish("TAG_SEARCH_RESULTS"));
     }
   };
 

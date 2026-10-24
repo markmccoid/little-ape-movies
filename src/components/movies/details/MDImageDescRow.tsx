@@ -38,6 +38,7 @@ const MDImageDescRow = ({ existsInSaved, movieDetails, storedMovie, detailsFaile
         <MDDetailContextMenu
           movieId={storedMovie?.id || movieDetails?.id}
           movieTitle={storedMovie?.title || movieDetails?.title}
+          imdbId={movieDetails?.imdbId}
           existsInSaved={existsInSaved}
         >
           <View className="relative">

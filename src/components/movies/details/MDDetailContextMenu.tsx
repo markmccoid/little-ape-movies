@@ -7,11 +7,18 @@ import { nativeShareItem } from "@/utils/utils";
 type Props = {
   movieId: number | undefined;
   movieTitle: string | undefined;
+  imdbId: string | undefined;
   existsInSaved: boolean;
   children: React.ReactElement;
 };
 
-const MDDetailContextMenu = ({ movieId, movieTitle, existsInSaved, children }: Props) => {
+const MDDetailContextMenu = ({
+  movieId,
+  movieTitle,
+  imdbId,
+  existsInSaved,
+  children,
+}: Props) => {
   const router = useRouter();
   const pathname = usePathname();
   const segments = useSegments();
@@ -22,10 +29,11 @@ const MDDetailContextMenu = ({ movieId, movieTitle, existsInSaved, children }: P
   const handleShare = () => {
     if (movieId == null || !movieTitle) return;
     const deepLink = Linking.createURL(`/search/${movieId}`);
-    nativeShareItem({
-      message: "Open and Search in Little Ape Movies ->",
-      url: deepLink,
-    });
+    const shareLines = ["Open and Search in Little Ape Movies ->", deepLink];
+    if (imdbId) {
+      shareLines.push(`IMDB: http://www.imdb.com/title/${imdbId}`);
+    }
+    nativeShareItem({ message: shareLines.join("\n") });
   };
 
   const handlePickImage = () => {

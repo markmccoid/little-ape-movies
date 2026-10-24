@@ -1,4 +1,4 @@
-import { View, Text, Pressable, InteractionManager } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import React from "react";
 import { SymbolView } from "expo-symbols";
 import showConfirmationPrompt from "@/components/common/showConfirmationPrompt";
@@ -29,7 +29,7 @@ const ActionBarDelete = ({ movieId, actionBarShown }: Props) => {
     } catch (error) {
       console.error("Delete operation failed:", error);
     } finally {
-      InteractionManager.runAfterInteractions(() => eventBus.publish("TAG_SEARCH_RESULTS"));
+      requestIdleCallback(() => eventBus.publish("TAG_SEARCH_RESULTS"));
     }
   };
 

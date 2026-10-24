@@ -1,14 +1,21 @@
-import { View, Text } from "react-native";
 import React from "react";
-import { Stack, useTheme } from "expo-router";
+import { Stack } from "expo-router";
 import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle";
-import { getCurrentUser } from "@/store/dataAccess/localStorage-users";
+import { useCustomTheme } from "@/lib/colorThemes";
 import { useMovies } from "@/store/store.shows";
 const HomeLayout = () => {
   const { filteredCount, isLoading } = useMovies();
-  const currUser = getCurrentUser();
+  const { colors } = useCustomTheme();
   return (
-    <Stack screenOptions={{}}>
+    <Stack
+      screenOptions={{
+        // iOS 26+ defaults to a transparent Liquid Glass header and lays the
+        // screen underneath it. Keep the bar opaque so the grid starts below it.
+        headerTransparent: false,
+        headerShadowVisible: false,
+        headerStyle: { backgroundColor: colors.background },
+      }}
+    >
       <Stack.Screen
         name="index"
         options={{

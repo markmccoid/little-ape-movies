@@ -218,6 +218,7 @@ const MoviesContainer = () => {
         keyExtractor={(item) => item.id.toString()}
         numColumns={2}
         style={[listStyle, { zIndex: 10 }]}
+        contentInsetAdjustmentBehavior="never"
         columnWrapperStyle={{ marginHorizontal: horizontalMargin }}
         onScroll={scrollHandler}
         getItemLayout={getItemLayout}

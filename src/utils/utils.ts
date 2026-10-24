@@ -1,10 +1,7 @@
 import { Share } from "react-native";
-export const nativeShareItem = async ({ message, url }: { message: string; url: string }) => {
+export const nativeShareItem = async ({ message, url }: { message: string; url?: string }) => {
   try {
-    const result = await Share.share({
-      message,
-      url,
-    });
+    const result = await Share.share(url ? { message, url } : { message });
     //-------
     //- Below code can be used if you want to have some sort of
     //- callback after you have shared or dismissed the share ui

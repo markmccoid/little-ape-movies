@@ -92,7 +92,7 @@ const MovieItem = ({ movie, hideAll, column }: Props) => {
           borderRadius: 10,
           overflow: "hidden",
           marginVertical: verticalMargin,
-          marginRight: gap,
+          marginRight: column === 0 ? gap : 0,
           height: imageHeight,
         }}
       >

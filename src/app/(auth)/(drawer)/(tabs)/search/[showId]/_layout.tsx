@@ -1,12 +1,22 @@
-import { View, Text, Pressable } from "react-native";
+import { Text, Pressable } from "react-native";
 import React from "react";
 import { Stack, useRouter } from "expo-router";
 import { ChevronLeft } from "@/lib/icons/ChevronLeft";
+import { useCustomTheme } from "@/lib/colorThemes";
 
 const ShowIdLayout = () => {
   const router = useRouter();
+  const { colors } = useCustomTheme();
   return (
-    <Stack screenOptions={{}}>
+    <Stack
+      screenOptions={{
+        // iOS 26+ defaults to a transparent Liquid Glass header and lays the
+        // screen underneath it. Keep the bar opaque so details start below it.
+        headerTransparent: false,
+        headerShadowVisible: false,
+        headerStyle: { backgroundColor: colors.background },
+      }}
+    >
       <Stack.Screen
         name="index"
         options={{
