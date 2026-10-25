@@ -28,7 +28,9 @@ const MDDetailContextMenu = ({
 
   const handleShare = () => {
     if (movieId == null || !movieTitle) return;
-    const deepLink = Linking.createURL(`/search/${movieId}`);
+    const deepLink = Linking.createURL(`/search/${movieId}`, {
+      queryParams: { title: movieTitle },
+    });
     const shareLines = ["Open and Search in Little Ape Movies ->", deepLink];
     if (imdbId) {
       shareLines.push(`IMDB: http://www.imdb.com/title/${imdbId}`);

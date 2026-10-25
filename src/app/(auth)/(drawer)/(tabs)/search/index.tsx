@@ -12,7 +12,9 @@ import {
   useFocusEffect,
   useGlobalSearchParams,
   useIsFocused,
+  useLocalSearchParams,
   useNavigation,
+  useRouter,
   type NativeStackNavigationOptions,
 } from "expo-router";
 import { SearchBarCommands } from "react-native-screens";
@@ -34,6 +36,14 @@ import SearchInputAccessoryView from "@/components/search/SearchInputAccessoryVi
 
 import { GripHorizontalIcon } from "@/components/common/Icons";
 import NestedStackDrawerToggle from "@/components/common/NestedStackDrawerToggle";
+import { useMovieDetailData } from "@/store/dataHooks";
+import { useAuth } from "@/providers/AuthProvider";
+
+const firstParam = (value: string | string[] | undefined) => {
+  const raw = Array.isArray(value) ? value[0] : value;
+  const trimmed = raw?.trim();
+  return trimmed || undefined;
+};
 
 const SearchPage = () => {
   const { colors } = useCustomTheme();
@@ -46,6 +56,21 @@ const SearchPage = () => {
   const { top } = useSafeAreaInsets();
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<TextInput>(null);
+  const router = useRouter();
+  const params = useLocalSearchParams<{
+    deeplinkShowId?: string | string[];
+    deeplinkTitle?: string | string[];
+  }>();
+  const deeplinkShowId = firstParam(params.deeplinkShowId);
+  const deeplinkTitle = firstParam(params.deeplinkTitle);
+  const showIdNumber = Number(deeplinkShowId);
+  const shouldLookupTitle =
+    Boolean(deeplinkShowId) && !deeplinkTitle && Number.isInteger(showIdNumber) && showIdNumber > 0;
+  const { movieDetails, isError, isLoading } = useMovieDetailData(shouldLookupTitle ? showIdNumber : 0);
+  const openedShowId = useRef<string | null>(null);
+  // Startup hydration publishes CLEAR_SEARCH_STORES, which wipes a title set
+  // during the cold-start deep link. Wait until that reset has finished.
+  const { initialized: storesHydrated } = useAuth();
 
   useEffect(() => {
     columnRotation.value = withSpring(searchColumns === 2 ? 90 : 0, {
@@ -85,11 +110,47 @@ const SearchPage = () => {
   useFocusEffect(
     useCallback(() => {
       // console.log("IN FOcus", searchValue);
-      if (!searchValue) {
+      if (!searchValue && !deeplinkShowId) {
         inputRef.current?.focus();
       }
-    }, [])
+    }, [deeplinkShowId, searchValue])
   );
+
+  useEffect(() => {
+    if (!storesHydrated) return;
+    if (!deeplinkShowId) {
+      openedShowId.current = null;
+      return;
+    }
+    if (openedShowId.current === deeplinkShowId) return;
+    const title = deeplinkTitle || movieDetails?.title;
+    if (!title && !(shouldLookupTitle && isError && !isLoading)) return;
+
+    openedShowId.current = deeplinkShowId;
+    if (title) {
+      setSearchType("title");
+      setSearch(title);
+    }
+    const showId = deeplinkShowId;
+    setTimeout(() => {
+      router.setParams({ deeplinkShowId: "", deeplinkTitle: "" });
+      router.push({
+        pathname: "/search/[showId]",
+        params: { showId },
+      });
+    }, 0);
+  }, [
+    storesHydrated,
+    deeplinkShowId,
+    deeplinkTitle,
+    isError,
+    isLoading,
+    movieDetails?.title,
+    router,
+    setSearch,
+    setSearchType,
+    shouldLookupTitle,
+  ]);
 
   // const routeFocused = useIsFocused();
   // useEffect(() => {
